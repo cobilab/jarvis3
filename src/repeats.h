@@ -9,44 +9,34 @@
 #define MAX_BUF          2000000
 #define SCACHE           32
 #define NSYM             4
-#define MAXC             65535 //((1<<(sizeof(uint16_t)*8))-1)
+#define MAXC             ((1<<(sizeof(uint16_t)*8))-1)
 #define DEF_MRM          50
-#define DEF_CTX          16
+#define DEF_KMER         11
 #define DEF_ALPHA        1
 #define DEF_GAMMA        0.2
 #define DEF_BETA         0.90
-#define DEF_LIMIT        5
+#define DEF_LIMIT        7
 #define DEF_REV          0
 #define DEF_MODE         0
-#define INIWEIGHT        0.999
+#define INIWEIGHT        0.01
 
-#define HSIZE        16777259 // NEXT PRIME AFTER 16777216 (24 BITS)
-#define MAX_CTX      20       // ((HASH_SIZE (24 B) + KEY (16 B))>>1) = 20 
-
-typedef uint8_t      HCP;   
 typedef uint32_t     POS_PREC;   
 
-#define MAX_HASH_COL ((1<<(sizeof(HCP)*8))-1)
-
-typedef struct{
-  uint16_t key;      // THE KEY (INDEX / HASHSIZE) STORED IN THIS RENTRY
-  HCP      nPos;     // NUMBER OF POSITIONS FOR THIS RENTRY
-  POS_PREC *pos;     // THE LAST (NEAREST) REPEATING POSITION
+typedef struct
+  {
+  POS_PREC *array;         // ARRAY WITH POSITIONS AND INDEX
+  uint32_t nPos;           // NUMBER OF POSITIONS (CACHE)
+  uint32_t current_pos;    // CURRENT POSITION
+  uint32_t size;           // ARRAY_SIZE
   }
-RENTRY;
-
-typedef struct{
-  uint32_t *size;    // NUMBER OF KEYS FOR EACH RENTRY
-  RENTRY   **ent;    // ENTRIES VECTORS POINTERS
-  uint64_t max_c;
-  }
-RHASH;
+RTABLE;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // REPEAT MODELS TO HANDLE LONG SEGMENTS. DATA SUBSTITUTIONS DO NOT AFFECT THE
 // PERFORMANCE SO MUCH AS IN CONTEXT MODELS.
 //
-typedef struct{
+typedef struct
+  {
   uint64_t idx;      // CURRENT CONTEXT INDEX
   uint64_t idxRev;   // CURRENT INVERTED REPEAT INDEX
   uint64_t mult;     // CURRENT INVERTED REPEAT INDEX
@@ -64,7 +54,8 @@ typedef struct{
   }
 RPARAM;
 
-typedef struct{
+typedef struct
+  {
   uint64_t pos;      // POSITION OF THE SYMBOL
   uint32_t nHits;    // NUMBER OF TIMES THIS MODEL WAS CORRECT
   uint32_t nTries;   // NUMBER OF TIMES THIS MODEL WAS USED
@@ -77,8 +68,9 @@ typedef struct{
   }
 RMODEL;
 
-typedef struct{
-  RHASH    *hash;    // REPEATING KMERS HASH TABLE
+typedef struct
+  {
+  RTABLE   *table;   // REPEATING KMERS TABLE
   RMODEL   *RM;      // POINTER FOR EACH OF THE MULTIPLE REPEAT MODELS
   RPARAM   *P;       // EXTRA PARAMETERS FOR REPEAT MODELS
   uint32_t nRM;      // CURRENT NUMBER OF REPEAT MODELS
@@ -96,11 +88,7 @@ RCLASS    *CreateRC          (uint32_t, double, double, uint32_t, uint32_t,
                              double, uint8_t, double, uint64_t);
 uint64_t  GetIdxRev          (uint8_t *, RCLASS *);
 uint64_t  GetIdx             (uint8_t *, RCLASS *);
-uint64_t  GetTIdxRev         (RCLASS *, uint8_t);
-uint64_t  GetTIdx            (RCLASS *, uint8_t, uint8_t);
-RENTRY    *GetHEnt           (RCLASS *, uint64_t);
 int32_t   StartRM            (RCLASS *, uint32_t, uint64_t, uint8_t);
-void      RemoveKmerPos      (RCLASS *, uint8_t *);
 void      InsertKmerPos      (RCLASS *, uint64_t, POS_PREC);
 void      ComputeRMProbs     (RCLASS *, RMODEL *, uint8_t *);
 void      UpdateRM           (RMODEL *, uint8_t *, uint8_t);

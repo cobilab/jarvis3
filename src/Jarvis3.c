@@ -324,11 +324,8 @@ void Compress(PARAM *P, char *fn){
         if(CM[r]->edits != 0)
           UpdateTolerantModel(CM[r]->TM, PM[++c], sym);
 
-      for(r = 0 ; r < P->nRModels ; ++r){
-	if(RC[r]->P->c_max != 0) 
-	  RemoveKmerPos(RC[r], buf);
+      for(r = 0 ; r < P->nRModels ; ++r)
         UpdateWeights(RC[r], buf, sym);
-        }
 
       UpdateCBuffer(SB);
       }
@@ -574,11 +571,8 @@ void Decompress(char *fn){
         if(CM[r]->edits != 0)
           UpdateTolerantModel(CM[r]->TM, PM[++c], sym);
 
-      for(r = 0 ; r < P->nRModels ; ++r){
+      for(r = 0 ; r < P->nRModels ; ++r)
         UpdateWeights(RC[r], buf, sym);
-        if(RC[r]->P->c_max != 0) 
-	  RemoveKmerPos(RC[r], buf);
-        }
 
       UpdateCBuffer(SB);
       }
