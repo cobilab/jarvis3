@@ -13,43 +13,43 @@
 </div>
 
 <p align="center"><img src="imgs/logo.png" 
-alt="JARVIS2" width="300" border="0" /></p>
-<p align="center"><b>JARVIS2: a data compressor for large genome sequences</b></p>
+alt="JARVIS3" width="300" border="0" /></p>
+<p align="center"><b>JARVIS3: an improved encoder for biological sequences</b></p>
 
 ### Installation ###
 
 <pre>
-git clone https://github.com/cobilab/jarvis2.git
-cd jarvis2/src/
+git clone https://github.com/cobilab/jarvis3.git
+cd jarvis3/src/
 make
 </pre>
 
 ### Execution ###
 
-#### Run JARVIS2 ####
+#### Run JARVIS3 ####
 
-Run JARVIS2 using level 9:
+Run JARVIS3 using level 9:
 
 <pre>
-./JARVIS2 -v -l 9 File.seq
+./JARVIS3 -v -l 9 File.seq
 </pre>
 
 ### Parameters ###
 
 To see the possible options type
 <pre>
-./JARVIS2 -h
+./JARVIS3 -h
 </pre>
 
 This will print the following options:
 ```
 
 SYNOPSIS                                                           
-      ./JARVIS2 [OPTION]... [FILE]                                 
+      ./JARVIS3 [OPTION]... [FILE]                                 
                                                                    
 SAMPLE                                                             
-      Run Compression   -> ./JARVIS2 -v -l 30 sequence.txt          
-      Run Decompression -> ./JARVIS2 -v -d sequence.txt.jc         
+      Run Compression   -> ./JARVIS3 -v -l 30 sequence.txt          
+      Run Decompression -> ./JARVIS3 -v -d sequence.txt.jc         
                                                                    
 DESCRIPTION                                                        
       Lossless compression and decompression of genomic            
@@ -105,7 +105,7 @@ DESCRIPTION
 
 To see the possible levels (automatic choosen compression parameters), type:
 <pre>
-./JARVIS2 -s
+./JARVIS3 -s
 </pre>
 
 This will ouput th following pre-set models for each 33 levels:
@@ -147,7 +147,7 @@ Level 33: -lr 0.03 -hs 42 -rm 200:12:1:0.9:7:0.8:1:0.01:250000 -cm 7:1:0:0.9/0:0
 
 To see the meaning of the model parameters, type:
 <pre>
-./JARVIS2 -x
+./JARVIS3 -x
 </pre>
 This will output the following content:
 <pre>
@@ -249,42 +249,42 @@ This will output the following content:
 
 First, make sure to give permitions to the script by typing the following at the src/ folder
 <pre>
-chmod +x JARVIS2.sh
+chmod +x JARVIS3.sh
 </pre>
 
 The extension of compressing FASTA and FASTQ data contains a menu to expose the parameters that can be accessed using:
 <pre>
-./JARVIS2.sh --help
+./JARVIS3.sh --help
 </pre>
 
-Preparing JARVIS2 for FASTA and FASTQ:
+Preparing JARVIS3 for FASTA and FASTQ:
 <pre>
-./JARVIS2.sh --install
+./JARVIS3.sh --install
 </pre>
 
 Compression of FASTA data:
 <pre>
-./JARVIS2.sh --threads 8 --fasta --block 10MB --input sample.fa
+./JARVIS3.sh --threads 8 --fasta --block 10MB --input sample.fa
 </pre>
 
 Decompression of FASTA data:
 <pre>
-./JARVIS2.sh --decompress --fasta --threads 4 --input sample.fa.tar
+./JARVIS3.sh --decompress --fasta --threads 4 --input sample.fa.tar
 </pre>
 
 Compression of FASTQ data:
 <pre>
-./JARVIS2.sh --threads 8 --fastq --block 40MB --input sample.fq
+./JARVIS3.sh --threads 8 --fastq --block 40MB --input sample.fq
 </pre>
 
 Decompression of FASTQ data:
 <pre>
-./JARVIS2.sh --decompress --fastq --threads 4 --input sample.fq.tar
+./JARVIS3.sh --decompress --fastq --threads 4 --input sample.fq.tar
 </pre>
 
 ### Benchmark ###
 
-JARVIS2 has been tested in two large benchmarks, namely the:
+JARVIS3 has been tested in two large benchmarks, namely the:
 
 1. Human genome (T2T Chm13 version 2.0 [<a href="https://doi.org/10.1126/science.abj6987">article</a>,<a href="https://s3-us-west-2.amazonaws.com/human-pangenomics/T2T/CHM13/assemblies/analysis_set/chm13v2.0.fa.gz">sequence</a>])
 <pre>
@@ -298,7 +298,7 @@ https://github.com/cobilab/CassavaGenome
 
 #### Performance #### 
 
-Currently, as far as we know, JARVIS2 holds the record on the higher compressibility for both genomes.
+Currently, as far as we know, JARVIS3 holds the record on the higher compressibility for both genomes.
 
 ### Citation ###
 
@@ -308,7 +308,7 @@ In progress...
 
 #### Issues ###
 
-For any issue let us know at [issues link](https://github.com/cobilab/jarvis2/issues).
+For any issue let us know at [issues link](https://github.com/cobilab/JARVIS3/issues).
 
 ### License ###
 
