@@ -51,7 +51,7 @@ double g, uint8_t i, double w, uint64_t s)
 
   // TABLE
   C->T           = (RTABLE *) Calloc(1, sizeof(RTABLE));
-  C->T->nPos     = 5;
+  C->T->nPos     = s;
   C->T->nPosAnd1 = C->T->nPos + 1;
   C->T->size     = pow(NSYM, C->P->ctx) * C->T->nPosAnd1;
   C->T->array    = (POS_PREC *) Calloc(C->T->size + 1, sizeof(POS_PREC));

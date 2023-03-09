@@ -93,9 +93,9 @@ void ModelsExplanation(void){
   "              use of this sub-program increases the necessary time \n"
   "              to compress but it does not affect the RAM.          \n"
   "      [NB_W]: (real (0;1)) initial weight for the repeat class.    \n"
-  "      [NB_Y]: (integer {0}, [50;*]) repeat cache size. This will   \n"
-  "              use a cache of entries while hashing. Value '0' will \n"
-  "              use the whole sequence length.                       \n"
+  "      [NB_Y]: (integer {0}, [1;50]) maximum cache size. This will  \n"
+  "              use a table cache with the specified size. The size  \n"
+  "              must be in balance with the k-mer size [NB_C].       \n"
   "                                                                   \n");
   } 
 
