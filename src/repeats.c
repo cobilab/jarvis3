@@ -79,15 +79,16 @@ uint64_t GetIdx(uint8_t *p, RCLASS *C){
 int32_t StartRM(RCLASS *C, uint32_t m, uint64_t i, uint8_t r)
   {
   POS_PREC *E = &C->T->array[i * C->T->nPosAnd1];
+  uint32_t last = E[C->T->nPos];
 
-  if(E[C->T->nPos] == 0) return 0;
+  if(last == 0) return 0;
 
   uint64_t idx = rand() % C->T->nPos; 
 
   if(r == 0) // REGULAR REPEAT
     {
     if(E[idx] == 0)
-      C->RM[m].pos = E[E[C->T->nPos]]; // IF POSITION 0 THEN USE LATEST  
+      C->RM[m].pos = E[last]; // IF POSITION 0 THEN USE LATEST  
     else 
       C->RM[m].pos = E[idx];
     }
@@ -127,8 +128,8 @@ void AddKmerPos(RCLASS *C, uint64_t key, POS_PREC pos)
     }
   else
     {
-    TC[idx + 1] = pos;
-    TC[C->T->nPos] = idx + 1;
+    TC[++idx] = pos;
+    TC[C->T->nPos] = idx;
     }
   
   return;
