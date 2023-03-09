@@ -254,13 +254,15 @@ void Compress(PARAM *P, char *fn){
       p = &SB->buf[SB->idx-1];
 
       c = 0;
-      for(r = 0 ; r < P->nCModels ; ++r){       // FOR ALL CMODELS
+      for(r = 0 ; r < P->nCModels ; ++r)       // FOR ALL CMODELS
+	{
         CMODEL *FCM = CM[r];
         GetPModelIdx(p, FCM);
         ComputePModel(FCM, PM[c], FCM->pModelIdx, FCM->alphaDen, 
 	freqs[c], &sums[c]);
         ComputeWeightedFreqs(WM->weight[c], PM[c], PT, NSYM);
-        if(FCM->edits != 0){
+        if(FCM->edits != 0)
+	  {
 	  ++c;
           FCM->TM->seq->buf[FCM->TM->seq->idx] = sym;
           FCM->TM->idx = GetPModelIdxCorr(FCM->TM->seq->buf+
@@ -272,10 +274,11 @@ void Compress(PARAM *P, char *fn){
         ++c;
         }
 
-      for(r = 0 ; r < P->nRModels ; ++r){             // FOR ALL REPEAT MODELS
+      for(r = 0 ; r < P->nRModels ; ++r)              // FOR ALL REPEAT MODELS
+	{
         StopRM           (RC[r]);
         StartMultipleRMs (RC[r], p);
-        InsertKmerPos    (RC[r], RC[r]->P->idx, pos);        // pos = (i<<2)+n
+        AddKmerPos       (RC[r], RC[r]->P->idx, pos);        // pos = (i<<2)+n
 	RenormWeights    (RC[r]);
         ComputeMixture   (RC[r], MX_RM[r], buf);
 	}
@@ -500,25 +503,30 @@ void Decompress(char *fn){
       p = &SB->buf[SB->idx-1];
 
       c = 0;
-      for(r = 0 ; r < P->nCModels ; ++r){       // FOR ALL CMODELS
+      for(r = 0 ; r < P->nCModels ; ++r)      // FOR ALL CMODELS
+	{
         CMODEL *FCM = CM[r];
         GetPModelIdx(p, FCM);
-        ComputePModel(FCM, PM[c], FCM->pModelIdx, FCM->alphaDen, freqs[c], &sums[c]);
+        ComputePModel(FCM, PM[c], FCM->pModelIdx, FCM->alphaDen, 
+	freqs[c], &sums[c]);
         ComputeWeightedFreqs(WM->weight[c], PM[c], PT, NSYM);
-        if(FCM->edits != 0){
+        if(FCM->edits != 0)
+	  {
 	  ++c;
           FCM->TM->idx = GetPModelIdxCorr(FCM->TM->seq->buf+
           FCM->TM->seq->idx-1, FCM, FCM->TM->idx);
-          ComputePModel(FCM, PM[c], FCM->TM->idx, FCM->TM->den, freqs[c], &sums[c]);
+          ComputePModel(FCM, PM[c], FCM->TM->idx, FCM->TM->den, 
+	  freqs[c], &sums[c]);
           ComputeWeightedFreqs(WM->weight[c], PM[c], PT, FCM->nSym);
           }
 	++c;
         }
 
-      for(r = 0 ; r < P->nRModels ; ++r){
+      for(r = 0 ; r < P->nRModels ; ++r)
+        {
         StopRM           (RC[r]);
         StartMultipleRMs (RC[r], p);
-        InsertKmerPos    (RC[r], RC[r]->P->idx, pos);        // pos = (i<<2)+n
+        AddKmerPos       (RC[r], RC[r]->P->idx, pos);        // pos = (i<<2)+n
         RenormWeights    (RC[r]);
         ComputeMixture   (RC[r], MX_RM[r], buf);
         }

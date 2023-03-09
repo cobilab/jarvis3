@@ -49,10 +49,12 @@ double g, uint8_t i, double w, uint64_t s)
   C->P->c_idxRev = 0;
   C->P->iWeight  = w;
 
-  C->table        = (RTABLE *) Calloc(1, sizeof(RTABLE));
-  C->table->nPos  = 10;
-  C->table->size  = pow(4, C->P->ctx) * (C->table->nPos + 1);
-  C->table->array = (POS_PREC *) Calloc(C->table->size, sizeof(POS_PREC));
+  // TABLE
+  C->T           = (RTABLE *) Calloc(1, sizeof(RTABLE));
+  C->T->nPos     = 5;
+  C->T->size     = pow(NSYM, C->P->ctx) * C->T->nPos;
+  C->T->array    = (POS_PREC *) Calloc(C->T->size + 1, sizeof(POS_PREC));
+  C->T->index    = (IDX_PREC *) Calloc(C->T->size + 1, sizeof(IDX_PREC));
 
   return C;
   }
@@ -76,12 +78,21 @@ uint64_t GetIdx(uint8_t *p, RCLASS *C){
 //
 int32_t StartRM(RCLASS *C, uint32_t m, uint64_t i, uint8_t r)
   {
-  POS_PREC *E = &C->table->array[i * C->table->nPos];
+  uint32_t pointer = i * C->T->nPos;
+  POS_PREC *E = &C->T->array[pointer];
+  IDX_PREC *I = &C->T->index[pointer];
 
-  uint64_t idx = rand() % C->table->nPos; 
+  if(E[I[0]] == 0) return 0;
+
+  uint64_t idx = rand() % C->T->nPos; 
 
   if(r == 0) // REGULAR REPEAT
-    C->RM[m].pos = E[idx];
+    {
+    if(E[idx] == 0)
+      C->RM[m].pos = E[I[0]]; // IF POSITION 0 THEN USE LATEST  
+    else 
+      C->RM[m].pos = E[idx];
+    }
   else // INVERTED REPEAT
     {
     if(E[idx] <= C->P->ctx+1) 
@@ -104,23 +115,25 @@ int32_t StartRM(RCLASS *C, uint32_t m, uint64_t i, uint8_t r)
   }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// INSERT KMER POSITION INTO RHASH TABLE 
+// ADD KMER POSITION INTO RTABLE 
 //
-void InsertKmerPos(RCLASS *C, uint64_t key, POS_PREC pos)
+void AddKmerPos(RCLASS *C, uint64_t key, POS_PREC pos)
   {
-  POS_PREC *TC = &C->table->array[key * C->table->nPos];
-  POS_PREC index_max = C->table->nPos - 1;
-  POS_PREC index_pos = TC[index_max];
+  uint32_t pointer = key * C->T->nPos;
+  POS_PREC *TC = &C->T->array[pointer];
+  IDX_PREC *TI = &C->T->index[pointer];
 
-  if(index_pos == index_max)
+  IDX_PREC index = TI[0];
+
+  if(index == C->T->nPos)
     {
     TC[0] = pos;
-    TC[index_max] = 0;
+    TI[0] = 0;
     }
   else
     {
-    TC[index_pos + 1] = pos;
-    TC[index_max] = index_pos + 1;
+    TC[index + 1] = pos;
+    TI[0] = index + 1;
     }
   
   return;
@@ -135,10 +148,13 @@ void ComputeRMProbs(RCLASS *C, RMODEL *R, uint8_t *b){
   
   s = (R->rev != 0) ? CompNum(GetNBase(b, R->pos)) : GetNBase(b, R->pos);
 
-  R->probs[s] = (R->nHits+C->P->alpha) / (R->nTries+2*C->P->alpha);  //TODO: SPACE FOR OPT >>1
+  R->probs[s] = (R->nHits+C->P->alpha) / (R->nTries+2*C->P->alpha);  
+  //TODO: SPACE FOR OPT >>1
+  
   for(n = 0 ; n < 4 ; ++n)
     if(n != s){
-      R->probs[n] = (1-R->probs[s])/3;                     //TODO: SPACE FOR OPT (complement... and FOR)
+      R->probs[n] = (1-R->probs[s])/3;                     
+      //TODO: SPACE FOR OPT (complement... and FOR)
       }
 
   return;
@@ -243,8 +259,8 @@ void ComputeMixture(RCLASS *C, PMODEL *M, uint8_t *b)
   
   for(r = 0 ; r < C->nRM ; ++r)
     {
-    double rmw = C->RM[r].weight;
     ComputeRMProbs(C, &C->RM[r], b);
+    double rmw = C->RM[r].weight;
     F[0] += C->RM[r].probs[0] * rmw;
     F[1] += C->RM[r].probs[1] * rmw;
     F[2] += C->RM[r].probs[2] * rmw;
@@ -252,7 +268,7 @@ void ComputeMixture(RCLASS *C, PMODEL *M, uint8_t *b)
     }
 
   M->sum = 0;
-  M->sum += (M->freqs[0] = 1 + (uint32_t)(F[0] * MAXC)); // SHIFT <<  WITH 2^ TO MAXC?
+  M->sum += (M->freqs[0] = 1 + (uint32_t)(F[0] * MAXC)); // <<  WITH 2^ TO MAXC?
   M->sum += (M->freqs[1] = 1 + (uint32_t)(F[1] * MAXC));
   M->sum += (M->freqs[2] = 1 + (uint32_t)(F[2] * MAXC));
   M->sum += (M->freqs[3] = 1 + (uint32_t)(F[3] * MAXC));

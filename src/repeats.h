@@ -20,12 +20,15 @@
 #define DEF_MODE         0
 #define INIWEIGHT        0.01
 
-typedef uint32_t     POS_PREC;   
+typedef uint32_t     POS_PREC; 
+typedef uint16_t     IDX_PREC; 
 
 typedef struct
   {
-  POS_PREC *array;         // ARRAY WITH POSITIONS AND INDEX
+  POS_PREC *array;         // ARRAY WITH POSITIONS
+  IDX_PREC *index;         // ARRAY WITH INDEXES
   uint32_t nPos;           // NUMBER OF POSITIONS (CACHE)
+  uint32_t nPosAnd1;       // NUMBER OF POSITIONS (CACHE) PLUS ONE (INDEXES)
   uint32_t current_pos;    // CURRENT POSITION
   uint32_t size;           // ARRAY_SIZE
   }
@@ -70,7 +73,7 @@ RMODEL;
 
 typedef struct
   {
-  RTABLE   *table;   // REPEATING KMERS TABLE
+  RTABLE   *T;       // REPEATING KMERS TABLE
   RMODEL   *RM;      // POINTER FOR EACH OF THE MULTIPLE REPEAT MODELS
   RPARAM   *P;       // EXTRA PARAMETERS FOR REPEAT MODELS
   uint32_t nRM;      // CURRENT NUMBER OF REPEAT MODELS
@@ -89,7 +92,7 @@ RCLASS    *CreateRC          (uint32_t, double, double, uint32_t, uint32_t,
 uint64_t  GetIdxRev          (uint8_t *, RCLASS *);
 uint64_t  GetIdx             (uint8_t *, RCLASS *);
 int32_t   StartRM            (RCLASS *, uint32_t, uint64_t, uint8_t);
-void      InsertKmerPos      (RCLASS *, uint64_t, POS_PREC);
+void      AddKmerPos         (RCLASS *, uint64_t, POS_PREC);
 void      ComputeRMProbs     (RCLASS *, RMODEL *, uint8_t *);
 void      UpdateRM           (RMODEL *, uint8_t *, uint8_t);
 void      RenormWeights      (RCLASS *);
