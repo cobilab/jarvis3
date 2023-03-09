@@ -21,15 +21,12 @@
 #define INIWEIGHT        0.01
 
 typedef uint32_t     POS_PREC; 
-typedef uint16_t     IDX_PREC; 
 
 typedef struct
   {
   POS_PREC *array;         // ARRAY WITH POSITIONS
-  IDX_PREC *index;         // ARRAY WITH INDEXES
   uint32_t nPos;           // NUMBER OF POSITIONS (CACHE)
   uint32_t nPosAnd1;       // NUMBER OF POSITIONS (CACHE) PLUS ONE (INDEXES)
-  uint32_t current_pos;    // CURRENT POSITION
   uint32_t size;           // ARRAY_SIZE
   }
 RTABLE;

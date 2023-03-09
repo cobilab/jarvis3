@@ -52,9 +52,9 @@ double g, uint8_t i, double w, uint64_t s)
   // TABLE
   C->T           = (RTABLE *) Calloc(1, sizeof(RTABLE));
   C->T->nPos     = 5;
-  C->T->size     = pow(NSYM, C->P->ctx) * C->T->nPos;
+  C->T->nPosAnd1 = C->T->nPos + 1;
+  C->T->size     = pow(NSYM, C->P->ctx) * C->T->nPosAnd1;
   C->T->array    = (POS_PREC *) Calloc(C->T->size + 1, sizeof(POS_PREC));
-  C->T->index    = (IDX_PREC *) Calloc(C->T->size + 1, sizeof(IDX_PREC));
 
   return C;
   }
@@ -78,18 +78,16 @@ uint64_t GetIdx(uint8_t *p, RCLASS *C){
 //
 int32_t StartRM(RCLASS *C, uint32_t m, uint64_t i, uint8_t r)
   {
-  uint32_t pointer = i * C->T->nPos;
-  POS_PREC *E = &C->T->array[pointer];
-  IDX_PREC *I = &C->T->index[pointer];
+  POS_PREC *E = &C->T->array[i * C->T->nPosAnd1];
 
-  if(E[I[0]] == 0) return 0;
+  if(E[C->T->nPos] == 0) return 0;
 
   uint64_t idx = rand() % C->T->nPos; 
 
   if(r == 0) // REGULAR REPEAT
     {
     if(E[idx] == 0)
-      C->RM[m].pos = E[I[0]]; // IF POSITION 0 THEN USE LATEST  
+      C->RM[m].pos = E[E[C->T->nPos]]; // IF POSITION 0 THEN USE LATEST  
     else 
       C->RM[m].pos = E[idx];
     }
@@ -119,21 +117,18 @@ int32_t StartRM(RCLASS *C, uint32_t m, uint64_t i, uint8_t r)
 //
 void AddKmerPos(RCLASS *C, uint64_t key, POS_PREC pos)
   {
-  uint32_t pointer = key * C->T->nPos;
-  POS_PREC *TC = &C->T->array[pointer];
-  IDX_PREC *TI = &C->T->index[pointer];
+  POS_PREC *TC = &C->T->array[key * C->T->nPosAnd1];
+  uint32_t idx = TC[C->T->nPos];
 
-  IDX_PREC index = TI[0];
-
-  if(index == C->T->nPos)
+  if(idx == C->T->nPos)
     {
     TC[0] = pos;
-    TI[0] = 0;
+    TC[C->T->nPos] = 0;
     }
   else
     {
-    TC[index + 1] = pos;
-    TI[0] = index + 1;
+    TC[idx + 1] = pos;
+    TC[C->T->nPos] = idx + 1;
     }
   
   return;
