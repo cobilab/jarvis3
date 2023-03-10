@@ -226,10 +226,11 @@ void StopRM(RCLASS *C)
   uint32_t n, a;
   do
     {
-    a = 0;
-    for(n = 0 ; n < C->nRM ; ++n)
-      if((C->RM[n].acting = C->RM[n].acting * C->P->beta + C->RM[n].lastHit) > 
-      C->P->limit || C->RM[n].pos == 0)
+    for(a = 0, n = 0 ; n < C->nRM ; ++n)
+      {
+      RMODEL *R = &C->RM[n];
+      if((R->acting = R->acting * C->P->beta + R->lastHit) > C->P->limit || 
+	  R->pos == 0)
         {
         if(n != C->nRM-1)
           C->RM[n] = C->RM[C->nRM-1];
@@ -237,6 +238,7 @@ void StopRM(RCLASS *C)
         a = 1;
         break;
         }
+      }
     }
   while(a);
 
@@ -274,12 +276,13 @@ void ComputeMixture(RCLASS *C, PMODEL *M, uint8_t *b)
   
   for(r = 0 ; r < C->nRM ; ++r)
     {
-    ComputeRMProbs(C, &C->RM[r], b);
-    double rmw = C->RM[r].weight;
-    F[0] += C->RM[r].probs[0] * rmw;
-    F[1] += C->RM[r].probs[1] * rmw;
-    F[2] += C->RM[r].probs[2] * rmw;
-    F[3] += C->RM[r].probs[3] * rmw;
+    RMODEL *R = &C->RM[r];
+    ComputeRMProbs(C, R, b);
+    double rmw = R->weight;
+    F[0] += R->probs[0] * rmw;
+    F[1] += R->probs[1] * rmw;
+    F[2] += R->probs[2] * rmw;
+    F[3] += R->probs[3] * rmw;
     }
 
   M->sum  = (M->freqs[0] = 1 + (uint32_t)(F[0] * MAXC));
