@@ -249,7 +249,7 @@ void StopRM(RCLASS *C)
 // START NEW REPEAT MODELS IF THERE IS STILL SPACE
 //                         
 void StartMultipleRMs(RCLASS *C, uint8_t *b)
-  {  
+  {
   uint64_t idx = GetIdx(b, C); // DO NOT SET IT INSIDE THE NEXT IF!
 			       
   if(C->P->rev != 2)
@@ -271,10 +271,9 @@ void StartMultipleRMs(RCLASS *C, uint8_t *b)
 //
 void ComputeMixture(RCLASS *C, PMODEL *M, uint8_t *b)
   {
-  uint32_t r; 
   double F[4] = {0,0,0,0};
   
-  for(r = 0 ; r < C->nRM ; ++r)
+  for(uint32_t r = 0 ; r < C->nRM ; ++r)
     {
     RMODEL *R = &C->RM[r];
     ComputeRMProbs(C, R, b);
@@ -298,12 +297,11 @@ void ComputeMixture(RCLASS *C, PMODEL *M, uint8_t *b)
 //
 void UpdateWeights(RCLASS *C, uint8_t *b, uint8_t s)
   {
-  uint32_t r;
-
-  for(r = 0 ; r < C->nRM ; ++r)
+  for(uint32_t r = 0 ; r < C->nRM ; ++r)
     {
-    C->RM[r].weight = Power(C->RM[r].weight, C->P->gamma) * C->RM[r].probs[s];
-    UpdateRM(&C->RM[r], b, s);
+    RMODEL *R = &C->RM[r];
+    R->weight = Power(R->weight, C->P->gamma) * R->probs[s];
+    UpdateRM(R, b, s);
     }
 
   return;
