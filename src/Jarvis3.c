@@ -60,7 +60,6 @@ void EncodeHeader(PARAM *P, RCLASS **RC, CMODEL **CM, FILE *F){
   WriteNBits(P->nRModels,                           NRMODELS_BITS, F);
   for(n = 0 ; n < P->nRModels ; ++n){
     WriteNBits(RC[n]->mRM,                       MAX_RMODELS_BITS, F);
-    WriteNBits((uint16_t)(RC[n]->P->alpha * 65534),    ALPHA_BITS, F);
     WriteNBits((uint16_t)(RC[n]->P->beta  * 65534),     BETA_BITS, F);
     WriteNBits((uint16_t)(RC[n]->P->gamma * 65534),    GAMMA_BITS, F);
     WriteNBits((uint16_t)(RC[n]->P->iWeight * 65534), WEIGHT_BITS, F);
@@ -94,7 +93,6 @@ void EncodeHeader(PARAM *P, RCLASS **RC, CMODEL **CM, FILE *F){
   for(n = 0 ; n < P->nRModels ; ++n){
     printf("  class %u\n",        n);
     printf("    max rep = %u\n",  RC[n]->mRM);
-    printf("    alpha   = %g\n",  RC[n]->P->alpha);
     printf("    beta    = %g\n",  RC[n]->P->beta);
     printf("    gamma   = %g\n",  RC[n]->P->gamma);
     printf("    weight  = %g\n",  RC[n]->P->iWeight);
@@ -219,9 +217,9 @@ void Compress(PARAM *P, char *fn){
 
   RC = (RCLASS **) Malloc(P->nRModels * sizeof(RCLASS *));
   for(n = 0 ; n < P->nRModels ; ++n){
-    RC[n] = CreateRC(P->rmodel[n].nr,    P->rmodel[n].alpha,  P->rmodel[n].beta,  
-                     P->rmodel[n].limit, P->rmodel[n].ctx,    P->rmodel[n].gamma,
-                     P->rmodel[n].ir,    P->rmodel[n].weight, P->rmodel[n].cache);
+    RC[n] = CreateRC(P->rmodel[n].nr, P->rmodel[n].beta,  
+            P->rmodel[n].limit, P->rmodel[n].ctx, P->rmodel[n].gamma,
+            P->rmodel[n].ir, P->rmodel[n].weight, P->rmodel[n].cache);
     }
 
   P->length = NBytesInFile(IN);
@@ -421,7 +419,6 @@ void Decompress(char *fn){
   RC = (RCLASS **) Malloc(P->nRModels * sizeof(RCLASS *));
   for(n = 0 ; n < P->nRModels ; ++n){
     uint32_t  m = ReadNBits(              MAX_RMODELS_BITS, IN);
-    double    a = ReadNBits(                    ALPHA_BITS, IN) / 65534.0;
     double    b = ReadNBits(                     BETA_BITS, IN) / 65534.0;
     double    g = ReadNBits(                    GAMMA_BITS, IN) / 65534.0;
     double    w = ReadNBits(                   WEIGHT_BITS, IN) / 65534.0;
@@ -429,7 +426,7 @@ void Decompress(char *fn){
     uint32_t  c = ReadNBits(                      CTX_BITS, IN);
     uint8_t   r = ReadNBits(                       IR_BITS, IN);
     uint64_t  s = ReadNBits(                    CACHE_BITS, IN);
-    RC[n] = CreateRC(m, a, b, l, c, g, r, w, s);
+    RC[n] = CreateRC(m, b, l, c, g, r, w, s);
     }
 
   #ifdef DEBUG
@@ -456,7 +453,6 @@ void Decompress(char *fn){
   for(n = 0 ; n < P->nRModels ; ++n){
     printf("  class %u\n",              n + 1);
     printf("    max rep = %u\n",        RC[n]->mRM);
-    printf("    alpha   = %g\n",        RC[n]->P->alpha);
     printf("    beta    = %g\n",        RC[n]->P->beta);
     printf("    gamma   = %g\n",        RC[n]->P->gamma);
     printf("    weight  = %g\n",        RC[n]->P->iWeight);

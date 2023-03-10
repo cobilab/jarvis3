@@ -94,28 +94,28 @@ CModelPar ArgsUniqCModel(char *str, uint8_t type){
 
 RModelPar ArgsUniqRModel(char *str, uint8_t type){
   uint32_t   m, ctx, limit, ir;
-  uint64_t   cache;
-  double     alpha, beta, gamma, weight;
+  uint32_t   cache;
+  double     beta, gamma, weight;
   RModelPar  Mp;
 
-  if(sscanf(str, "%u:%u:%lf:%lf:%u:%lf:%u:%lf:%lu", 
-  &m, &ctx, &alpha, &beta, &limit, &gamma, &ir, &weight, &cache) == 9){
+  if(sscanf(str, "%u:%u:%lf:%u:%lf:%u:%lf:%u", 
+  &m, &ctx, &beta, &limit, &gamma, &ir, &weight, &cache) == 8){
 
-    if(m      >  100000  || m      <  1       ||
-       ctx    >  MAX_CTX || ctx    <  MIN_CTX ||
-       alpha  >  50      || alpha  <= 0       || 
-       beta   >= 1       || beta   <= 0       ||
-       limit  >  21      || limit  <= 0       ||
-       gamma  >= 1       || gamma  <= 0       ||
-       ir     >  2       || weight <= 0       ||
-       weight >= 1       || (cache  < MIN_CACHE && cache != 0)){
-       FailModelScheme();
-       exit(1);
-       }
+    if(m      >  100000   || m      <  1       ||
+       ctx    >  MAX_RCTX || ctx    <  MIN_CTX ||
+       beta   >= 1        || beta   <= 0       ||
+       limit  >  21       || limit  <= 0       ||
+       gamma  >= 1        || gamma  <= 0       ||
+       ir     >  2        || weight <= 0       ||
+       weight >= 1        || cache  <  1       ||
+       cache  > MAX_CACHE)
+         {
+         FailModelScheme();
+         exit(1);
+         }
        
     Mp.nr     = m;
     Mp.ctx    = ctx;
-    Mp.alpha  = ((int)(alpha  * 65534)) / 65534.0;
     Mp.beta   = ((int)(beta   * 65534)) / 65534.0;
     Mp.gamma  = ((int)(gamma  * 65534)) / 65534.0;
     Mp.weight = ((int)(weight * 65534)) / 65534.0;
@@ -186,8 +186,6 @@ void PrintArgs(PARAM *P){
     P->rmodel[n].nr);
     fprintf(stderr, "  [+] Context order ................ %u\n",
     P->rmodel[n].ctx);
-    fprintf(stderr, "  [+] Alpha ........................ %.3lf\n",
-    P->rmodel[n].alpha);
     fprintf(stderr, "  [+] Beta ......................... %.3lf\n",
     P->rmodel[n].beta);
     fprintf(stderr, "  [+] Gamma ........................ %.3lf\n", 
@@ -198,11 +196,8 @@ void PrintArgs(PARAM *P){
     InvName(P->rmodel[n].ir);
     fprintf(stderr, "  [+] Init weight .................. %.3lf\n",
     P->rmodel[n].weight);
-    if(P->rmodel[n].cache != 0)
-      fprintf(stderr, "  [+] Cache ........................ %"PRIu64"\n",
-      P->rmodel[n].cache);
-    else
-      fprintf(stderr, "  [+] Cache ........................ (seq size)\n");
+    fprintf(stderr, "  [+] Cache ........................ %u\n",
+    P->rmodel[n].cache);
     }
 
   fprintf(stderr, "Target file ........................ %s\n", P->tar); 

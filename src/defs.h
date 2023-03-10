@@ -16,12 +16,11 @@ typedef struct{
   uint32_t nr;
   uint32_t ctx;
   uint32_t ir;
-  double   alpha;
   double   beta;
   int32_t  limit;
   double   gamma;
   double   weight;
-  uint64_t cache;
+  uint32_t cache;
   }
 RModelPar;
 
@@ -83,9 +82,11 @@ PARAM;
 #define DEFAULT_LR             0.03
 #define MAX_LEVEL              37
 #define MIN_LEVEL              1
-#define MAX_CTX                20
+#define MAX_CTX                14
+#define MAX_RCTX               13
 #define MIN_CTX                1
 #define MIN_CACHE              1
+#define MAX_CACHE              7
 #define MAX_DEN                1000000
 #define MIN_DEN                1
 #define BGUARD                 32
@@ -95,7 +96,6 @@ PARAM;
 #define CHECKSUMGF             1073741824
 #define WATERMARK              16042014
 #define DEFAULT_GAMMA          0.90
-#define MAX_HISTORYSIZE        50
 #define MAX_STR                2048
 #define REFERENCE              1
 #define TARGET                 0

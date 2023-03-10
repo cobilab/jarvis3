@@ -7,7 +7,6 @@
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 #define MAX_BUF          2000000
-#define SCACHE           32
 #define NSYM             4
 #define MAXC             ((1<<(sizeof(uint16_t)*8))-1)
 #define DEF_MRM          50
@@ -19,6 +18,7 @@
 #define DEF_REV          0
 #define DEF_MODE         0
 #define INIWEIGHT        0.01
+#define MAX_LT           200
 
 typedef uint32_t     POS_PREC; 
 
@@ -42,7 +42,6 @@ typedef struct
   uint64_t mult;     // CURRENT INVERTED REPEAT INDEX
   uint32_t ctx;      // CONTEXT TEMPLATE SIZE FOR REPEAT MODEL
   uint32_t limit;    // REPEAT PERFORMANCE LIMIT, ASSOCIATED WITH BETA
-  double   alpha;    // ALPHA PROBABILITY ESTIMATOR
   double   beta;     // REPEAT PERFORMANCE DECAYING FOR REPEAT MOVE
   double   gamma;    // PERFORMANCE DECAYING PARAMETER
   uint8_t  rev;      // INVERTED REPEAT USAGE [HEAVY -> MEMORY/TIME]
@@ -82,9 +81,8 @@ RCLASS;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-void      ShiftRBuf          (uint8_t *, int32_t, uint8_t);
 uint8_t   GetNBase           (uint8_t *, uint64_t);
-RCLASS    *CreateRC          (uint32_t, double, double, uint32_t, uint32_t, 
+RCLASS    *CreateRC          (uint32_t, double, uint32_t, uint32_t, 
                              double, uint8_t, double, uint64_t);
 uint64_t  GetIdxRev          (uint8_t *, RCLASS *);
 uint64_t  GetIdx             (uint8_t *, RCLASS *);
