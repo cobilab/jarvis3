@@ -140,18 +140,17 @@ void AddKmerPos(RCLASS *C, uint64_t key, POS_PREC pos)
 //
 void ComputeRMProbs(RCLASS *C, RMODEL *R, uint8_t *b){
   
-  uint8_t n, s;
-  
+  uint8_t s;
   s = (R->rev != 0) ? CompNum(GetNBase(b, R->pos)) : GetNBase(b, R->pos);
 
   R->probs[s] = (R->nHits+C->P->alpha) / (R->nTries+2*C->P->alpha);  
   //TODO: SPACE FOR OPT >>1
   
-  for(n = 0 ; n < 4 ; ++n)
-    if(n != s){
-      R->probs[n] = (1-R->probs[s])/3;                     
-      //TODO: SPACE FOR OPT (complement... and FOR)
-      }
+  double comp_prob = (1-R->probs[s])/3;
+  if(0 != s) R->probs[0] = comp_prob;
+  if(1 != s) R->probs[1] = comp_prob;
+  if(2 != s) R->probs[2] = comp_prob;
+  if(3 != s) R->probs[3] = comp_prob;
 
   return;
   }
