@@ -135,6 +135,146 @@ void UpdateCModels(CMODEL **CM, CBUF *SB, uint8_t sym, uint32_t nCModels){
 
   return;
   }
+  
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// COMPRESSION RMs ONLY
+//
+void CompressRMsOnly(PARAM *P, char *fn){
+  FILE      *IN  = Fopen(fn, "r"), *OUT = Fopen(Cat(fn, ".jc"), "w");
+  uint64_t  i = 0, mSize = MAX_BUF, pos = 0, r = 0;
+  uint32_t  m, n, q, j, c;
+  uint8_t   t[NSYM], *buf = (uint8_t *) Calloc(mSize, sizeof(uint8_t)), sym = 0, 
+            *p; 
+
+  RCLASS    **RC;
+  PMODEL    **PM;
+  PMODEL    *MX_CM;
+  PMODEL    **MX_RM;
+  FPMODEL   *PT;
+  CMWEIGHT  *WM;
+  CBUF      *SB;
+
+  srand(0);
+
+  if(P->verbose)
+    fprintf(stderr, "Analyzing data and creating models ...\n");
+ 
+  if(P->nRModels < 1){
+    fprintf(stderr, "Error: At least one repeat model must be set!\n");
+    exit(1);    
+    }
+
+  P->nCPModels = P->nRModels; // FOR MIXING
+
+  // NEURAL NETWORK INITIALIZATION
+  int nmodels = P->nCPModels + 1;
+  float **probs = calloc(nmodels, sizeof(float *));
+  for(n = 0 ; n < nmodels ; ++n)
+    probs[n] = calloc(NSYM, sizeof(float));
+  long **freqs = calloc(P->nCPModels, sizeof(long *));
+  for(n = 0 ; n < P->nCPModels ; ++n)
+    freqs[n] = calloc(NSYM, sizeof(long));
+  long *sums = calloc(P->nCPModels, sizeof(long));
+  mix_state_t *mxs = mix_init(nmodels, NSYM, P->hs);
+
+  PM      = (PMODEL **) Calloc(P->nCPModels, sizeof(PMODEL *));
+  for(n = 0 ; n < P->nCPModels ; ++n)
+    PM[n] = CreatePModel(NSYM);
+  MX_RM   = (PMODEL **) Calloc(P->nRModels, sizeof(PMODEL *));
+  for(n = 0 ; n < P->nRModels ; ++n)
+    MX_RM[n] = CreatePModel(NSYM);
+  PT      = CreateFloatPModel(NSYM);
+  WM      = CreateWeightModel(P->nCPModels);
+  SB      = CreateCBuffer(BUFFER_SIZE, BGUARD);
+
+  RC = (RCLASS **) Malloc(P->nRModels * sizeof(RCLASS *));
+  for(n = 0 ; n < P->nRModels ; ++n){
+    RC[n] = CreateRC(P->rmodel[n].nr, P->rmodel[n].beta,  
+            P->rmodel[n].limit, P->rmodel[n].ctx, P->rmodel[n].gamma,
+            P->rmodel[n].ir, P->rmodel[n].weight, P->rmodel[n].cache);
+    }
+
+  P->length = NBytesInFile(IN);
+
+  if(P->length > 4294967295){
+    fprintf(stderr, "Error: DNA sequence larger than 2^32.\n");
+    fprintf(stderr, "Tip: Use split to separate data into buckets...\n");
+    exit(1);
+    }
+
+  P->size = P->length>>2;
+
+  if(P->verbose){
+    fprintf(stderr, "Done!\n");
+    fprintf(stderr, "Compressing %"PRIu64" symbols ...\n", P->length);
+    }
+
+  startoutputtingbits();
+  start_encode();
+  //TODO: EncodeHeaderRMsOnly(P, RC, CM, OUT);
+
+  while((m = fread(t, sizeof(uint8_t), NSYM, IN)) == NSYM)
+    {
+    buf[i] = S2N(t[3])|(S2N(t[2])<<2)|(S2N(t[1])<<4)|(S2N(t[0])<<6); // PACK 4
+    
+    for(n = 0 ; n < m ; ++n){
+
+      SB->buf[SB->idx] = sym = S2N(t[n]);
+
+      memset((void *)PT->freqs, 0, NSYM * sizeof(double));
+      p = &SB->buf[SB->idx-1];
+      
+      for(r = 0 ; r < P->nRModels ; ++r)              // FOR ALL REPEAT MODELS
+	{
+        StopRM           (RC[r]);
+        StartMultipleRMs (RC[r], p);
+        AddKmerPos       (RC[r], RC[r]->P->idx, pos);        // pos = (i<<2)+n
+	RenormWeights    (RC[r]);
+        ComputeMixture   (RC[r], MX_RM[r], buf);
+	}
+
+      ++pos;
+      AESym(sym, (int *) (MX_RM[0]->freqs), (int) MX_RM[0]->sum, OUT);
+
+      for(r = 0 ; r < P->nRModels ; ++r)
+        UpdateWeights(RC[r], buf, sym);
+
+      UpdateCBuffer(SB);
+      }
+
+    if(++i == mSize)    // REALLOC BUFFER ON OVERFLOW 4 STORE THE COMPLETE SEQ
+      buf = (uint8_t *) Realloc(buf, (mSize+=mSize) * sizeof(uint8_t));
+
+    Progress(P->size, i); 
+    }
+
+  WriteNBits(m, 8, OUT);
+  for(n = 0 ; n < m ; ++n)
+    WriteNBits(S2N(t[n]), 8, OUT);        // ENCODE REMAINING SYMBOLS
+
+  fprintf(stderr, "Done!                                               \n");
+  fprintf(stderr, "Compression: %"PRIu64" -> %"PRIu64" ( %.6g bpb )\n", 
+  P->length, (uint64_t) _bytes_output, (double) _bytes_output*8.0 / P->length);
+  fprintf(stderr, "Ratio: %6lf\n",  (double) P->length / _bytes_output);
+
+  finish_encode(OUT);
+  doneoutputtingbits(OUT);
+
+  /*
+  mix_free(mxs);
+  free(sums);
+  for (n = 0; n < P->nCPModels; ++n)
+    free(freqs[n]);
+  free(freqs);
+  for(n = 0; n < nmodels; ++n)
+    free(probs[n]);
+  free(probs);
+*/
+
+  fclose(IN);
+  fclose(OUT);
+  }
+
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // COMPRESSION
@@ -161,7 +301,7 @@ void Compress(PARAM *P, char *fn){
     fprintf(stderr, "Analyzing data and creating models ...\n");
  
   if(P->nCModels + P->nRModels < 1){
-    fprintf(stderr, "Error: At least one context or one repeat model must be set!\n");
+    fprintf(stderr, "Error: At least one context or repeat model must be set!\n");
     exit(1);    
     }
 
@@ -712,7 +852,10 @@ int main(int argc, char **argv){
   if(!P->mode){
     if(P->verbose) PrintArgs(P);
     fprintf(stderr, "Compressing ...\n"); 
-    Compress(P, argv[argc-1]);
+    if(P->nRModels == 1 && P->nCModels == 0) 
+      CompressRMsOnly(P, argv[argc-1]);
+    else
+      Compress(P, argv[argc-1]);
     }
   else{
     fprintf(stderr, "Decompressing ...\n"); 
