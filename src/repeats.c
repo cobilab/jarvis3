@@ -186,7 +186,7 @@ void UpdateRM(RMODEL *R, uint8_t *b, uint8_t s)
     {
     if(GetNBase(b, R->pos++) == s)
       {
-      R->nHits++;
+      ++R->nHits;
       R->lastHit = 0;
       }
     }
@@ -194,12 +194,12 @@ void UpdateRM(RMODEL *R, uint8_t *b, uint8_t s)
     {
     if(CompNum(GetNBase(b, R->pos--)) == s)
       {
-      R->nHits++;
+      ++R->nHits;
       R->lastHit = 0;
       }
     }
 
-  R->nTries++;
+  ++R->nTries;
   return;
   }
 

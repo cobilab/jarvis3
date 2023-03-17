@@ -80,7 +80,7 @@ PARAM;
 #define DEFAULT_LEVEL          30
 #define DEFAULT_HS             40
 #define DEFAULT_LR             0.03
-#define MAX_LEVEL              37
+#define MAX_LEVEL              21
 #define MIN_LEVEL              1
 #define MAX_CTX                14
 #define MAX_RCTX               13
