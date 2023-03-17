@@ -824,8 +824,6 @@ int main(int argc, char **argv){
 		 MIN_LEVEL, MAX_LEVEL);
   P->mode      = ArgState(DEF_MODE,  p, argc, "-d", "--decompress"); 
 
-  P->lr = ((int)(P->lr * 65534)) / 65534.0;
-  
   for(n = 1 ; n < argc ; ++n){
     if(strcmp(argv[n], "-cm") == 0){
       P->nCModels++;
@@ -852,8 +850,18 @@ int main(int argc, char **argv){
         P->nRModels++;
         P->nModels++;
         }
+
+      if(strcmp(xargv[n], "-hs") == 0){
+        P->hs = atoi(xargv[n+1]);
+	}
+      
+      if(strcmp(xargv[n], "-lr") == 0){
+        P->lr = atof(xargv[n+1]);
+        }
       }
     }
+
+  P->lr = ((int)(P->lr * 65534)) / 65534.0;
 
   if(P->nModels == 0 && !P->mode){
     MsgNoModels();

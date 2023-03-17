@@ -77,10 +77,10 @@ PARAM;
 #define DEFAULT_HELP           0
 #define DEFAULT_VERBOSE        0
 #define DEFAULT_FORCE          0
-#define DEFAULT_LEVEL          30
+#define DEFAULT_LEVEL          8
 #define DEFAULT_HS             40
 #define DEFAULT_LR             0.03
-#define MAX_LEVEL              21
+#define MAX_LEVEL              24
 #define MIN_LEVEL              1
 #define MAX_CTX                14
 #define MAX_RCTX               13
