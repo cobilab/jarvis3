@@ -263,7 +263,223 @@ void CompressRMsOnly(PARAM *P, char *fn)
   fclose(IN);
   fclose(OUT);
   }
+  
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// COMPRESSION NO NN
+// 
+void CompressNoNN(PARAM *P, char *fn)
+  {
+  FILE      *IN  = Fopen(fn, "r"), *OUT = Fopen(Cat(fn, ".jc"), "w");
+  uint64_t  i = 0, mSize = MAX_BUF, pos = 0, r = 0;
+  uint32_t  m, n, q, j, c;
+  uint8_t   t[NSYM], *buf = (uint8_t *) Calloc(mSize, sizeof(uint8_t)), sym = 0, 
+            *p; 
 
+  RCLASS    **RC;
+  CMODEL    **CM;
+  PMODEL    **PM;
+  PMODEL    *MX_CM;
+  PMODEL    **MX_RM;
+  FPMODEL   *PT;
+  CMWEIGHT  *WM;
+  CBUF      *SB;
+
+  srand(0);
+
+  if(P->verbose)
+    fprintf(stderr, "Analyzing data and creating models ...\n");
+ 
+  if(P->nCModels + P->nRModels < 1){
+    fprintf(stderr, "Error: At least one model must be set!\n");
+    exit(1);    
+    }
+
+  #ifdef ESTIMATE
+  FILE *IAE = NULL;
+  char *IAEName = NULL;
+  if(P->estim == 1){
+    IAEName = Cat(fn, ".info");
+    IAE = Fopen(IAEName, "w");
+    }
+  #endif
+
+  // EXTRA MODELS DERIVED FROM TOLERANT CONTEXT MODELS
+  P->nCPModels = P->nCModels;
+  for(n = 0 ; n < P->nCModels ; ++n)
+    if(P->cmodel[n].edits != 0)
+      P->nCPModels += 1;
+  P->nCPModels += P->nRModels; // FOR MIXING
+
+  // NEURAL NETWORK INITIALIZATION
+  int nmodels = P->nCPModels + 1;
+  float **probs = calloc(nmodels, sizeof(float *));
+  for(n = 0 ; n < nmodels ; ++n)
+    probs[n] = calloc(NSYM, sizeof(float));
+  long **freqs = calloc(P->nCPModels, sizeof(long *));
+  for(n = 0 ; n < P->nCPModels ; ++n)
+    freqs[n] = calloc(NSYM, sizeof(long));
+  long *sums = calloc(P->nCPModels, sizeof(long));
+
+  PM      = (PMODEL **) Calloc(P->nCPModels, sizeof(PMODEL *));
+  for(n = 0 ; n < P->nCPModels ; ++n)
+    PM[n] = CreatePModel(NSYM);
+  MX_RM   = (PMODEL **) Calloc(P->nRModels, sizeof(PMODEL *));
+  for(n = 0 ; n < P->nRModels ; ++n)
+    MX_RM[n] = CreatePModel(NSYM);
+  MX_CM   = CreatePModel(NSYM);
+  PT      = CreateFloatPModel(NSYM);
+  WM      = CreateWeightModel(P->nCPModels);
+  SB      = CreateCBuffer(BUFFER_SIZE, BGUARD);
+
+  CM = (CMODEL **) Malloc(P->nCModels * sizeof(CMODEL *));
+  for(n = 0, r = 0; n < P->nCModels ; ++n){
+    CM[n] = CreateCModel(P->cmodel[n].ctx,   P->cmodel[n].den,  1,
+                         P->cmodel[n].edits, P->cmodel[n].eDen, NSYM,
+                         P->cmodel[n].gamma, P->cmodel[n].eGamma,
+                         P->cmodel[n].ir,    P->cmodel[n].eIr);
+    // GIVE SPECIFIC GAMMA TO EACH MODEL:
+    WM->gamma[r++] = CM[n]->gamma;
+    if(CM[n]->edits != 0)
+      WM->gamma[r++] = CM[n]->eGamma;
+    }
+
+  RC = (RCLASS **) Malloc(P->nRModels * sizeof(RCLASS *));
+  for(n = 0 ; n < P->nRModels ; ++n){
+    RC[n] = CreateRC(P->rmodel[n].nr, P->rmodel[n].beta,  
+            P->rmodel[n].limit, P->rmodel[n].ctx, P->rmodel[n].gamma,
+            P->rmodel[n].ir, P->rmodel[n].weight, P->rmodel[n].cache);
+    }
+
+  P->length = NBytesInFile(IN);
+
+  if(P->length > 4294967295){
+    fprintf(stderr, "Error: DNA sequence larger than 2^32.\n");
+    fprintf(stderr, "Tip: Use split to separate data into buckets...\n");
+    exit(1);
+    }
+
+  P->size = P->length>>2;
+
+  if(P->verbose){
+    fprintf(stderr, "Done!\n");
+    fprintf(stderr, "Compressing %"PRIu64" symbols ...\n", P->length);
+    }
+
+  startoutputtingbits();
+  start_encode();
+  EncodeHeader(P, RC, CM, OUT);
+
+  while((m = fread(t, sizeof(uint8_t), NSYM, IN)) == NSYM){
+    buf[i] = S2N(t[3])|(S2N(t[2])<<2)|(S2N(t[1])<<4)|(S2N(t[0])<<6); // PACK 4
+    
+    for(n = 0 ; n < m ; ++n){
+
+      SB->buf[SB->idx] = sym = S2N(t[n]);
+
+      memset((void *)PT->freqs, 0, NSYM * sizeof(double));
+      p = &SB->buf[SB->idx-1];
+
+      c = 0;
+      for(r = 0 ; r < P->nCModels ; ++r)       // FOR ALL CMODELS
+	{
+        CMODEL *FCM = CM[r];
+        GetPModelIdx(p, FCM);
+        ComputePModel(FCM, PM[c], FCM->pModelIdx, FCM->alphaDen, 
+	freqs[c], &sums[c]);
+        ComputeWeightedFreqs(WM->weight[c], PM[c], PT, NSYM);
+        if(FCM->edits != 0)
+	  {
+	  ++c;
+          FCM->TM->seq->buf[FCM->TM->seq->idx] = sym;
+          FCM->TM->idx = GetPModelIdxCorr(FCM->TM->seq->buf+
+          FCM->TM->seq->idx-1, FCM, FCM->TM->idx);
+          ComputePModel(FCM, PM[c], FCM->TM->idx, FCM->TM->den, 
+	  freqs[c], &sums[c]);
+          ComputeWeightedFreqs(WM->weight[c], PM[c], PT, FCM->nSym);
+          }
+        ++c;
+        }
+
+      for(r = 0 ; r < P->nRModels ; ++r)              // FOR ALL REPEAT MODELS
+	{
+        StopRM           (RC[r]);
+        StartMultipleRMs (RC[r], p);
+        AddKmerPos       (RC[r], RC[r]->P->idx, pos);        // pos = (i<<2)+n
+	RenormWeights    (RC[r]);
+        ComputeMixture   (RC[r], MX_RM[r], buf);
+	}
+
+      // PASS MX_RM[q] AS LAST MODEL AND SET IT AS PM[c]
+      for(j = c, q = 0 ; j < c + P->nRModels ; ++j, ++q){ // FOR * REPEAT MODELS
+        PM[j]->sum = 0;
+        for(r = 0 ; r < NSYM ; ++r){
+          PM[j]->freqs[r] = MX_RM[q]->freqs[r];
+	  freqs[j][r] = PM[j]->freqs[r];
+	  }
+	sums[j] = MX_RM[q]->sum;
+        PM[j]->sum = MX_RM[q]->sum;
+        ComputeWeightedFreqs(WM->weight[j], PM[j], PT, NSYM);
+        }
+
+      ComputeMXProbs(PT, MX_CM, NSYM);
+
+      ++pos;
+
+      AESym(sym, (int *) (MX_CM->freqs), (int) MX_CM->sum, OUT);
+      #ifdef ESTIMATE
+      if(P->estim != 0)
+        fprintf(IAE, "%.3g\n", PModelNats(MX_CM, sym) / M_LN2);
+      #endif
+
+      CalcDecayment(WM, PM, sym);
+      UpdateCModels(CM, SB, sym, P->nCModels);
+      RenormalizeWeights(WM);
+
+      for(r = 0, c = 0 ; r < P->nCModels ; ++r, ++c)
+        if(CM[r]->edits != 0)
+          UpdateTolerantModel(CM[r]->TM, PM[++c], sym);
+
+      for(r = 0 ; r < P->nRModels ; ++r)
+        UpdateWeights(RC[r], buf, sym);
+
+      UpdateCBuffer(SB);
+      }
+
+    if(++i == mSize)    // REALLOC BUFFER ON OVERFLOW 4 STORE THE COMPLETE SEQ
+      buf = (uint8_t *) Realloc(buf, (mSize+=mSize) * sizeof(uint8_t));
+
+    Progress(P->size, i); 
+    }
+
+  WriteNBits(m, 8, OUT);
+  for(n = 0 ; n < m ; ++n)
+    WriteNBits(S2N(t[n]), 8, OUT);        // ENCODE REMAINING SYMBOLS
+
+  fprintf(stderr, "Done!                                               \n");
+  fprintf(stderr, "Compression: %"PRIu64" -> %"PRIu64" ( %.6g bpb )\n", 
+  P->length, (uint64_t) _bytes_output, (double) _bytes_output*8.0 / P->length);
+  fprintf(stderr, "Ratio: %6lf\n",  (double) P->length / _bytes_output);
+
+  finish_encode(OUT);
+  doneoutputtingbits(OUT);
+
+  #ifdef ESTIMATE
+  if(P->estim == 1){
+    fclose(IAE);
+    Free(IAEName);
+    }
+  #endif
+
+  for (n = 0; n < P->nCPModels; ++n)
+    free(freqs[n]);
+  free(freqs);
+  for(n = 0; n < nmodels; ++n)
+    free(probs[n]);
+  free(probs);
+
+  fclose(IN);
+  fclose(OUT);
+  }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // COMPRESSION
@@ -290,7 +506,7 @@ void Compress(PARAM *P, char *fn){
     fprintf(stderr, "Analyzing data and creating models ...\n");
  
   if(P->nCModels + P->nRModels < 1){
-    fprintf(stderr, "Error: At least one context or repeat model must be set!\n");
+    fprintf(stderr, "Error: At least one model must be set!\n");
     exit(1);    
     }
 
@@ -702,7 +918,7 @@ void Decompress(char *fn)
           }
 
         // PASS MX_RM AS LAST MODEL AND SET IT AS PM[c]
-        for(j = c, q = 0 ; j < c + P->nRModels ; ++j, ++q){  // FOR ALL REPEAT MODELS
+        for(j = c, q = 0 ; j < c + P->nRModels ; ++j, ++q){       // FOR ALL RMs
           PM[j]->sum = 0;
           for(r = 0 ; r < NSYM ; ++r){
             PM[j]->freqs[r] = MX_RM[q]->freqs[r];
@@ -727,7 +943,7 @@ void Decompress(char *fn)
 
         ++pos;
 
-        sym = ArithDecodeSymbol(NSYM, (int *) MX_CM->freqs, (int) MX_CM->sum, IN);
+        sym = ArithDecodeSymbol(NSYM, (int *)MX_CM->freqs, (int)MX_CM->sum, IN);
         SB->buf[SB->idx] = sym;
       
         mix_update_state(mxs, probs, sym, P->lr);
@@ -898,7 +1114,8 @@ int main(int argc, char **argv){
     if(P->nRModels == 1 && P->nCModels == 0) 
       CompressRMsOnly(P, argv[argc-1]);
     else
-      Compress(P, argv[argc-1]);
+      //Compress(P, argv[argc-1]);
+      CompressNoNN(P, argv[argc-1]);
     }
   else{
     fprintf(stderr, "Decompressing ...\n"); 

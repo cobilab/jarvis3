@@ -3,6 +3,7 @@
 
 #include "defs.h"
 #include "pmodels.h"
+#include "cm.h"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -18,7 +19,7 @@
 #define DEF_REV          0
 #define DEF_MODE         0
 #define INIWEIGHT        0.01
-#define MAX_LT           200
+#define MAX_LT           250
 
 typedef uint32_t     POS_PREC; 
 
@@ -69,6 +70,8 @@ RMODEL;
 
 typedef struct
   {
+  uint8_t  cm;       // CONTEXT MODEL ACTIVE
+  CMODEL   *C;       // CONTEXT MODEL FOR COMPLEMENTAR SYMBOL PROBS 
   RTABLE   *T;       // REPEATING KMERS TABLE
   RMODEL   *RM;      // POINTER FOR EACH OF THE MULTIPLE REPEAT MODELS
   RPARAM   *P;       // EXTRA PARAMETERS FOR REPEAT MODELS

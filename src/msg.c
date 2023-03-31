@@ -5,7 +5,7 @@
 void ModelsExplanation(void){
   fprintf(stderr,
   "                                                                   \n"
-  "      -cm [NB_C]:[NB_D]:[NB_I]:[NB_G]/[NB_S]:[NB_E]:[NB_I]:[NB_A]  \n"
+  "      -cm [NB_C]:[NB_D]:[NB_I]:[NB_G]/[NB_S]:[NB_R]:[NB_E]:[NB_A]  \n"
   "      Template of a context model.                                 \n"
   "      Parameters:                                                  \n"
   "      [NB_C]: (integer [1;20]) order size of the regular context   \n"

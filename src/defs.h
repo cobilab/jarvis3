@@ -83,7 +83,7 @@ PARAM;
 #define MAX_LEVEL              24
 #define MIN_LEVEL              1
 #define MAX_CTX                14
-#define MAX_RCTX               13
+#define MAX_RCTX               14
 #define MIN_CTX                1
 #define MIN_CACHE              1
 #define MAX_CACHE              12

@@ -14,6 +14,7 @@
 double LT  [MAX_LT][MAX_LT];
 double LT_C[MAX_LT][MAX_LT];
 
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // GET NUMERICAL BASE FROM PACKED SEQUENCE BY ID. THE ID%4 IS GIVEN BY THE 2
 // LESS SIGNIFICATIVE BITS (ID&3).
@@ -69,6 +70,13 @@ double g, uint8_t i, double w, uint64_t s)
   C->T->array    = (POS_PREC *) Calloc(C->T->size + 1, sizeof(POS_PREC));
 
   FillLT();
+
+  // CONTEXT MODEL FOR COMPLEMENTAR PROBABILITIES
+  C->cm = 1; // AUTOMATIZE
+  //
+  if(C->cm == 1)
+    C->C = CreateCModel(2, 1, 1, 0, 0, 4, 0.9, 0.9, 0, 0);
+  // ctx, den, 1, edits, eDen, NSYM, gamma, eGamma, ir, eIr);
 
   return C;
   }
@@ -151,8 +159,8 @@ void AddKmerPos(RCLASS *C, uint64_t key, POS_PREC pos)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // COMPUTE REPEAT MODEL PROBABILITIES
 //
-void ComputeRMProbs(RCLASS *C, RMODEL *R, uint8_t *b){
- 
+void ComputeRMProbs(RCLASS *C, RMODEL *R, uint8_t *b)
+  {
   uint8_t s = (R->rev) ? CompNum(GetNBase(b, R->pos)) : GetNBase(b, R->pos);
   double comp_prob;	
 
@@ -172,6 +180,35 @@ void ComputeRMProbs(RCLASS *C, RMODEL *R, uint8_t *b){
   if(2 != s) R->probs[2] = comp_prob;
   if(3 != s) R->probs[3] = comp_prob;
   
+  return;
+  }
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// COMPUTE REPEAT MODEL PROBABILITIES WITH FCM FOR COMPLEMENTAR PROBABILITIES
+//
+void ComputeRMProbsCompFCMs(RCLASS *C, RMODEL *R, uint8_t *b)
+  {
+  uint8_t s = (R->rev) ? CompNum(GetNBase(b, R->pos)) : GetNBase(b, R->pos);
+  double comp_prob;
+
+  if(R->nTries < MAX_LT)
+    {
+    R->probs[s] = LT[R->nHits][R->nTries];
+    comp_prob = LT_C[R->nHits][R->nTries];
+    }
+  else
+    {
+    R->probs[s] = (R->nHits+1.0) / (R->nTries+2.0);
+    comp_prob = (1-R->probs[s])/3;
+    }
+
+  // TODO FCM HERE...
+
+  if(0 != s) R->probs[0] = comp_prob;
+  if(1 != s) R->probs[1] = comp_prob;
+  if(2 != s) R->probs[2] = comp_prob;
+  if(3 != s) R->probs[3] = comp_prob;
+
   return;
   }
 
@@ -254,13 +291,13 @@ void StartMultipleRMs(RCLASS *C, uint8_t *b)
 			       
   if(C->P->rev != 2)
     if(C->nRM < C->mRM && StartRM(C, C->nRM, idx, 0))
-      C->nRM++;
+      ++C->nRM;
 
   if(C->P->rev != 0)
     {
     uint64_t idx_rev = GetIdxRev(b, C);
     if(C->nRM < C->mRM && StartRM(C, C->nRM, idx_rev, 1))
-      C->nRM++;
+      ++C->nRM;
     }
 
   return;
