@@ -46,8 +46,8 @@ void EncodeHeaderOnlyRMs(PARAM *P, RCLASS **RC, FILE *F)
   WriteNBits((uint16_t)(P->lr * 65534),                   LR_BITS, F);
   WriteNBits(0,                                     NCMODELS_BITS, F);
   WriteNBits(P->nCPModels,                          NCMODELS_BITS, F);
-  WriteNBits(P->nRModels,                           NRMODELS_BITS, F);
-  for(n = 0 ; n < P->nRModels ; ++n){
+  WriteNBits(P->nRMClasses,                       NRMCLASSES_BITS, F);
+  for(n = 0 ; n < P->nRMClasses ; ++n){
     WriteNBits(RC[n]->mRM,                       MAX_RMODELS_BITS, F);
     WriteNBits((uint16_t)(RC[n]->P->beta  * 65534),     BETA_BITS, F);
     WriteNBits((uint16_t)(RC[n]->P->gamma * 65534),    GAMMA_BITS, F);
@@ -86,8 +86,8 @@ void EncodeHeader(PARAM *P, RCLASS **RC, CMODEL **CM, FILE *F)
       }
     }
   WriteNBits(P->nCPModels,                          NCMODELS_BITS, F);
-  WriteNBits(P->nRModels,                           NRMODELS_BITS, F);
-  for(n = 0 ; n < P->nRModels ; ++n){
+  WriteNBits(P->nRMClasses,                       NRMCLASSES_BITS, F);
+  for(n = 0 ; n < P->nRMClasses ; ++n){
     WriteNBits(RC[n]->mRM,                       MAX_RMODELS_BITS, F);
     WriteNBits((uint16_t)(RC[n]->P->beta  * 65534),     BETA_BITS, F);
     WriteNBits((uint16_t)(RC[n]->P->gamma * 65534),    GAMMA_BITS, F);
@@ -118,8 +118,8 @@ void EncodeHeader(PARAM *P, RCLASS **RC, CMODEL **CM, FILE *F)
       printf("      eIr    = %u\n", CM[n]->TM->ir);
       }
     }
-  printf("n class = %u\n",        P->nRModels);
-  for(n = 0 ; n < P->nRModels ; ++n){
+  printf("n class = %u\n",        P->nRMClasses);
+  for(n = 0 ; n < P->nRMClasses ; ++n){
     printf("  class %u\n",        n);
     printf("    max rep = %u\n",  RC[n]->mRM);
     printf("    beta    = %g\n",  RC[n]->P->beta);
@@ -185,18 +185,18 @@ void CompressRMsOnly(PARAM *P, char *fn)
   if(P->verbose)
     fprintf(stderr, "Analyzing data and creating models ...\n");
  
-  if(P->nRModels < 1){
-    fprintf(stderr, "Error: At least one repeat model must be set!\n");
+  if(P->nRMClasses < 1){
+    fprintf(stderr, "Error: At least one repeat class model must be set!\n");
     exit(1);    
     }
 
-  P->nCPModels = P->nRModels;
+  P->nCPModels = P->nRMClasses;
   
   MX_RM = CreatePModel(NSYM);
   SB    = CreateCBuffer(BUFFER_SIZE, BGUARD);
 
-  RC = (RCLASS **) Malloc(P->nRModels * sizeof(RCLASS *));
-  for(n = 0 ; n < P->nRModels ; ++n)
+  RC = (RCLASS **) Malloc(P->nRMClasses * sizeof(RCLASS *));
+  for(n = 0 ; n < P->nRMClasses ; ++n)
     RC[n] = CreateRC(P->rmodel[n].nr, P->rmodel[n].beta,  
             P->rmodel[n].limit, P->rmodel[n].ctx, P->rmodel[n].gamma,
             P->rmodel[n].ir, P->rmodel[n].weight, P->rmodel[n].cache);
@@ -289,7 +289,7 @@ void CompressNoNN(PARAM *P, char *fn)
   if(P->verbose)
     fprintf(stderr, "Analyzing data and creating models ...\n");
  
-  if(P->nCModels + P->nRModels < 1){
+  if(P->nCModels + P->nRMClasses < 1){
     fprintf(stderr, "Error: At least one model must be set!\n");
     exit(1);    
     }
@@ -308,9 +308,8 @@ void CompressNoNN(PARAM *P, char *fn)
   for(n = 0 ; n < P->nCModels ; ++n)
     if(P->cmodel[n].edits != 0)
       P->nCPModels += 1;
-  P->nCPModels += P->nRModels; // FOR MIXING
+  P->nCPModels += P->nRMClasses; // FOR MIXING
 
-  // NEURAL NETWORK INITIALIZATION
   int nmodels = P->nCPModels + 1;
   float **probs = calloc(nmodels, sizeof(float *));
   for(n = 0 ; n < nmodels ; ++n)
@@ -323,8 +322,8 @@ void CompressNoNN(PARAM *P, char *fn)
   PM      = (PMODEL **) Calloc(P->nCPModels, sizeof(PMODEL *));
   for(n = 0 ; n < P->nCPModels ; ++n)
     PM[n] = CreatePModel(NSYM);
-  MX_RM   = (PMODEL **) Calloc(P->nRModels, sizeof(PMODEL *));
-  for(n = 0 ; n < P->nRModels ; ++n)
+  MX_RM   = (PMODEL **) Calloc(P->nRMClasses, sizeof(PMODEL *));
+  for(n = 0 ; n < P->nRMClasses ; ++n)
     MX_RM[n] = CreatePModel(NSYM);
   MX_CM   = CreatePModel(NSYM);
   PT      = CreateFloatPModel(NSYM);
@@ -337,14 +336,13 @@ void CompressNoNN(PARAM *P, char *fn)
                          P->cmodel[n].edits, P->cmodel[n].eDen, NSYM,
                          P->cmodel[n].gamma, P->cmodel[n].eGamma,
                          P->cmodel[n].ir,    P->cmodel[n].eIr);
-    // GIVE SPECIFIC GAMMA TO EACH MODEL:
     WM->gamma[r++] = CM[n]->gamma;
     if(CM[n]->edits != 0)
       WM->gamma[r++] = CM[n]->eGamma;
     }
 
-  RC = (RCLASS **) Malloc(P->nRModels * sizeof(RCLASS *));
-  for(n = 0 ; n < P->nRModels ; ++n){
+  RC = (RCLASS **) Malloc(P->nRMClasses * sizeof(RCLASS *));
+  for(n = 0 ; n < P->nRMClasses ; ++n){
     RC[n] = CreateRC(P->rmodel[n].nr, P->rmodel[n].beta,  
             P->rmodel[n].limit, P->rmodel[n].ctx, P->rmodel[n].gamma,
             P->rmodel[n].ir, P->rmodel[n].weight, P->rmodel[n].cache);
@@ -400,19 +398,20 @@ void CompressNoNN(PARAM *P, char *fn)
         ++c;
         }
 
-      for(r = 0 ; r < P->nRModels ; ++r)              // FOR ALL REPEAT MODELS
+      for(r = 0 ; r < P->nRMClasses ; ++r)                // FOR ALL REPEAT MODELS
 	{
         StopRM           (RC[r]);
         StartMultipleRMs (RC[r], p);
-        AddKmerPos       (RC[r], RC[r]->P->idx, pos);        // pos = (i<<2)+n
+        AddKmerPos       (RC[r], RC[r]->P->idx, pos);          // pos = (i<<2)+n
 	RenormWeights    (RC[r]);
         ComputeMixture   (RC[r], MX_RM[r], buf);
 	}
 
-      // PASS MX_RM[q] AS LAST MODEL AND SET IT AS PM[c]
-      for(j = c, q = 0 ; j < c + P->nRModels ; ++j, ++q){ // FOR * REPEAT MODELS
+      for(j = c, q = 0 ; j < c + P->nRMClasses ; ++j, ++q)  // FOR * REPEAT MODELS
+        { 
         PM[j]->sum = 0;
-        for(r = 0 ; r < NSYM ; ++r){
+        for(r = 0 ; r < NSYM ; ++r)
+	  {
           PM[j]->freqs[r] = MX_RM[q]->freqs[r];
 	  freqs[j][r] = PM[j]->freqs[r];
 	  }
@@ -439,7 +438,7 @@ void CompressNoNN(PARAM *P, char *fn)
         if(CM[r]->edits != 0)
           UpdateTolerantModel(CM[r]->TM, PM[++c], sym);
 
-      for(r = 0 ; r < P->nRModels ; ++r)
+      for(r = 0 ; r < P->nRMClasses ; ++r)
         UpdateWeights(RC[r], buf, sym);
 
       UpdateCBuffer(SB);
@@ -505,7 +504,7 @@ void Compress(PARAM *P, char *fn){
   if(P->verbose)
     fprintf(stderr, "Analyzing data and creating models ...\n");
  
-  if(P->nCModels + P->nRModels < 1){
+  if(P->nCModels + P->nRMClasses < 1){
     fprintf(stderr, "Error: At least one model must be set!\n");
     exit(1);    
     }
@@ -524,7 +523,7 @@ void Compress(PARAM *P, char *fn){
   for(n = 0 ; n < P->nCModels ; ++n)
     if(P->cmodel[n].edits != 0)
       P->nCPModels += 1;
-  P->nCPModels += P->nRModels; // FOR MIXING
+  P->nCPModels += P->nRMClasses; // FOR MIXING
 
   // NEURAL NETWORK INITIALIZATION
   int nmodels = P->nCPModels + 1;
@@ -540,8 +539,8 @@ void Compress(PARAM *P, char *fn){
   PM      = (PMODEL **) Calloc(P->nCPModels, sizeof(PMODEL *));
   for(n = 0 ; n < P->nCPModels ; ++n)
     PM[n] = CreatePModel(NSYM);
-  MX_RM   = (PMODEL **) Calloc(P->nRModels, sizeof(PMODEL *));
-  for(n = 0 ; n < P->nRModels ; ++n)
+  MX_RM   = (PMODEL **) Calloc(P->nRMClasses, sizeof(PMODEL *));
+  for(n = 0 ; n < P->nRMClasses ; ++n)
     MX_RM[n] = CreatePModel(NSYM);
   MX_CM   = CreatePModel(NSYM);
   PT      = CreateFloatPModel(NSYM);
@@ -560,8 +559,8 @@ void Compress(PARAM *P, char *fn){
       WM->gamma[r++] = CM[n]->eGamma;
     }
 
-  RC = (RCLASS **) Malloc(P->nRModels * sizeof(RCLASS *));
-  for(n = 0 ; n < P->nRModels ; ++n){
+  RC = (RCLASS **) Malloc(P->nRMClasses * sizeof(RCLASS *));
+  for(n = 0 ; n < P->nRMClasses ; ++n){
     RC[n] = CreateRC(P->rmodel[n].nr, P->rmodel[n].beta,  
             P->rmodel[n].limit, P->rmodel[n].ctx, P->rmodel[n].gamma,
             P->rmodel[n].ir, P->rmodel[n].weight, P->rmodel[n].cache);
@@ -617,7 +616,7 @@ void Compress(PARAM *P, char *fn){
         ++c;
         }
 
-      for(r = 0 ; r < P->nRModels ; ++r)              // FOR ALL REPEAT MODELS
+      for(r = 0 ; r < P->nRMClasses ; ++r)              // FOR ALL REPEAT MODELS
 	{
         StopRM           (RC[r]);
         StartMultipleRMs (RC[r], p);
@@ -627,7 +626,7 @@ void Compress(PARAM *P, char *fn){
 	}
 
       // PASS MX_RM[q] AS LAST MODEL AND SET IT AS PM[c]
-      for(j = c, q = 0 ; j < c + P->nRModels ; ++j, ++q){ // FOR * REPEAT MODELS
+      for(j = c, q = 0 ; j < c + P->nRMClasses ; ++j, ++q){ // FOR * REPEAT MODELS
         PM[j]->sum = 0;
         for(r = 0 ; r < NSYM ; ++r){
           PM[j]->freqs[r] = MX_RM[q]->freqs[r];
@@ -670,7 +669,7 @@ void Compress(PARAM *P, char *fn){
         if(CM[r]->edits != 0)
           UpdateTolerantModel(CM[r]->TM, PM[++c], sym);
 
-      for(r = 0 ; r < P->nRModels ; ++r)
+      for(r = 0 ; r < P->nRMClasses ; ++r)
         UpdateWeights(RC[r], buf, sym);
 
       UpdateCBuffer(SB);
@@ -760,9 +759,9 @@ void Decompress(char *fn)
     }
   P->nCPModels = ReadNBits(                  NCMODELS_BITS, IN);
 
-  P->nRModels  = ReadNBits(                  NRMODELS_BITS, IN);
-  RC = (RCLASS **) Malloc(P->nRModels * sizeof(RCLASS *));
-  for(n = 0 ; n < P->nRModels ; ++n){
+  P->nRMClasses  = ReadNBits(              NRMCLASSES_BITS, IN);
+  RC = (RCLASS **) Malloc(P->nRMClasses * sizeof(RCLASS *));
+  for(n = 0 ; n < P->nRMClasses ; ++n){
     uint32_t  m = ReadNBits(              MAX_RMODELS_BITS, IN);
     double    b = ReadNBits(                     BETA_BITS, IN) / 65534.0;
     double    g = ReadNBits(                    GAMMA_BITS, IN) / 65534.0;
@@ -794,8 +793,8 @@ void Decompress(char *fn)
       printf("      eIr    = %u\n", CM[n]->TM->ir);
       }
     }
-  printf("n class = %u\n",        P->nRModels);
-  for(n = 0 ; n < P->nRModels ; ++n){
+  printf("n class = %u\n",        P->nRMClasses);
+  for(n = 0 ; n < P->nRMClasses ; ++n){
     printf("  class %u\n",              n + 1);
     printf("    max rep = %u\n",        RC[n]->mRM);
     printf("    beta    = %g\n",        RC[n]->P->beta);
@@ -808,7 +807,7 @@ void Decompress(char *fn)
     }
   #endif
     
-  if(P->nCModels == 0 && P->nRModels == 1)
+  if(P->nCModels == 0 && P->nRMClasses == 1)
     {
     PMODEL *MX_RM = CreatePModel(NSYM);
     SB = CreateCBuffer(BUFFER_SIZE, BGUARD);
@@ -852,146 +851,278 @@ void Decompress(char *fn)
     }
   else
     {
-    PM = (PMODEL **) Calloc(P->nCPModels, sizeof(PMODEL *));
-    for(n = 0 ; n < P->nCPModels ; ++n)
-      PM[n] = CreatePModel(NSYM);
-    PMODEL **MX_RM   = (PMODEL **) Calloc(P->nRModels, sizeof(PMODEL *));
-    for(n = 0 ; n < P->nRModels ; ++n)
-      MX_RM[n] = CreatePModel(NSYM);
-    MX_CM   = CreatePModel(NSYM);
-    PT      = CreateFloatPModel(NSYM);
-    WM      = CreateWeightModel(P->nCPModels);
-    SB      = CreateCBuffer(BUFFER_SIZE, BGUARD);
+    if(P->lr == 0)
+      {
+      PM = (PMODEL **) Calloc(P->nCPModels, sizeof(PMODEL *));
+      for(n = 0 ; n < P->nCPModels ; ++n)
+        PM[n] = CreatePModel(NSYM);
+      PMODEL **MX_RM   = (PMODEL **) Calloc(P->nRMClasses, sizeof(PMODEL *));
+      for(n = 0 ; n < P->nRMClasses ; ++n)
+        MX_RM[n] = CreatePModel(NSYM);
+      MX_CM   = CreatePModel(NSYM);
+      PT      = CreateFloatPModel(NSYM);
+      WM      = CreateWeightModel(P->nCPModels);
+      SB      = CreateCBuffer(BUFFER_SIZE, BGUARD);
 
-    // GIVE SPECIFIC GAMMA TO EACH MODEL:
-    for(n = 0, r = 0 ; n < P->nCModels ; ++n){
-      WM->gamma[r++] = CM[n]->gamma;
-      if(CM[n]->edits != 0)
-        WM->gamma[r++] = CM[n]->eGamma;
-      }
-
-    // NEURAL NETWORK INITIALIZATION
-    int nmodels = P->nCPModels + 1;
-    float **probs = calloc(nmodels, sizeof(float *));
-    for(n = 0 ; n < nmodels ; ++n)
-      probs[n] = calloc(NSYM, sizeof(float));
-    long **freqs = calloc(P->nCPModels, sizeof(long *));
-    for(n = 0 ; n < P->nCPModels ; ++n)
-      freqs[n] = calloc(NSYM, sizeof(long));
-    long *sums = calloc(P->nCPModels, sizeof(long));
-    mix_state_t *mxs = mix_init(nmodels, NSYM, P->hs);
-
-    while(i < P->size)
-      {                                       // NOT absolute size (CHAR SIZE)
-      for(n = 0 ; n < NSYM ; ++n)
-        {
-        memset((void *)PT->freqs, 0, NSYM * sizeof(double));
-        p = &SB->buf[SB->idx-1];
-
-        c = 0;
-        for(r = 0 ; r < P->nCModels ; ++r)                  // FOR ALL CMODELS
-          {
-          CMODEL *FCM = CM[r];
-          GetPModelIdx(p, FCM);
-          ComputePModel(FCM, PM[c], FCM->pModelIdx, FCM->alphaDen, 
-          freqs[c], &sums[c]);
-          ComputeWeightedFreqs(WM->weight[c], PM[c], PT, NSYM);
-          if(FCM->edits != 0)
-	    {
-	    ++c;
-            FCM->TM->idx = GetPModelIdxCorr(FCM->TM->seq->buf+
-            FCM->TM->seq->idx-1, FCM, FCM->TM->idx);
-            ComputePModel(FCM, PM[c], FCM->TM->idx, FCM->TM->den, 
-	    freqs[c], &sums[c]);
-            ComputeWeightedFreqs(WM->weight[c], PM[c], PT, FCM->nSym);
-            }
-	  ++c;
-          }
-
-        for(r = 0 ; r < P->nRModels ; ++r)
-          {
-          StopRM           (RC[r]);
-          StartMultipleRMs (RC[r], p);
-          AddKmerPos       (RC[r], RC[r]->P->idx, pos);        // pos = (i<<2)+n
-          RenormWeights    (RC[r]);
-          ComputeMixture   (RC[r], MX_RM[r], buf);
-          }
-
-        // PASS MX_RM AS LAST MODEL AND SET IT AS PM[c]
-        for(j = c, q = 0 ; j < c + P->nRModels ; ++j, ++q){       // FOR ALL RMs
-          PM[j]->sum = 0;
-          for(r = 0 ; r < NSYM ; ++r){
-            PM[j]->freqs[r] = MX_RM[q]->freqs[r];
-	    freqs[j][r] = PM[j]->freqs[r];
-	    }
-	  sums[j] = MX_RM[q]->sum;
-          PM[j]->sum = MX_RM[q]->sum;
-          ComputeWeightedFreqs(WM->weight[j], PM[j], PT, NSYM);
-          }
-
-        // FILL PROBABILITIES FOR ALL MODELS FOR NEURAL NETWORK
-        for(q = 0 ; q < P->nCPModels ; ++q)
-          for(j = 0 ; j < NSYM ; ++j)
-            probs[q][j] = (float)freqs[q][j]/sums[q];
-        for(j = 0 ; j < NSYM ; ++j)
-          probs[P->nCPModels][j] = PT->freqs[j];
-        const float *y = mix(mxs, probs);
-        for(q = 0 ; q < NSYM ; ++q)
-          PT->freqs[q] = y[q];
-
-        ComputeMXProbs(PT, MX_CM, NSYM);
-
-        ++pos;
-
-        sym = ArithDecodeSymbol(NSYM, (int *)MX_CM->freqs, (int)MX_CM->sum, IN);
-        SB->buf[SB->idx] = sym;
-      
-        mix_update_state(mxs, probs, sym, P->lr);
-
-        if(n == 0) buf[i] = sym<<6 ; else buf[i] |= (sym<<((3-n)<<1));
-        fputc(N2S(sym), OUT);
-
-        for(r = 0 ; r < P->nCModels ; ++r)
-          if(CM[r]->edits != 0)
-            CM[r]->TM->seq->buf[CM[r]->TM->seq->idx] = sym;
-
-        CalcDecayment(WM, PM, sym);
-
-        UpdateCModels(CM, SB, sym, P->nCModels);
-      
-        RenormalizeWeights(WM);
-
-        for(r = 0, c = 0 ; r < P->nCModels ; ++r, ++c)
-          if(CM[r]->edits != 0)
-            UpdateTolerantModel(CM[r]->TM, PM[++c], sym);
-
-        for(r = 0 ; r < P->nRModels ; ++r)
-          UpdateWeights(RC[r], buf, sym);
-
-        UpdateCBuffer(SB);
+      // GIVE SPECIFIC GAMMA TO EACH MODEL:
+      for(n = 0, r = 0 ; n < P->nCModels ; ++n){
+        WM->gamma[r++] = CM[n]->gamma;
+        if(CM[n]->edits != 0)
+          WM->gamma[r++] = CM[n]->eGamma;
         }
 
-      if(++i == mSize) // REALLOC BUFFER ON OVERFLOW 4 STORE THE COMPLETE SEQ
-        buf = (uint8_t *) Realloc(buf, (mSize+=mSize) * sizeof(uint8_t));
+      // NEURAL NETWORK INITIALIZATION
+      int nmodels = P->nCPModels + 1;
+      float **probs = calloc(nmodels, sizeof(float *));
+      for(n = 0 ; n < nmodels ; ++n)
+        probs[n] = calloc(NSYM, sizeof(float));
+      long **freqs = calloc(P->nCPModels, sizeof(long *));
+      for(n = 0 ; n < P->nCPModels ; ++n)
+        freqs[n] = calloc(NSYM, sizeof(long));
+      long *sums = calloc(P->nCPModels, sizeof(long));
 
-      Progress(P->size, i);
+      while(i < P->size)
+        {                                       // NOT absolute size (CHAR SIZE)
+        for(n = 0 ; n < NSYM ; ++n)
+          {
+          memset((void *)PT->freqs, 0, NSYM * sizeof(double));
+          p = &SB->buf[SB->idx-1];
+
+          c = 0;
+          for(r = 0 ; r < P->nCModels ; ++r)                  // FOR ALL CMODELS
+            {
+            CMODEL *FCM = CM[r];
+            GetPModelIdx(p, FCM);
+            ComputePModel(FCM, PM[c], FCM->pModelIdx, FCM->alphaDen, 
+            freqs[c], &sums[c]);
+            ComputeWeightedFreqs(WM->weight[c], PM[c], PT, NSYM);
+            if(FCM->edits != 0)
+	      {
+	      ++c;
+              FCM->TM->idx = GetPModelIdxCorr(FCM->TM->seq->buf+
+              FCM->TM->seq->idx-1, FCM, FCM->TM->idx);
+              ComputePModel(FCM, PM[c], FCM->TM->idx, FCM->TM->den, 
+	      freqs[c], &sums[c]);
+              ComputeWeightedFreqs(WM->weight[c], PM[c], PT, FCM->nSym);
+              }
+	    ++c;
+            }
+
+          for(r = 0 ; r < P->nRMClasses ; ++r)
+            {
+            StopRM           (RC[r]);
+            StartMultipleRMs (RC[r], p);
+            AddKmerPos       (RC[r], RC[r]->P->idx, pos);        // pos = (i<<2)+n
+            RenormWeights    (RC[r]);
+            ComputeMixture   (RC[r], MX_RM[r], buf);
+            }
+
+          // PASS MX_RM AS LAST MODEL AND SET IT AS PM[c]
+          for(j = c, q = 0 ; j < c + P->nRMClasses ; ++j, ++q){       // FOR ALL RMs
+            PM[j]->sum = 0;
+            for(r = 0 ; r < NSYM ; ++r){
+              PM[j]->freqs[r] = MX_RM[q]->freqs[r];
+	      freqs[j][r] = PM[j]->freqs[r];
+	      }
+            sums[j] = MX_RM[q]->sum;
+            PM[j]->sum = MX_RM[q]->sum;
+            ComputeWeightedFreqs(WM->weight[j], PM[j], PT, NSYM);
+            }
+
+          ComputeMXProbs(PT, MX_CM, NSYM);
+
+          ++pos;
+
+          SB->buf[SB->idx] = sym = ArithDecodeSymbol(NSYM, 
+          (int *)MX_CM->freqs, (int)MX_CM->sum, IN);
+
+          if(n == 0) buf[i] = sym<<6 ; else buf[i] |= (sym<<((3-n)<<1));
+          fputc(N2S(sym), OUT);
+
+          for(r = 0 ; r < P->nCModels ; ++r)
+            if(CM[r]->edits != 0)
+              CM[r]->TM->seq->buf[CM[r]->TM->seq->idx] = sym;
+
+          CalcDecayment(WM, PM, sym);
+
+          UpdateCModels(CM, SB, sym, P->nCModels);
+      
+          RenormalizeWeights(WM);
+
+          for(r = 0, c = 0 ; r < P->nCModels ; ++r, ++c)
+            if(CM[r]->edits != 0)
+              UpdateTolerantModel(CM[r]->TM, PM[++c], sym);
+
+          for(r = 0 ; r < P->nRMClasses ; ++r)
+            UpdateWeights(RC[r], buf, sym);
+
+          UpdateCBuffer(SB);
+          }
+
+        if(++i == mSize) // REALLOC BUFFER ON OVERFLOW 4 STORE THE COMPLETE SEQ
+          buf = (uint8_t *) Realloc(buf, (mSize+=mSize) * sizeof(uint8_t));
+
+        Progress(P->size, i);
+        }
+
+      m = ReadNBits(8, IN);
+      for(n = 0 ; n < m ; ++n)
+        fputc(N2S(ReadNBits(8, IN)), OUT);    // DECODE REMAINING SYMBOLS
+
+      finish_decode();
+      doneinputtingbits();
+
+      free(sums);
+      for (n = 0; n < P->nCPModels; ++n)
+        free(freqs[n]);
+      free(freqs);
+      for(n = 0; n < nmodels; ++n)
+        free(probs[n]);
+      free(probs);
       }
+    else
+      {  
+      PM = (PMODEL **) Calloc(P->nCPModels, sizeof(PMODEL *));
+      for(n = 0 ; n < P->nCPModels ; ++n)
+        PM[n] = CreatePModel(NSYM);
+      PMODEL **MX_RM   = (PMODEL **) Calloc(P->nRMClasses, sizeof(PMODEL *));
+      for(n = 0 ; n < P->nRMClasses ; ++n)
+        MX_RM[n] = CreatePModel(NSYM);
+      MX_CM   = CreatePModel(NSYM);
+      PT      = CreateFloatPModel(NSYM);
+      WM      = CreateWeightModel(P->nCPModels);
+      SB      = CreateCBuffer(BUFFER_SIZE, BGUARD);
 
-    m = ReadNBits(8, IN);
-    for(n = 0 ; n < m ; ++n)
-      fputc(N2S(ReadNBits(8, IN)), OUT);    // DECODE REMAINING SYMBOLS
+      // GIVE SPECIFIC GAMMA TO EACH MODEL:
+      for(n = 0, r = 0 ; n < P->nCModels ; ++n){
+        WM->gamma[r++] = CM[n]->gamma;
+        if(CM[n]->edits != 0)
+          WM->gamma[r++] = CM[n]->eGamma;
+        }
 
-    finish_decode();
-    doneinputtingbits();
+      // NEURAL NETWORK INITIALIZATION
+      int nmodels = P->nCPModels + 1;
+      float **probs = calloc(nmodels, sizeof(float *));
+      for(n = 0 ; n < nmodels ; ++n)
+        probs[n] = calloc(NSYM, sizeof(float));
+      long **freqs = calloc(P->nCPModels, sizeof(long *));
+      for(n = 0 ; n < P->nCPModels ; ++n)
+        freqs[n] = calloc(NSYM, sizeof(long));
+      long *sums = calloc(P->nCPModels, sizeof(long));
+      mix_state_t *mxs = mix_init(nmodels, NSYM, P->hs);
 
-    mix_free(mxs);
-    free(sums);
-    for (n = 0; n < P->nCPModels; ++n)
-      free(freqs[n]);
-    free(freqs);
-    for(n = 0; n < nmodels; ++n)
-      free(probs[n]);
-    free(probs);
+      while(i < P->size)
+        {                                       // NOT absolute size (CHAR SIZE)
+        for(n = 0 ; n < NSYM ; ++n)
+          {
+          memset((void *)PT->freqs, 0, NSYM * sizeof(double));
+          p = &SB->buf[SB->idx-1];
+
+          c = 0;
+          for(r = 0 ; r < P->nCModels ; ++r)                  // FOR ALL CMODELS
+            {
+            CMODEL *FCM = CM[r];
+            GetPModelIdx(p, FCM);
+            ComputePModel(FCM, PM[c], FCM->pModelIdx, FCM->alphaDen, 
+            freqs[c], &sums[c]);
+            ComputeWeightedFreqs(WM->weight[c], PM[c], PT, NSYM);
+            if(FCM->edits != 0)
+	      {
+	      ++c;
+              FCM->TM->idx = GetPModelIdxCorr(FCM->TM->seq->buf+
+              FCM->TM->seq->idx-1, FCM, FCM->TM->idx);
+              ComputePModel(FCM, PM[c], FCM->TM->idx, FCM->TM->den, 
+	      freqs[c], &sums[c]);
+              ComputeWeightedFreqs(WM->weight[c], PM[c], PT, FCM->nSym);
+              }
+	    ++c;
+            }
+
+          for(r = 0 ; r < P->nRMClasses ; ++r)
+            {
+            StopRM           (RC[r]);
+            StartMultipleRMs (RC[r], p);
+            AddKmerPos       (RC[r], RC[r]->P->idx, pos);        // pos = (i<<2)+n
+            RenormWeights    (RC[r]);
+            ComputeMixture   (RC[r], MX_RM[r], buf);
+            }
+
+          // PASS MX_RM AS LAST MODEL AND SET IT AS PM[c]
+          for(j = c, q = 0 ; j < c + P->nRMClasses ; ++j, ++q){       // FOR ALL RMs
+            PM[j]->sum = 0;
+            for(r = 0 ; r < NSYM ; ++r){
+              PM[j]->freqs[r] = MX_RM[q]->freqs[r];
+	      freqs[j][r] = PM[j]->freqs[r];
+	      }
+            sums[j] = MX_RM[q]->sum;
+            PM[j]->sum = MX_RM[q]->sum;
+            ComputeWeightedFreqs(WM->weight[j], PM[j], PT, NSYM);
+            }
+
+          // FILL PROBABILITIES FOR ALL MODELS FOR NEURAL NETWORK
+          for(q = 0 ; q < P->nCPModels ; ++q)
+            for(j = 0 ; j < NSYM ; ++j)
+              probs[q][j] = (float)freqs[q][j]/sums[q];
+          for(j = 0 ; j < NSYM ; ++j)
+            probs[P->nCPModels][j] = PT->freqs[j];
+          const float *y = mix(mxs, probs);
+          for(q = 0 ; q < NSYM ; ++q)
+            PT->freqs[q] = y[q];
+
+          ComputeMXProbs(PT, MX_CM, NSYM);
+
+          ++pos;
+
+          SB->buf[SB->idx] = sym = ArithDecodeSymbol(NSYM, 
+          (int *)MX_CM->freqs, (int)MX_CM->sum, IN);
+      
+          mix_update_state(mxs, probs, sym, P->lr);
+
+          if(n == 0) buf[i] = sym<<6 ; else buf[i] |= (sym<<((3-n)<<1));
+          fputc(N2S(sym), OUT);
+
+          for(r = 0 ; r < P->nCModels ; ++r)
+            if(CM[r]->edits != 0)
+              CM[r]->TM->seq->buf[CM[r]->TM->seq->idx] = sym;
+
+          CalcDecayment(WM, PM, sym);
+
+          UpdateCModels(CM, SB, sym, P->nCModels);
+      
+          RenormalizeWeights(WM);
+
+          for(r = 0, c = 0 ; r < P->nCModels ; ++r, ++c)
+            if(CM[r]->edits != 0)
+              UpdateTolerantModel(CM[r]->TM, PM[++c], sym);
+
+          for(r = 0 ; r < P->nRMClasses ; ++r)
+            UpdateWeights(RC[r], buf, sym);
+
+          UpdateCBuffer(SB);
+          }
+
+        if(++i == mSize) // REALLOC BUFFER ON OVERFLOW 4 STORE THE COMPLETE SEQ
+          buf = (uint8_t *) Realloc(buf, (mSize+=mSize) * sizeof(uint8_t));
+
+        Progress(P->size, i);
+        }
+
+      m = ReadNBits(8, IN);
+      for(n = 0 ; n < m ; ++n)
+        fputc(N2S(ReadNBits(8, IN)), OUT);    // DECODE REMAINING SYMBOLS
+
+      finish_decode();
+      doneinputtingbits();
+
+      mix_free(mxs);
+      free(sums);
+      for (n = 0; n < P->nCPModels; ++n)
+        free(freqs[n]);
+      free(freqs);
+      for(n = 0; n < nmodels; ++n)
+        free(probs[n]);
+      free(probs);
+      }
     }
 
   fclose(IN);
@@ -1046,7 +1177,7 @@ int main(int argc, char **argv){
       P->nModels++;
       }
     if(strcmp(argv[n], "-rm") == 0){
-      P->nRModels++;
+      P->nRMClasses++;
       P->nModels++;
       }
     }
@@ -1063,7 +1194,7 @@ int main(int argc, char **argv){
         P->nModels++;
         }
       if(strcmp(xargv[n], "-rm") == 0){
-        P->nRModels++;
+        P->nRMClasses++;
         P->nModels++;
         }
 
@@ -1084,7 +1215,7 @@ int main(int argc, char **argv){
     return 1;
     }
 
-  P->rmodel = (RModelPar *) Calloc(P->nRModels, sizeof(RModelPar));
+  P->rmodel = (RModelPar *) Calloc(P->nRMClasses, sizeof(RModelPar));
   k = 0;
   for(n = 1 ; n < argc ; ++n)
     if(strcmp(argv[n], "-rm") == 0)
@@ -1111,11 +1242,19 @@ int main(int argc, char **argv){
   if(!P->mode){
     if(P->verbose) PrintArgs(P);
     fprintf(stderr, "Compressing ...\n"); 
-    if(P->nRModels == 1 && P->nCModels == 0) 
+    if(P->nRMClasses == 1 && P->nCModels == 0) 
       CompressRMsOnly(P, argv[argc-1]);
     else
-      //Compress(P, argv[argc-1]);
-      CompressNoNN(P, argv[argc-1]);
+      { 
+      if(P->lr == 0)
+        {
+        CompressNoNN(P, argv[argc-1]);
+	}
+      else
+	{
+        Compress(P, argv[argc-1]);
+	}
+      }
     }
   else{
     fprintf(stderr, "Decompressing ...\n"); 

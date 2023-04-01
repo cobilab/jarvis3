@@ -170,6 +170,7 @@ void PrintMenu(void){
   "                                                                   \n"
   "      -lr [DOUBLE],  --learning-rate [DOUBLE]                      \n"
   "           Neural Network leaning rate (double).                   \n"
+  "           The 0 value turns the Neural Network off.               \n"
   "           Default value: %.3lf.                                   \n"
   "                                                                   \n"
   "      [FILE]                                                       \n"
@@ -202,8 +203,8 @@ void PrintVersion(void){
   "Copyright (C) 2014-2024, University of Aveiro and University of    \n"
   "Helsinki. JARVIS3 is a Free software. Copies may be distributed    \n"
   "under the terms of the GNU-General Public License v3. See site:    \n"
-  "http://www.gnu.org/licenses/gpl.html.                              \n" 
-  "There is NOT ANY WARRANTY. Use it at your own risk.              \n\n", 
+  "http://www.gnu.org/licenses/gpl.html. There is NOT ANY WARRANTY    \n" 
+  "Use it at your own risk.                                         \n\n", 
   VERSION, RELEASE);
   }
 

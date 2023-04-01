@@ -52,7 +52,7 @@ typedef struct{
   uint32_t  nRPModels;
   uint32_t  nCPModels;
   uint32_t  nCModels;
-  uint32_t  nRModels;
+  uint32_t  nRMClasses;
   CModelPar *cmodel;
   RModelPar *rmodel;
   char      *tar;
@@ -110,7 +110,7 @@ PARAM;
 #define E_GAMMA_BITS           16
 #define E_DEN_BITS             16
 #define IR_BITS                8
-#define NRMODELS_BITS          16
+#define NRMCLASSES_BITS        16
 #define MAX_RMODELS_BITS       16
 #define LIMIT_BITS             8
 #define ALPHA_BITS             16
