@@ -8,7 +8,7 @@ void ModelsExplanation(void){
   "      -cm [NB_C]:[NB_D]:[NB_I]:[NB_G]/[NB_S]:[NB_R]:[NB_E]:[NB_A]  \n"
   "      Template of a context model.                                 \n"
   "      Parameters:                                                  \n"
-  "      [NB_C]: (integer [1;20]) order size of the regular context   \n"
+  "      [NB_C]: (integer [1;14]) order size of the regular context   \n"
   "              model. Higher values use more RAM but, usually, are  \n"
   "              related to a better compression score.               \n"
   "      [NB_D]: (integer [1;5000]) denominator to build alpha, which \n"
@@ -68,7 +68,7 @@ void ModelsExplanation(void){
   "              for the class. On very repetive sequences the RAM    \n"
   "              increases along with this value, however it also     \n"
   "              improves the compression capability.                 \n"
-  "      [NB_C]: (integer [1;20]) order size of the repeat context    \n"
+  "      [NB_C]: (integer [1;14]) order size of the repeat context    \n"
   "              model. Higher values use more RAM but, usually, are  \n"
   "              related to a better compression score.               \n"
   "      [NB_B]: (real (0;1]) beta is a real value, which is a        \n"
@@ -106,7 +106,7 @@ void PrintMenu(void){
   "                                                                   \n"
   "NAME                                                               \n"
   "      JARVIS3 v%u.%u,                                              \n"
-  "      High-ratio lossless encoding of genome sequences             \n"
+  "      Efficient lossless encoding of genome sequences              \n"
   "                                                                   \n"
   "SYNOPSIS                                                           \n"
   "      ./JARVIS3 [OPTION]... [FILE]                                 \n"
@@ -164,6 +164,10 @@ void PrintMenu(void){
 
   fprintf(stderr,
   "                                                                   \n"
+  "      -sd [NUMBER],  --seed [NUMBER]                               \n"
+  "           Pseudo-random seed.                                     \n"
+  "           Default value: %u.                                      \n"
+  "                                                                   \n"
   "      -hs [NUMBER],  --hidden-size [NUMBER]                        \n"
   "           Hidden size of the neural network (integer).            \n"
   "           Default value: %u.                                      \n"
@@ -182,7 +186,7 @@ void PrintMenu(void){
   "      This is a Free software, under GPLv3. You may redistribute   \n"
   "      copies of it under the terms of the GNU - General Public     \n"
   "      License v3 <http://www.gnu.org/licenses/gpl.html>.         \n\n",
-  DEFAULT_HS, DEFAULT_LR);
+  DEFAULT_SEED, DEFAULT_HS, DEFAULT_LR);
   }
 
 

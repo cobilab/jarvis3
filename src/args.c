@@ -152,6 +152,7 @@ void PrintArgs(PARAM *P){
   "no" : "yes"); 
   fprintf(stderr, "Force mode ......................... %s\n", !P->force ? 
   "no" : "yes");
+  fprintf(stderr, "Pseudo-random seed ................. %u\n", P->seed);  
   fprintf(stderr, "Neural Network hidden size ......... %u\n", P->hs);  
   fprintf(stderr, "Neural Network learning rate ....... %.3lf\n", P->lr);  
 

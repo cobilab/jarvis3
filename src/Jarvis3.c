@@ -40,6 +40,7 @@ void EncodeHeaderOnlyRMs(PARAM *P, RCLASS **RC, FILE *F)
   {
   uint32_t n;
 
+  WriteNBits(P->seed,                                   SEED_BITS, F);
   WriteNBits(P->size,                                   SIZE_BITS, F);
   WriteNBits(P->length,                               LENGTH_BITS, F);
   WriteNBits(P->hs,                                       HS_BITS, F);
@@ -68,6 +69,7 @@ void EncodeHeader(PARAM *P, RCLASS **RC, CMODEL **CM, FILE *F)
   {
   uint32_t n;
 
+  WriteNBits(P->seed,                                   SEED_BITS, F);
   WriteNBits(P->size,                                   SIZE_BITS, F);
   WriteNBits(P->length,                               LENGTH_BITS, F);
   WriteNBits(P->hs,                                       HS_BITS, F);
@@ -99,6 +101,7 @@ void EncodeHeader(PARAM *P, RCLASS **RC, CMODEL **CM, FILE *F)
     } 
 
   #ifdef DEBUG
+  printf("seed    = %"PRIu32"\n", P->seed);
   printf("size    = %"PRIu64"\n", P->size);
   printf("hs      = %u\n",        P->hs);
   printf("lr      = %g\n",        P->lr);
@@ -180,7 +183,7 @@ void CompressRMsOnly(PARAM *P, char *fn)
   PMODEL    *MX_RM;
   CBUF      *SB;
 
-  srand(0);
+  srand(P->seed);
 
   if(P->verbose)
     fprintf(stderr, "Analyzing data and creating models ...\n");
@@ -284,7 +287,7 @@ void CompressNoNN(PARAM *P, char *fn)
   CMWEIGHT  *WM;
   CBUF      *SB;
 
-  srand(0);
+  srand(P->seed);
 
   if(P->verbose)
     fprintf(stderr, "Analyzing data and creating models ...\n");
@@ -499,7 +502,7 @@ void Compress(PARAM *P, char *fn){
   CMWEIGHT  *WM;
   CBUF      *SB;
 
-  srand(0);
+  srand(P->seed);
 
   if(P->verbose)
     fprintf(stderr, "Analyzing data and creating models ...\n");
@@ -731,11 +734,10 @@ void Decompress(char *fn)
   CMWEIGHT *WM;
   CBUF     *SB;
 
-  srand(0);
-
   startinputtingbits();
   start_decode(IN);
 
+  P->seed      = ReadNBits(                      SEED_BITS, IN);
   P->size      = ReadNBits(                      SIZE_BITS, IN);
   P->length    = ReadNBits(                    LENGTH_BITS, IN);
   P->hs        = ReadNBits(                        HS_BITS, IN);
@@ -772,8 +774,11 @@ void Decompress(char *fn)
     uint64_t  s = ReadNBits(                    CACHE_BITS, IN);
     RC[n] = CreateRC(m, b, l, c, g, r, w, s);
     }
+  
+  srand(P->seed);
 
   #ifdef DEBUG
+  printf("seed    = %"PRIu32"\n", P->seed);;
   printf("size    = %"PRIu64"\n", P->size);
   printf("length  = %"PRIu64"\n", P->length);
   printf("hs      = %u\n",        P->hs);
@@ -1164,6 +1169,8 @@ int main(int argc, char **argv){
   P->verbose   = ArgState  (DEFAULT_VERBOSE, p, argc, "-v",  "--verbose");
   P->force     = ArgState  (DEFAULT_FORCE,   p, argc, "-f",  "--force");
   P->estim     = ArgState  (0,               p, argc, "-e",  "--estimate");
+  P->seed      = ArgNumber (DEFAULT_SEED,    p, argc, "-sd", "--seed", 
+		 1, 599999);
   P->hs        = ArgNumber (DEFAULT_HS,      p, argc, "-hs", "--hidden-size", 
 		 1, 999999);
   P->lr        = ArgDouble (DEFAULT_LR,      p, argc, "-lr", "--learning-rate");
@@ -1237,7 +1244,7 @@ int main(int argc, char **argv){
         P->cmodel[k++] = ArgsUniqCModel(xargv[n+1], 0);
     }
 
-  P->tar  = argv[argc-1];
+  P->tar = argv[argc-1];
  
   if(!P->mode){
     if(P->verbose) PrintArgs(P);

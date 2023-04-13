@@ -46,6 +46,7 @@ typedef struct{
   uint8_t   nn;
   uint8_t   mode;
   uint32_t  col;
+  uint32_t  seed;
   double    lr;
   uint32_t  hs;
   uint32_t  nModels;
@@ -80,13 +81,13 @@ PARAM;
 #define DEFAULT_LEVEL          8
 #define DEFAULT_HS             40
 #define DEFAULT_LR             0.03
-#define MAX_LEVEL              24
+#define MAX_LEVEL              25
 #define MIN_LEVEL              1
 #define MAX_CTX                14
 #define MAX_RCTX               14
 #define MIN_CTX                1
 #define MIN_CACHE              1
-#define MAX_CACHE              12
+#define MAX_CACHE              15
 #define MAX_DEN                1000000
 #define MIN_DEN                1
 #define BGUARD                 32
@@ -100,6 +101,8 @@ PARAM;
 #define REFERENCE              1
 #define TARGET                 0
 #define DEF_EXPLANATION        0
+#define DEFAULT_SEED           0
+#define SEED_BITS              32
 #define SIZE_BITS              48
 #define LENGTH_BITS            48
 #define SELECTION_BITS         8
