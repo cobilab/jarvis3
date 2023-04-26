@@ -175,7 +175,7 @@ void PrintMenu(void){
   "      -lr [DOUBLE],  --learning-rate [DOUBLE]                      \n"
   "           Neural Network leaning rate (double).                   \n"
   "           The 0 value turns the Neural Network off.               \n"
-  "           Default value: %.3lf.                                   \n"
+  "           Default value: %.2lf.                                   \n"
   "                                                                   \n"
   "      [FILE]                                                       \n"
   "           Input sequence filename (to compress) -- MANDATORY.     \n"
