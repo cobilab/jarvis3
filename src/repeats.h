@@ -21,21 +21,19 @@
 #define INIWEIGHT        0.01
 #define MAX_LT           250
 
-typedef uint32_t     POS_PREC; 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+typedef uint32_t POS_PREC; 
 
 typedef struct
   {
-  POS_PREC *array;         // ARRAY WITH POSITIONS
-  uint32_t nPos;           // NUMBER OF POSITIONS (CACHE)
-  uint32_t nPosAnd1;       // NUMBER OF POSITIONS (CACHE) PLUS ONE (INDEXES)
-  uint32_t size;           // ARRAY_SIZE
+  POS_PREC *array;   // ARRAY WITH POSITIONS
+  uint32_t nPos;     // NUMBER OF POSITIONS (CACHE)
+  uint32_t nPosAnd1; // NUMBER OF POSITIONS (CACHE) PLUS ONE (INDEXES)
+  uint32_t size;     // ARRAY_SIZE
   }
 RTABLE;
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// REPEAT MODELS TO HANDLE LONG SEGMENTS. DATA SUBSTITUTIONS DO NOT AFFECT THE
-// PERFORMANCE SO MUCH AS IN CONTEXT MODELS.
-//
 typedef struct
   {
   uint64_t idx;      // CURRENT CONTEXT INDEX
@@ -70,7 +68,6 @@ RMODEL;
 
 typedef struct
   {
-  uint8_t  cm;       // CONTEXT MODEL ACTIVE
   CMODEL   *C;       // CONTEXT MODEL FOR COMPLEMENTAR SYMBOL PROBS 
   RTABLE   *T;       // REPEATING KMERS TABLE
   RMODEL   *RM;      // POINTER FOR EACH OF THE MULTIPLE REPEAT MODELS
@@ -85,8 +82,8 @@ RCLASS;
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 uint8_t   GetNBase           (uint8_t *, uint64_t);
-RCLASS    *CreateRC          (uint32_t, double, uint32_t, uint32_t, 
-                             double, uint8_t, double, uint64_t);
+RCLASS    *CreateRC          (uint32_t, double, uint32_t, uint32_t, double, 
+		               uint8_t, double, uint64_t);
 uint64_t  GetIdxRev          (uint8_t *, RCLASS *);
 uint64_t  GetIdx             (uint8_t *, RCLASS *);
 int32_t   StartRM            (RCLASS *, uint32_t, uint64_t, uint8_t);
