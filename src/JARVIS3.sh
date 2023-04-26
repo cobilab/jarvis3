@@ -15,7 +15,7 @@ THREADS="8";
 SHOW_MENU () {
   echo " -------------------------------------------------------";
   echo "                                                        ";
-  echo " JARVIS3, v1.0. High reference-free compression of DNA  ";
+  echo " JARVIS3, v1.1. High reference-free compression of DNA  ";
   echo "                sequences, FASTA data, and FASTQ data.  ";
   echo "                                                        ";
   echo " Program options ---------------------------------------";
@@ -80,7 +80,7 @@ SHOW_HEADER () {
   echo " [JARVIS3 :: DNA, FASTA, and FASTQ Extensions]          ";
   echo "                                                        ";
   echo " Release year: 2024,                                    ";
-  echo " Version: 1.0                                           ";
+  echo " Version: 1.1                                           ";
   echo " Author: D. Pratas                                      ";
   echo " Language: Bash / C                                     ";
   echo " License: GPL v3                                        ";
@@ -99,9 +99,9 @@ MERGE_DNA () {
   INPUT="$1";    # "Filename"
   THREADS="$2";  # "8"
   #
-  tar -xvf $INPUT 1> .DEC_F_JV2;
+  tar -xvf $INPUT 1> .DEC_F_JV3;
   #
-  mapfile -t FILES < .DEC_F_JV2;
+  mapfile -t FILES < .DEC_F_JV3;
   #
   D_NAMES="";
   IDX_T=1;
@@ -126,7 +126,7 @@ MERGE_DNA () {
     rm -f $file.jd $file .tmp_report_$file
     done
   #
-  rm -f .DEC_F_JV2
+  rm -f .DEC_F_JV3
   }
 #
 ################################################################################
@@ -139,9 +139,9 @@ SPLIT_DNA () {
   LEVEL="$4";
   #
   split --bytes=$SIZE --verbose $INPUT $INPUT- \
-  | tr -d "\'" | awk '{ print $3;}' > .ENC_F_JV2 2> .tmp_report;
+  | tr -d "\'" | awk '{ print $3;}' > .ENC_F_JV3 2> .tmp_report;
   #
-  mapfile -t FILES < .ENC_F_JV2;
+  mapfile -t FILES < .ENC_F_JV3;
   #
   C_NAMES="";
   IDX_T=1;
@@ -166,7 +166,7 @@ SPLIT_DNA () {
     rm -f $file.jc $file .tmp_report_$file;
     done
   #
-  rm -f .ENC_F_JV2 .tmp_report .tmp_err;
+  rm -f .ENC_F_JV3 .tmp_report .tmp_err;
   }	
 #
 ################################################################################
@@ -330,7 +330,7 @@ if [[ "$DECOMPRESS" -eq "0" ]];
     wait
     echo "Done!";
     ls -lah $INPUT.tar | awk '{ print "TOTAL:\t"$5; }'
-    rm -f DNA.JV2.tar .rep_out_enc
+    rm -f DNA.JV3.tar .rep_out_enc
     echo "Compressed file: $INPUT.tar";
     #
     elif [[ "$TYPE" -eq "2" ]]; # FASTA DATA ===================================
@@ -341,18 +341,18 @@ if [[ "$DECOMPRESS" -eq "0" ]];
     Program_installed "./bzip2";
     Program_installed "./JARVIS3";
     ./SplitFastaStreams < $INPUT
-    SPLIT_DNA "DNA.JV2" "$BLOCK" "$THREADS" "$LEVEL" &
-    ./bbb cfm10q HEADERS.JV2 HEADERS.JV2.bbb &
-    ./bzip2 -f EXTRA.JV2 &
+    SPLIT_DNA "DNA.JV3" "$BLOCK" "$THREADS" "$LEVEL" &
+    ./bbb cfm10q HEADERS.JV3 HEADERS.JV3.bbb &
+    ./bzip2 -f EXTRA.JV3 &
     wait
-    tar -cvf $INPUT.tar DNA.JV2.tar EXTRA.JV2.bz2 HEADERS.JV2.bbb 1> .rep_out_ec
+    tar -cvf $INPUT.tar DNA.JV3.tar EXTRA.JV3.bz2 HEADERS.JV3.bbb 1> .rep_out_ec
     echo "Done!";
-    ls -lah HEADERS.JV2.bbb | awk '{ print "HEADS:\t"$5; }'
-    ls -lah DNA.JV2.tar | awk '{ print "DNA:\t"$5; }'
-    ls -lah EXTRA.JV2.bz2 | awk '{ print "EXTRA:\t"$5; }'
+    ls -la HEADERS.JV3.bbb | awk '{ print "HEADS:\t"$5; }'
+    ls -la DNA.JV3.tar | awk '{ print "DNA:\t"$5; }'
+    ls -la EXTRA.JV3.bz2 | awk '{ print "EXTRA:\t"$5; }'
     echo "------";
-    ls -lah $INPUT.tar | awk '{ print "TOTAL:\t"$5; }'
-    rm -f DNA.JV2.tar EXTRA.JV2 HEADERS.JV2 .rep_out_ec
+    ls -la $INPUT.tar | awk '{ print "TOTAL:\t"$5; }'
+    rm -f DNA.JV3.tar EXTRA.JV3 HEADERS.JV3 .rep_out_ec
     echo "Compressed file: $INPUT.tar";
     #
     else # FASTQ DATA ==========================================================
@@ -363,20 +363,20 @@ if [[ "$DECOMPRESS" -eq "0" ]];
     Program_installed "./XScoreC";
     Program_installed "./JARVIS3";
     ./SplitFastqStreams < $INPUT
-    SPLIT_DNA "DNA.JV2" "$BLOCK" "$THREADS" "$LEVEL" &
-    ./bzip2 -f N.JV2 &
-    ./bbb cfm10q HEADERS.JV2 HEADERS.JV2.bbb &
-    ./XScoreC -l 2 QUALITIES.JV2 1> .tmp_report_out_xc 2> .tmp_report_err_xc &
+    SPLIT_DNA "DNA.JV3" "$BLOCK" "$THREADS" "$LEVEL" &
+    ./bzip2 -f N.JV3 &
+    ./bbb cfm10q HEADERS.JV3 HEADERS.JV3.bbb &
+    ./XScoreC -l 2 QUALITIES.JV3 1> .tmp_report_out_xc 2> .tmp_report_err_xc &
     wait
-    tar -cvf $INPUT.tar DNA.JV2.tar N.JV2.bz2 HEADERS.JV2.bbb QUALITIES.JV2.co 1> .rep_main_info;
+    tar -cvf $INPUT.tar DNA.JV3.tar N.JV3.bz2 HEADERS.JV3.bbb QUALITIES.JV3.co 1> .rep_main_info;
     echo "Done!";
-    ls -lah HEADERS.JV2.bbb | awk '{ print "HEADS:\t"$5; }'
-    ls -lah DNA.JV2.tar | awk '{ print "DNA:\t"$5; }'
-    ls -lah N.JV2.bz2 | awk '{ print "Ns:\t"$5; }'
-    ls -lah QUALITIES.JV2.co | awk '{ print "QUALS:\t"$5; }'
+    ls -la HEADERS.JV3.bbb | awk '{ print "HEADS:\t"$5; }'
+    ls -la DNA.JV3.tar | awk '{ print "DNA:\t"$5; }'
+    ls -la N.JV3.bz2 | awk '{ print "Ns:\t"$5; }'
+    ls -la QUALITIES.JV3.co | awk '{ print "QUALS:\t"$5; }'
     echo "------";
     ls -lah $INPUT.tar | awk '{ print "TOTAL:\t"$5; }'
-    rm -f DNA.JV2 N.JV2 HEADERS.JV2 QUALITIES.JV2 .rep_main_info \
+    rm -f DNA.JV3 N.JV3 HEADERS.JV3 QUALITIES.JV3 .rep_main_info \
     .tmp_report_out_xc .tmp_report_err_xc;
     echo "Compressed file: $INPUT.tar";
     #	    
@@ -408,13 +408,13 @@ if [[ "$DECOMPRESS" -eq "0" ]];
     Program_installed "./JARVIS3";
     echo "Decompressing data ...";
     tar -xvf $INPUT 1> .rep_out_dec
-    MERGE_DNA "DNA.JV2.tar" "$THREADS" &
-    ./bzip2 -d -f EXTRA.JV2.bz2 &
-    ./bbb -fqd HEADERS.JV2.bbb HEADERS.JV2 &
+    MERGE_DNA "DNA.JV3.tar" "$THREADS" &
+    ./bzip2 -d -f EXTRA.JV3.bz2 &
+    ./bbb -fqd HEADERS.JV3.bbb HEADERS.JV3 &
     wait
-    mv DNA.JV2.tar.out DNA.JV2
+    mv DNA.JV3.tar.out DNA.JV3
     ./MergeFastaStreams > $INPUT.out
-    rm -f DNA.JV2.jc DNA.JV2.tar.out EXTRA.JV2.bz2 HEADERS.JV2.bbb .rep_out_dec
+    rm -f DNA.JV3.jc DNA.JV3.tar.out EXTRA.JV3.bz2 HEADERS.JV3.bbb .rep_out_dec
     echo "Done!";
     echo "Decompressed file: $INPUT.out";
     #
@@ -428,16 +428,16 @@ if [[ "$DECOMPRESS" -eq "0" ]];
     Program_installed "./JARVIS3";
     echo "Decompressing data ...";
     tar -xvf $INPUT 1> .rep_main_info;
-    ./bbb dqf HEADERS.JV2.bbb HEADERS.JV2 &
-    MERGE_DNA "DNA.JV2.tar" "$THREADS" &
-    ./bzip2 -d -f N.JV2.bz2 &
-    ./XScoreD -d QUALITIES.JV2.co 1> .tmp_report_out_xd 2> .tmp_report_err_xd &
+    ./bbb dqf HEADERS.JV3.bbb HEADERS.JV3 &
+    MERGE_DNA "DNA.JV3.tar" "$THREADS" &
+    ./bzip2 -d -f N.JV3.bz2 &
+    ./XScoreD -d QUALITIES.JV3.co 1> .tmp_report_out_xd 2> .tmp_report_err_xd &
     wait
-    mv DNA.JV2.tar.out DNA.JV2
-    mv QUALITIES.JV2.de QUALITIES.JV2
+    mv DNA.JV3.tar.out DNA.JV3
+    mv QUALITIES.JV3.de QUALITIES.JV3
     ./MergeFastqStreams > $INPUT.out
-    rm -f DNA.JV2.jc DNA.JV2.tar.out N.JV2.bz2 HEADERS.JV2.bbb \
-    QUALITIES.JV2.co .rep_main_info .tmp_report_out_xd .tmp_report_err_xd ;
+    rm -f DNA.JV3.jc DNA.JV3.tar.out N.JV3.bz2 HEADERS.JV3.bbb \
+    QUALITIES.JV3.co .rep_main_info .tmp_report_out_xd .tmp_report_err_xd ;
     echo "Decompressed file: $INPUT.out";
     #
     fi

@@ -5,7 +5,6 @@ BIN    = .
 CC     = gcc
 CPLP   = 
 #-----------------------------------------------------------------------------
-#CFLAGS = -Wall -O3 -march=native -mtune=native $(CPLP) -DPROGRESS
 CFLAGS = -Wall -O3 $(CPLP) -DPROGRESS
 #-----------------------------------------------------------------------------
 LIBS   = -lm

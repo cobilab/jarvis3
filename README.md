@@ -14,7 +14,7 @@
 
 <p align="center"><img src="imgs/logo.png" 
 alt="JARVIS3" width="300" border="0" /></p>
-<p align="center"><b>JARVIS3: an improved encoder for biological sequences</b></p>
+<p align="center"><b>JARVIS3: an improved encoder for genomic sequences</b></p>
 
 ### Installation ###
 
@@ -28,10 +28,10 @@ make
 
 #### Run JARVIS3 ####
 
-Run JARVIS3 using level 9:
+Run JARVIS3 using level 13:
 
 <pre>
-./JARVIS3 -v -l 9 File.seq
+./JARVIS3 -v -l 13 File.seq
 </pre>
 
 ### Parameters ###
@@ -48,7 +48,7 @@ SYNOPSIS
       ./JARVIS3 [OPTION]... [FILE]                                 
                                                                    
 SAMPLE                                                             
-      Run Compression   -> ./JARVIS3 -v -l 30 sequence.txt          
+      Run Compression   -> ./JARVIS3 -v -l 13 sequence.txt          
       Run Decompression -> ./JARVIS3 -v -d sequence.txt.jc         
                                                                    
 DESCRIPTION                                                        
@@ -84,7 +84,7 @@ DESCRIPTION
                                                                    
       -l [NUMBER],  --level [NUMBER]                               
            Compression level (integer).                            
-           Default level: 30.                                      
+           Default level: 8.                                      
            It defines compressibility in balance with computational
            resources (RAM & time). Use -s for levels perception.   
                                                                    
@@ -94,7 +94,7 @@ DESCRIPTION
                                                                    
       -lr [DOUBLE],  --learning-rate [DOUBLE]                      
            Neural Network leaning rate (double).                   
-           Default value: 0.030.                                   
+           Default value: 0.03.                                   
                                                                    
       [FILE]                                                       
            Input sequence filename (to compress) -- MANDATORY.     
