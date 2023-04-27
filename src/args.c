@@ -101,13 +101,13 @@ RModelPar ArgsUniqRModel(char *str, uint8_t type){
   if(sscanf(str, "%u:%u:%lf:%u:%lf:%u:%lf:%u", 
   &m, &ctx, &beta, &limit, &gamma, &ir, &weight, &cache) == 8){
 
-    if(m      >  100000   || m      <  1       ||
-       ctx    >  MAX_RCTX || ctx    <  MIN_CTX ||
-       beta   >= 1        || beta   <= 0       ||
-       limit  >  21       || limit  <= 0       ||
-       gamma  >= 1        || gamma  <= 0       ||
-       ir     >  2        || weight <= 0       ||
-       weight >= 1        || cache  <  1       ||
+    if(m      >  100000   || m      <  1        ||
+       ctx    >  MAX_RCTX || ctx    <  MIN_RCTX ||
+       beta   >= 1        || beta   <= 0        ||
+       limit  >  21       || limit  <= 0        ||
+       gamma  >= 1        || gamma  <= 0        ||
+       ir     >  2        || weight <= 0        ||
+       weight >= 1        || cache  <= 1        ||
        cache  > MAX_CACHE)
          {
          FailModelScheme();

@@ -296,10 +296,6 @@ https://github.com/cobilab/HumanGenome
 https://github.com/cobilab/CassavaGenome
 </pre>
 
-#### Performance #### 
-
-Currently, as far as we know, JARVIS3 holds the record on the higher compressibility for both genomes.
-
 ### Citation ###
 
 <pre>
