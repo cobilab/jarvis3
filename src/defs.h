@@ -72,7 +72,8 @@ PARAM;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-#define BUFFER_SIZE            262144      
+#define BUFFER_SIZE            262144
+#define ADD_SPACE              100000000
 #define PROGRESS_MIN           1000000
 #define DEF_VERSION            0
 #define DEFAULT_HELP           0

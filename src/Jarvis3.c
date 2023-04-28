@@ -246,7 +246,7 @@ void CompressRMsOnly(PARAM *P, char *fn)
       }
 
     if(++i == mSize)    // REALLOC BUFFER ON OVERFLOW 4 STORE THE COMPLETE SEQ
-      buf = (uint8_t *) Realloc(buf, (mSize+=mSize) * sizeof(uint8_t));
+      buf = (uint8_t *) Realloc(buf, (mSize+=ADD_SPACE) * sizeof(uint8_t));
 
     Progress(P->size, i); 
     }
@@ -448,7 +448,7 @@ void CompressNoNN(PARAM *P, char *fn)
       }
 
     if(++i == mSize)    // REALLOC BUFFER ON OVERFLOW 4 STORE THE COMPLETE SEQ
-      buf = (uint8_t *) Realloc(buf, (mSize+=mSize) * sizeof(uint8_t));
+      buf = (uint8_t *) Realloc(buf, (mSize+=ADD_SPACE) * sizeof(uint8_t));
 
     Progress(P->size, i); 
     }
@@ -679,7 +679,7 @@ void Compress(PARAM *P, char *fn){
       }
 
     if(++i == mSize)    // REALLOC BUFFER ON OVERFLOW 4 STORE THE COMPLETE SEQ
-      buf = (uint8_t *) Realloc(buf, (mSize+=mSize) * sizeof(uint8_t));
+      buf = (uint8_t *) Realloc(buf, (mSize+=ADD_SPACE) * sizeof(uint8_t));
 
     Progress(P->size, i); 
     }
@@ -842,7 +842,7 @@ void Decompress(char *fn)
         }
 
       if(++i == mSize) // REALLOC BUFFER ON OVERFLOW 4 STORE THE COMPLETE SEQ
-        buf = (uint8_t *) Realloc(buf, (mSize+=mSize) * sizeof(uint8_t));
+        buf = (uint8_t *) Realloc(buf, (mSize+=ADD_SPACE) * sizeof(uint8_t));
 
       Progress(P->size, i);
       }
@@ -965,7 +965,7 @@ void Decompress(char *fn)
           }
 
         if(++i == mSize) // REALLOC BUFFER ON OVERFLOW 4 STORE THE COMPLETE SEQ
-          buf = (uint8_t *) Realloc(buf, (mSize+=mSize) * sizeof(uint8_t));
+          buf = (uint8_t *) Realloc(buf, (mSize+=ADD_SPACE) * sizeof(uint8_t));
 
         Progress(P->size, i);
         }
@@ -1107,7 +1107,7 @@ void Decompress(char *fn)
           }
 
         if(++i == mSize) // REALLOC BUFFER ON OVERFLOW 4 STORE THE COMPLETE SEQ
-          buf = (uint8_t *) Realloc(buf, (mSize+=mSize) * sizeof(uint8_t));
+          buf = (uint8_t *) Realloc(buf, (mSize+=ADD_SPACE) * sizeof(uint8_t));
 
         Progress(P->size, i);
         }
