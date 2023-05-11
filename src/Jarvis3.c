@@ -248,7 +248,9 @@ void CompressRMsOnly(PARAM *P, char *fn)
     if(++i == mSize)    // REALLOC BUFFER ON OVERFLOW 4 STORE THE COMPLETE SEQ
       buf = (uint8_t *) Realloc(buf, (mSize+=ADD_SPACE) * sizeof(uint8_t));
 
-    Progress(P->size, i); 
+    #ifdef PROGRESS
+    Progress(P->size, i);
+    #endif
     }
 
   WriteNBits(m, 8, OUT);
@@ -450,7 +452,9 @@ void CompressNoNN(PARAM *P, char *fn)
     if(++i == mSize)    // REALLOC BUFFER ON OVERFLOW 4 STORE THE COMPLETE SEQ
       buf = (uint8_t *) Realloc(buf, (mSize+=ADD_SPACE) * sizeof(uint8_t));
 
-    Progress(P->size, i); 
+    #ifdef PROGRESS
+    Progress(P->size, i);
+    #endif 
     }
 
   WriteNBits(m, 8, OUT);
@@ -681,7 +685,9 @@ void Compress(PARAM *P, char *fn){
     if(++i == mSize)    // REALLOC BUFFER ON OVERFLOW 4 STORE THE COMPLETE SEQ
       buf = (uint8_t *) Realloc(buf, (mSize+=ADD_SPACE) * sizeof(uint8_t));
 
+    #ifdef PROGRESS
     Progress(P->size, i); 
+    #endif
     }
 
   WriteNBits(m, 8, OUT);
@@ -844,7 +850,9 @@ void Decompress(char *fn)
       if(++i == mSize) // REALLOC BUFFER ON OVERFLOW 4 STORE THE COMPLETE SEQ
         buf = (uint8_t *) Realloc(buf, (mSize+=ADD_SPACE) * sizeof(uint8_t));
 
+      #ifdef PROGRESS
       Progress(P->size, i);
+      #endif
       }
 
     m = ReadNBits(8, IN);
@@ -967,7 +975,9 @@ void Decompress(char *fn)
         if(++i == mSize) // REALLOC BUFFER ON OVERFLOW 4 STORE THE COMPLETE SEQ
           buf = (uint8_t *) Realloc(buf, (mSize+=ADD_SPACE) * sizeof(uint8_t));
 
+        #ifdef PROGRESS
         Progress(P->size, i);
+        #endif
         }
 
       m = ReadNBits(8, IN);
@@ -1109,7 +1119,9 @@ void Decompress(char *fn)
         if(++i == mSize) // REALLOC BUFFER ON OVERFLOW 4 STORE THE COMPLETE SEQ
           buf = (uint8_t *) Realloc(buf, (mSize+=ADD_SPACE) * sizeof(uint8_t));
 
+        #ifdef PROGRESS 
         Progress(P->size, i);
+        #endif
         }
 
       m = ReadNBits(8, IN);
