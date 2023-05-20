@@ -1155,7 +1155,8 @@ void Decompress(char *fn)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // MAIN 
 //
-int main(int argc, char **argv){
+int main(int argc, char **argv)
+  {
   char       **p = *&argv, **xargv, *xpl = NULL;
   int32_t    n, k, xargc = 0;
   PARAM      *P;
