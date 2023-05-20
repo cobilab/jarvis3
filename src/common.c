@@ -20,7 +20,6 @@ double Power(double base, double exponent)
   return u.d;
   }
 
-
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 double Log(double base, double x)

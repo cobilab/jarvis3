@@ -7,6 +7,7 @@
 #include "common.h"
 #include "dna.h"
 #include "mem.h"
+#include "rand.h"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // LOOKUP TABLES FOR SPEED ENHANCEMENT
@@ -66,7 +67,7 @@ double g, uint8_t i, double w, uint64_t s)
   C->T->nPos     = s;
   C->T->nPosAnd1 = C->T->nPos + 1;
   C->T->size     = pow(NSYM, C->P->ctx) * C->T->nPosAnd1;
-  C->T->array    = (POS_PREC *) Calloc(C->T->size + 1, sizeof(POS_PREC));
+  C->T->array    = (uint32_t *) Calloc(C->T->size + 1, sizeof(uint32_t));
 
   FillLT();
 
@@ -92,7 +93,7 @@ uint64_t GetIdx(uint8_t *p, RCLASS *C){
 //
 int32_t StartRM(RCLASS *C, uint32_t m, uint64_t i, uint8_t r)
   {
-  POS_PREC *E = &C->T->array[i * C->T->nPosAnd1];
+  uint32_t *E = &C->T->array[i * C->T->nPosAnd1];
   uint32_t last = E[C->T->nPos];
 
   if(last == 0) return 0;
@@ -128,23 +129,23 @@ int32_t StartRM(RCLASS *C, uint32_t m, uint64_t i, uint8_t r)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // ADD KMER POSITION INTO RTABLE 
 //
-void AddKmerPos(RCLASS *C, uint64_t key, POS_PREC pos)
+void AddKmerPos(RTABLE *RT, uint64_t key, uint32_t pos)
   {
-  POS_PREC *TC = &C->T->array[key * C->T->nPosAnd1];
-  uint32_t nPos = C->T->nPos;
+  uint32_t *TC = &RT->array[key * RT->nPosAnd1];
+  uint32_t nPos = RT->nPos;
   uint32_t idx = TC[nPos];
 
   if(idx == nPos)
     {
-    TC[0] = pos;
+    TC[0   ] = pos;
     TC[nPos] = 0;
     }
   else
     {
     TC[++idx] = pos;
-    TC[nPos] = idx;
+    TC[nPos ] = idx;
     }
-  
+
   return;
   }
 

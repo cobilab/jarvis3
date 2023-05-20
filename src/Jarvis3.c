@@ -235,7 +235,7 @@ void CompressRMsOnly(PARAM *P, char *fn)
 
       StopRM           (RC[0]);
       StartMultipleRMs (RC[0], p);
-      AddKmerPos       (RC[0], RC[0]->P->idx, pos++);        // pos = (i<<2)+n
+      AddKmerPos       (RC[0]->T, RC[0]->P->idx, pos++);     // pos = (i<<2)+n
       RenormWeights    (RC[0]);
       ComputeMixture   (RC[0], MX_RM, buf);
 
@@ -403,16 +403,16 @@ void CompressNoNN(PARAM *P, char *fn)
         ++c;
         }
 
-      for(r = 0 ; r < P->nRMClasses ; ++r)                // FOR ALL REPEAT MODELS
+      for(r = 0 ; r < P->nRMClasses ; ++r)              // FOR ALL REPEAT MODELS
 	{
         StopRM           (RC[r]);
         StartMultipleRMs (RC[r], p);
-        AddKmerPos       (RC[r], RC[r]->P->idx, pos);          // pos = (i<<2)+n
+        AddKmerPos       (RC[r]->T, RC[r]->P->idx, pos);       // pos = (i<<2)+n
 	RenormWeights    (RC[r]);
         ComputeMixture   (RC[r], MX_RM[r], buf);
 	}
 
-      for(j = c, q = 0 ; j < c + P->nRMClasses ; ++j, ++q)  // FOR * REPEAT MODELS
+      for(j = c, q = 0 ; j < c + P->nRMClasses ; ++j, ++q)      // FOR * RMODELS
         { 
         PM[j]->sum = 0;
         for(r = 0 ; r < NSYM ; ++r)
@@ -627,15 +627,17 @@ void Compress(PARAM *P, char *fn){
 	{
         StopRM           (RC[r]);
         StartMultipleRMs (RC[r], p);
-        AddKmerPos       (RC[r], RC[r]->P->idx, pos);        // pos = (i<<2)+n
+        AddKmerPos       (RC[r]->T, RC[r]->P->idx, pos);       // pos = (i<<2)+n
 	RenormWeights    (RC[r]);
         ComputeMixture   (RC[r], MX_RM[r], buf);
 	}
 
       // PASS MX_RM[q] AS LAST MODEL AND SET IT AS PM[c]
-      for(j = c, q = 0 ; j < c + P->nRMClasses ; ++j, ++q){ // FOR * REPEAT MODELS
+      for(j = c, q = 0 ; j < c + P->nRMClasses ; ++j, ++q)
+        {     // FOR * RMODELS
         PM[j]->sum = 0;
-        for(r = 0 ; r < NSYM ; ++r){
+        for(r = 0 ; r < NSYM ; ++r)
+	  {
           PM[j]->freqs[r] = MX_RM[q]->freqs[r];
 	  freqs[j][r] = PM[j]->freqs[r];
 	  }
@@ -831,7 +833,7 @@ void Decompress(char *fn)
 
         StopRM           (RC[0]);
         StartMultipleRMs (RC[0], p);
-        AddKmerPos       (RC[0], RC[0]->P->idx, pos);        // pos = (i<<2)+n
+        AddKmerPos       (RC[0]->T, RC[0]->P->idx, pos);     // pos = (i<<2)+n
         RenormWeights    (RC[0]);
         ComputeMixture   (RC[0], MX_RM, buf);
 
@@ -925,15 +927,17 @@ void Decompress(char *fn)
             {
             StopRM           (RC[r]);
             StartMultipleRMs (RC[r], p);
-            AddKmerPos       (RC[r], RC[r]->P->idx, pos);        // pos = (i<<2)+n
+            AddKmerPos       (RC[r]->T, RC[r]->P->idx, pos);   // pos = (i<<2)+n
             RenormWeights    (RC[r]);
             ComputeMixture   (RC[r], MX_RM[r], buf);
             }
 
           // PASS MX_RM AS LAST MODEL AND SET IT AS PM[c]
-          for(j = c, q = 0 ; j < c + P->nRMClasses ; ++j, ++q){       // FOR ALL RMs
+          for(j = c, q = 0 ; j < c + P->nRMClasses ; ++j, ++q)
+	    {     // FOR ALL RMs
             PM[j]->sum = 0;
-            for(r = 0 ; r < NSYM ; ++r){
+            for(r = 0 ; r < NSYM ; ++r)
+	      {
               PM[j]->freqs[r] = MX_RM[q]->freqs[r];
 	      freqs[j][r] = PM[j]->freqs[r];
 	      }
@@ -1057,15 +1061,17 @@ void Decompress(char *fn)
             {
             StopRM           (RC[r]);
             StartMultipleRMs (RC[r], p);
-            AddKmerPos       (RC[r], RC[r]->P->idx, pos);        // pos = (i<<2)+n
+            AddKmerPos       (RC[r]->T, RC[r]->P->idx, pos);   // pos = (i<<2)+n
             RenormWeights    (RC[r]);
             ComputeMixture   (RC[r], MX_RM[r], buf);
             }
 
           // PASS MX_RM AS LAST MODEL AND SET IT AS PM[c]
-          for(j = c, q = 0 ; j < c + P->nRMClasses ; ++j, ++q){       // FOR ALL RMs
+          for(j = c, q = 0 ; j < c + P->nRMClasses ; ++j, ++q)
+	    {     // FOR ALL RMs
             PM[j]->sum = 0;
-            for(r = 0 ; r < NSYM ; ++r){
+            for(r = 0 ; r < NSYM ; ++r)
+	      {
               PM[j]->freqs[r] = MX_RM[q]->freqs[r];
 	      freqs[j][r] = PM[j]->freqs[r];
 	      }

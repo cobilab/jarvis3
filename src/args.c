@@ -11,24 +11,43 @@
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 uint32_t ArgNumber(uint32_t d, char *a[], uint32_t n, char *s, char *s2, 
-uint32_t l, uint32_t u){
-  uint32_t x;
-  for( ; --n ; ) if(!strcmp(s, a[n]) || !strcmp(s2, a[n])){
-    if((x = atol(a[n+1])) < l || x > u){
-      fprintf(stderr, "[x] Invalid number! Interval: [%u;%u].\n", l, u);
-      exit(EXIT_FAILURE);
+uint32_t l, uint32_t u)
+  {
+  uint32_t x, argc = n;
+  for( ; --n ; ) 
+    if(!strcmp(s, a[n]) || !strcmp(s2, a[n]))
+      {
+      if(n + 1 >= argc)
+	{
+        fprintf(stderr, "[x] Error: Invalid argument!\n");
+        exit(EXIT_FAILURE);
+	}
+      if((x = atol(a[n+1])) < l || x > u)
+        {
+        fprintf(stderr, "[x] Invalid number! Interval: [%u;%u].\n", l, u);
+        exit(EXIT_FAILURE);
+        }
+      return x;
       }
-    return x;
-    }
   return d;
   }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-double ArgDouble(double def, char *arg[], uint32_t n, char *str, char *str2){
+double ArgDouble(double def, char *arg[], uint32_t n, char *str, char *str2)
+  {
+  uint32_t argc = n;
+
   for( ; --n ; )
     if(!strcmp(str, arg[n]) || !strcmp(str2, arg[n]))
+      {
+      if(n + 1 >= argc)
+        {
+        fprintf(stderr, "[x] Error: Invalid argument!\n");
+        exit(EXIT_FAILURE);
+        }
       return atof(arg[n+1]);
+      }
   return def;
   }
 
@@ -43,10 +62,20 @@ uint8_t ArgState(uint8_t def, char *arg[], uint32_t n, char *str, char *str2){
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-char *ArgString(char *def, char *arg[], uint32_t n, char *str, char *str2){
+char *ArgString(char *def, char *arg[], uint32_t n, char *str, char *str2)
+  {
+  uint32_t argc = n;
+  
   for( ; --n ; )
     if(!strcmp(str, arg[n]) || !strcmp(str2, arg[n]))
+      {
+      if(n + 1 >= argc)
+        {
+        fprintf(stderr, "[x] Error: Invalid argument!\n");
+        exit(EXIT_FAILURE);
+        }
       return arg[n+1];
+      }
   return def;
   }
 

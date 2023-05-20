@@ -106,7 +106,7 @@ void PrintMenu(void){
   "                                                                   \n"
   "NAME                                                               \n"
   "      JARVIS3 v%u.%u,                                              \n"
-  "      Efficient lossless encoding of genome sequences              \n"
+  "      Efficient lossless encoding of genomic sequences             \n"
   "                                                                   \n"
   "SYNOPSIS                                                           \n"
   "      ./JARVIS3 [OPTION]... [FILE]                                 \n"

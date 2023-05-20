@@ -5,8 +5,10 @@ BIN    = .
 CC     = gcc
 CPLP   = 
 #-----------------------------------------------------------------------------
-#CFLAGS = -Wall -O3 $(CPLP) -DPROGRESS
-CFLAGS = -Wall -Ofast -march=native -mtune=native -DPROGRESS
+CFLAGS = -Wall -Ofast $(CPLP) -DPROGRESS
+#CFLAGS = -Wall -pg -Ofast $(CPLP) -DPROGRESS
+#CFLAGS = -Wall -Ofast $(CPLP) -DPROGRESS
+#CFLAGS = -Wall -Ofast -march=native -mtune=native -DPROGRESS
 #-----------------------------------------------------------------------------
 LIBS   = -lm
 DEPS   = defs.h

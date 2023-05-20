@@ -23,11 +23,9 @@
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-typedef uint32_t POS_PREC; 
-
 typedef struct
   {
-  POS_PREC *array;   // ARRAY WITH POSITIONS
+  uint32_t *array;   // ARRAY WITH POSITIONS
   uint32_t nPos;     // NUMBER OF POSITIONS (CACHE)
   uint32_t nPosAnd1; // NUMBER OF POSITIONS (CACHE) PLUS ONE (INDEXES)
   uint32_t size;     // ARRAY_SIZE
@@ -87,7 +85,7 @@ RCLASS    *CreateRC          (uint32_t, double, uint32_t, uint32_t, double,
 uint64_t  GetIdxRev          (uint8_t *, RCLASS *);
 uint64_t  GetIdx             (uint8_t *, RCLASS *);
 int32_t   StartRM            (RCLASS *, uint32_t, uint64_t, uint8_t);
-void      AddKmerPos         (RCLASS *, uint64_t, POS_PREC);
+void      AddKmerPos         (RTABLE *, uint64_t, uint32_t);
 void      ComputeRMProbs     (RCLASS *, RMODEL *, uint8_t *);
 void      UpdateRM           (RMODEL *, uint8_t *, uint8_t);
 void      RenormWeights      (RCLASS *);

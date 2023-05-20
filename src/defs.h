@@ -67,8 +67,8 @@ PARAM;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-#define RELEASE                1
-#define VERSION                2
+#define RELEASE                2
+#define VERSION                3
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -79,10 +79,10 @@ PARAM;
 #define DEFAULT_HELP           0
 #define DEFAULT_VERBOSE        0
 #define DEFAULT_FORCE          0
-#define DEFAULT_LEVEL          8
+#define DEFAULT_LEVEL          3
 #define DEFAULT_HS             40
 #define DEFAULT_LR             0.03
-#define MAX_LEVEL              25
+#define MAX_LEVEL              27
 #define MIN_LEVEL              1
 #define MAX_CTX                14
 #define MAX_RCTX               14
