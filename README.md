@@ -247,7 +247,7 @@ This will output the following content:
 
 #### Compression and decompression of FASTA and FASTQ data ####
 
-First, make sure to give permitions to the script by typing the following at the src/ folder
+First, make sure to give permissions to the script by typing the following at the src/ folder
 <pre>
 chmod +x JARVIS3.sh
 </pre>
