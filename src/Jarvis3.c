@@ -215,7 +215,7 @@ void CompressRMsOnly(PARAM *P, char *fn)
   P->size = P->length>>2;
 
   if(P->verbose){
-    fprintf(stderr, "Done!\n");
+    //fprintf(stderr, "Done!\n");
     fprintf(stderr, "Compressing %"PRIu64" symbols ...\n", P->length);
     }
 
@@ -257,10 +257,11 @@ void CompressRMsOnly(PARAM *P, char *fn)
   for(n = 0 ; n < m ; ++n)
     WriteNBits(S2N(t[n]), 8, OUT);        // ENCODE REMAINING SYMBOLS
 
-  fprintf(stderr, "Done!                                               \n");
-  fprintf(stderr, "Compression: %"PRIu64" -> %"PRIu64" ( %.6g bpb )\n", 
-  P->length, (uint64_t) _bytes_output, (double) _bytes_output*8.0 / P->length);
-  fprintf(stderr, "Ratio: %6lf\n",  (double) P->length / _bytes_output);
+  fprintf(stderr, "Compressed %"PRIu64" sym to %"PRIu64" bytes [ %.4g bps "
+		  "; %.2g ratio ; %.4g NC ]\n", P->length, (uint64_t) 
+		  _bytes_output, (double) _bytes_output*8.0 / P->length, 
+		  (double) P->length / _bytes_output, _bytes_output * 4.0 /
+		  (double) P->length);
 
   finish_encode(OUT);
   doneoutputtingbits(OUT);
@@ -364,7 +365,6 @@ void CompressNoNN(PARAM *P, char *fn)
   P->size = P->length>>2;
 
   if(P->verbose){
-    fprintf(stderr, "Done!\n");
     fprintf(stderr, "Compressing %"PRIu64" symbols ...\n", P->length);
     }
 
@@ -461,10 +461,11 @@ void CompressNoNN(PARAM *P, char *fn)
   for(n = 0 ; n < m ; ++n)
     WriteNBits(S2N(t[n]), 8, OUT);        // ENCODE REMAINING SYMBOLS
 
-  fprintf(stderr, "Done!                                               \n");
-  fprintf(stderr, "Compression: %"PRIu64" -> %"PRIu64" ( %.6g bpb )\n", 
-  P->length, (uint64_t) _bytes_output, (double) _bytes_output*8.0 / P->length);
-  fprintf(stderr, "Ratio: %6lf\n",  (double) P->length / _bytes_output);
+  fprintf(stderr, "Compressed %"PRIu64" sym to %"PRIu64" bytes [ %.4g bps "
+                  "; %.2g ratio ; %.4g NC ]\n", P->length, (uint64_t)
+                  _bytes_output, (double) _bytes_output*8.0 / P->length,
+                  (double) P->length / _bytes_output, _bytes_output * 4.0 /
+                  (double) P->length);
 
   finish_encode(OUT);
   doneoutputtingbits(OUT);
@@ -584,7 +585,6 @@ void Compress(PARAM *P, char *fn){
   P->size = P->length>>2;
 
   if(P->verbose){
-    fprintf(stderr, "Done!\n");
     fprintf(stderr, "Compressing %"PRIu64" symbols ...\n", P->length);
     }
 
@@ -696,10 +696,11 @@ void Compress(PARAM *P, char *fn){
   for(n = 0 ; n < m ; ++n)
     WriteNBits(S2N(t[n]), 8, OUT);        // ENCODE REMAINING SYMBOLS
 
-  fprintf(stderr, "Done!                                               \n");
-  fprintf(stderr, "Compression: %"PRIu64" -> %"PRIu64" ( %.6g bpb )\n", 
-  P->length, (uint64_t) _bytes_output, (double) _bytes_output*8.0 / P->length);
-  fprintf(stderr, "Ratio: %6lf\n",  (double) P->length / _bytes_output);
+  fprintf(stderr, "Compressed %"PRIu64" sym to %"PRIu64" bytes [ %.4g bps "
+                  "; %.2g ratio ; %.4g NC ]\n", P->length, (uint64_t)
+                  _bytes_output, (double) _bytes_output*8.0 / P->length,
+                  (double) P->length / _bytes_output, _bytes_output * 4.0 /
+                  (double) P->length);
 
   finish_encode(OUT);
   doneoutputtingbits(OUT);
@@ -1265,9 +1266,13 @@ int main(int argc, char **argv)
 
   P->tar = argv[argc-1];
  
-  if(!P->mode){
-    if(P->verbose) PrintArgs(P);
-    fprintf(stderr, "Compressing ...\n"); 
+  if(!P->mode)
+    {
+    if(P->verbose) 
+      {
+      PrintArgs(P);
+      fprintf(stderr, "Compressing ...\n"); 
+      }
     if(P->nRMClasses == 1 && P->nCModels == 0) 
       CompressRMsOnly(P, argv[argc-1]);
     else
@@ -1282,17 +1287,18 @@ int main(int argc, char **argv)
 	}
       }
     }
-  else{
-    fprintf(stderr, "Decompressing ...\n"); 
+  else
+    {
+    if(P->verbose)
+      fprintf(stderr, "Decompressing ...\n"); 
     Decompress(argv[argc-1]);
     }
 
   stop = clock();
   if(P->verbose)
-    fprintf(stderr, "Spent %g seconds.\n", ((double)(stop-start)) / 
-    CLOCKS_PER_SEC); 
+    fprintf(stderr, "Spent %g seconds.              \n", 
+    ((double)(stop-start)) / CLOCKS_PER_SEC); 
 
-  fprintf(stderr, "Done!                        \n");  // SPACES ARE VALID!
   return 0;
   }
 
