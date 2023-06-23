@@ -13,17 +13,17 @@ int main(int argc, char *argv[]){
   FILE *HEADERS, *EXTRA, *DNA;
   int c;
 
-  if((HEADERS = fopen ("HEADERS.JV2", "w")) == NULL){
+  if((HEADERS = fopen ("HEADERS.JV3", "w")) == NULL){
     fprintf(stderr, "Error: could not open file!");
     return 1;
     }
 
-  if((EXTRA = fopen ("EXTRA.JV2", "w")) == NULL){
+  if((EXTRA = fopen ("EXTRA.JV3", "w")) == NULL){
     fprintf(stderr, "Error: could not open file!");
     return 1;
     }
 
-  if((DNA = fopen ("DNA.JV2", "w")) == NULL){
+  if((DNA = fopen ("DNA.JV3", "w")) == NULL){
     fprintf(stderr, "Error: could not open file!");
     return 1;
     }

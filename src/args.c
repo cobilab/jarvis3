@@ -136,7 +136,7 @@ RModelPar ArgsUniqRModel(char *str, uint8_t type){
        limit  >  21       || limit  <= 0        ||
        gamma  >= 1        || gamma  <= 0        ||
        ir     >  2        || weight <= 0        ||
-       weight >= 1        || cache  <= 1        ||
+       weight >= 1        || cache  <  1        ||
        cache  > MAX_CACHE)
          {
          FailModelScheme();

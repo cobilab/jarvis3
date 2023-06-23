@@ -14,22 +14,22 @@ int main(int argc, char *argv[]){
   FILE *HEADERS, *N, *DNA, *QUALITIES;
   int c;
 
-  if((HEADERS = fopen("HEADERS.JV2", "w")) == NULL){
+  if((HEADERS = fopen("HEADERS.JV3", "w")) == NULL){
     fprintf(stderr, "Error: could not open file!");
     return 1;
     }
 
-  if((N = fopen("N.JV2", "w")) == NULL){
+  if((N = fopen("N.JV3", "w")) == NULL){
     fprintf(stderr, "Error: could not open file!");
     return 1;
     }
 
-  if((DNA = fopen("DNA.JV2", "w")) == NULL){
+  if((DNA = fopen("DNA.JV3", "w")) == NULL){
     fprintf(stderr, "Error: could not open file!");
     return 1;
     }
 
-  if((QUALITIES = fopen("QUALITIES.JV2", "w")) == NULL){
+  if((QUALITIES = fopen("QUALITIES.JV3", "w")) == NULL){
     fprintf(stderr, "Error: could not open file!");
     return 1;
     }

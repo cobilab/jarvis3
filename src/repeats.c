@@ -7,13 +7,12 @@
 #include "common.h"
 #include "dna.h"
 #include "mem.h"
-#include "rand.h"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // LOOKUP TABLES FOR SPEED ENHANCEMENT
 //
-double LT  [MAX_LT][MAX_LT];
-double LT_C[MAX_LT][MAX_LT];
+double LT  [MAX_LT * MAX_LT];
+double LT_C[MAX_LT * MAX_LT];
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // GET NUMERICAL BASE FROM PACKED SEQUENCE BY ID. THE ID%4 IS GIVEN BY THE 2
@@ -26,13 +25,15 @@ uint8_t GetNBase(uint8_t *b, uint64_t i){
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // FILL LOOKUP TABLE
 //
+
 void FillLT(void)
   {
   for(uint32_t x = 0 ; x < MAX_LT ; ++x)
     for(uint32_t y = 0 ; y < MAX_LT ; ++y)
       {
-      LT  [y][x] = (y + 1.0) / (x + 2.0);
-      LT_C[y][x] = (1 - LT[y][x]) / 3;
+      uint32_t lt_idx = y * MAX_LT + x;
+      LT  [lt_idx] = (y + 1.0) / (x + 2.0);
+      LT_C[lt_idx] = (1 - LT[lt_idx]) / 3;
       }
 
   return;
@@ -62,12 +63,19 @@ double g, uint8_t i, double w, uint64_t s)
   C->P->c_idxRev = 0;
   C->P->iWeight  = w;
 
-  // TABLE
+  // CACHE TABLE
   C->T           = (RTABLE *) Calloc(1, sizeof(RTABLE));
   C->T->nPos     = s;
-  C->T->nPosAnd1 = C->T->nPos + 1;
-  C->T->size     = pow(NSYM, C->P->ctx) * C->T->nPosAnd1;
-  C->T->array    = (uint32_t *) Calloc(C->T->size + 1, sizeof(uint32_t));
+  if(C->T->nPos == 1)
+    {
+    C->T->size = pow(NSYM, C->P->ctx);
+    }
+  else
+    {
+    C->T->nPosAnd1 = C->T->nPos + 1;
+    C->T->size     = pow(NSYM, C->P->ctx) * C->T->nPosAnd1;
+    }
+  C->T->array = (uint32_t *) Calloc(C->T->size + 1, sizeof(uint32_t));
 
   FillLT();
 
@@ -93,28 +101,51 @@ uint64_t GetIdx(uint8_t *p, RCLASS *C){
 //
 int32_t StartRM(RCLASS *C, uint32_t m, uint64_t i, uint8_t r)
   {
-  uint32_t *E = &C->T->array[i * C->T->nPosAnd1];
-  uint32_t last = E[C->T->nPos];
+  RMODEL *RM = NULL;
 
-  if(last == 0) return 0;
-
-  RMODEL *RM = &C->RM[m];
-  uint64_t idx = rand() % C->T->nPos; 
-
-  if(r == 0) // REGULAR REPEAT
+  if(C->T->nPos == 1)
     {
-    if(E[idx] == 0)
-      RM->pos = E[last]; // IF POSITION 0 THEN USE LATEST  
-    else 
-      RM->pos = E[idx];
+    uint32_t idx = C->T->array[i];
+    RM = &C->RM[m];
+    if(r == 0) // REGULAR REPEAT
+      {
+      if(idx == 0) return 0;
+      RM->pos = idx;
+      }
+    else
+      {
+      if(idx <= C->P->ctx+1)
+        return 0;
+      RM->pos = idx - C->P->ctx - 1;
+      }
     }
-  else // INVERTED REPEAT
+  else
     {
-    if(E[idx] <= C->P->ctx+1) 
-      return 0;
-    RM->pos = E[idx] - C->P->ctx - 1;
+    uint32_t *E = &C->T->array[i * C->T->nPosAnd1];
+    uint32_t last = E[C->T->nPos];
+
+    if(last == 0) return 0;
+
+    RM = &C->RM[m];
+    uint64_t idx = rand() % C->T->nPos; 
+
+    if(r == 0) // REGULAR REPEAT
+      {
+      if(E[idx] == 0)
+        RM->pos = E[last]; // IF POSITION 0 THEN USE LATEST  
+      else 
+        RM->pos = E[idx];
+      }
+    else // INVERTED REPEAT
+      {
+      if(E[idx] <= C->P->ctx+1) 
+        return 0;
+      RM->pos = E[idx] - C->P->ctx - 1;
+      }
     }
 
+  //fprintf(stdout, "%"PRIu64"\n", RM->pos);
+  
   RM->nHits  = 0;
   RM->nTries = 0;
   RM->rev    = r;
@@ -131,19 +162,26 @@ int32_t StartRM(RCLASS *C, uint32_t m, uint64_t i, uint8_t r)
 //
 void AddKmerPos(RTABLE *RT, uint64_t key, uint32_t pos)
   {
-  uint32_t *TC = &RT->array[key * RT->nPosAnd1];
-  uint32_t nPos = RT->nPos;
-  uint32_t idx = TC[nPos];
-
-  if(idx == nPos)
+  if(RT->nPos == 1)
     {
-    TC[0   ] = pos;
-    TC[nPos] = 0;
+    RT->array[key] = pos;
     }
   else
     {
-    TC[++idx] = pos;
-    TC[nPos ] = idx;
+    uint32_t *TC = &RT->array[key * RT->nPosAnd1];
+    uint32_t nPos = RT->nPos;
+    uint32_t idx = TC[nPos];
+
+    if(idx == nPos)
+      {
+      TC[0   ] = pos;
+      TC[nPos] = 0;
+      }
+    else
+      {
+      TC[++idx] = pos;
+      TC[nPos ] = idx;
+      }
     }
 
   return;
@@ -159,8 +197,9 @@ void ComputeRMProbs(RCLASS *C, RMODEL *R, uint8_t *b)
 
   if(R->nTries < MAX_LT)
     {
-    R->probs[s] = LT[R->nHits][R->nTries];
-    comp_prob = LT_C[R->nHits][R->nTries];
+    uint32_t lt_idx = R->nHits * MAX_LT + R->nTries;
+    R->probs[s] = LT  [lt_idx];
+    comp_prob   = LT_C[lt_idx];
     }
   else
     {
