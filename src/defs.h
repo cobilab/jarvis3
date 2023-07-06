@@ -42,6 +42,7 @@ typedef struct{
   uint8_t   verbose;
   uint8_t   force;
   uint8_t   estim;
+  uint8_t   progress;
   uint8_t   level;
   uint8_t   nn;
   uint8_t   mode;

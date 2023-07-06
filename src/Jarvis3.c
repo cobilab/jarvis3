@@ -34,7 +34,7 @@
 #include "arith_aux.h"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// ENCODE HEADER
+// ENCODE HEADER RMS ONLY
 //
 void EncodeHeaderOnlyRMs(PARAM *P, RCLASS **RC, FILE *F)
   {
@@ -215,7 +215,6 @@ void CompressRMsOnly(PARAM *P, char *fn)
   P->size = P->length>>2;
 
   if(P->verbose){
-    //fprintf(stderr, "Done!\n");
     fprintf(stderr, "Compressing %"PRIu64" symbols ...\n", P->length);
     }
 
@@ -249,7 +248,7 @@ void CompressRMsOnly(PARAM *P, char *fn)
       buf = (uint8_t *) Realloc(buf, (mSize+=ADD_SPACE) * sizeof(uint8_t));
 
     #ifdef PROGRESS
-    Progress(P->size, i);
+    if(P->progress) Progress(P->size, i);
     #endif
     }
 
@@ -453,7 +452,7 @@ void CompressNoNN(PARAM *P, char *fn)
       buf = (uint8_t *) Realloc(buf, (mSize+=ADD_SPACE) * sizeof(uint8_t));
 
     #ifdef PROGRESS
-    Progress(P->size, i);
+    if(P->progress) Progress(P->size, i);
     #endif 
     }
 
@@ -688,7 +687,7 @@ void Compress(PARAM *P, char *fn){
       buf = (uint8_t *) Realloc(buf, (mSize+=ADD_SPACE) * sizeof(uint8_t));
 
     #ifdef PROGRESS
-    Progress(P->size, i); 
+    if(P->progress) Progress(P->size, i); 
     #endif
     }
 
@@ -854,7 +853,7 @@ void Decompress(char *fn)
         buf = (uint8_t *) Realloc(buf, (mSize+=ADD_SPACE) * sizeof(uint8_t));
 
       #ifdef PROGRESS
-      Progress(P->size, i);
+      if(P->progress) Progress(P->size, i);
       #endif
       }
 
@@ -981,7 +980,7 @@ void Decompress(char *fn)
           buf = (uint8_t *) Realloc(buf, (mSize+=ADD_SPACE) * sizeof(uint8_t));
 
         #ifdef PROGRESS
-        Progress(P->size, i);
+        if(P->progress) Progress(P->size, i);
         #endif
         }
 
@@ -1127,7 +1126,7 @@ void Decompress(char *fn)
           buf = (uint8_t *) Realloc(buf, (mSize+=ADD_SPACE) * sizeof(uint8_t));
 
         #ifdef PROGRESS 
-        Progress(P->size, i);
+        if(P->progress) Progress(P->size, i);
         #endif
         }
 
@@ -1189,6 +1188,7 @@ int main(int argc, char **argv)
   P->verbose   = ArgState  (DEFAULT_VERBOSE, p, argc, "-v",  "--verbose");
   P->force     = ArgState  (DEFAULT_FORCE,   p, argc, "-f",  "--force");
   P->estim     = ArgState  (0,               p, argc, "-e",  "--estimate");
+  P->progress  = ArgState  (0,               p, argc, "-p",  "--progress");
   P->seed      = ArgNumber (DEFAULT_SEED,    p, argc, "-sd", "--seed", 
 		 1, 599999);
   P->hs        = ArgNumber (DEFAULT_HS,      p, argc, "-hs", "--hidden-size", 

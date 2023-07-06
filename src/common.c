@@ -47,7 +47,7 @@ uint64_t CalcMult(uint32_t c)
 void Progress(uint64_t size, uint64_t i)
   {
   if(size < 101) return;
-  if(i % (size / 100) == 0 && size > PROGRESS_MIN)
+  if(size > PROGRESS_MIN && i % (size / 100) == 0)
     fprintf(stderr, "Progress:%3d %%\r", (uint8_t) (i / (size / 100)));
   }
 

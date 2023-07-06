@@ -135,6 +135,9 @@ void PrintMenu(void){
   "      -v,  --verbose                                               \n"
   "           Verbose mode (more information).                        \n"
   "                                                                   \n"
+  "      -p,  --progress                                              \n"
+  "           Show progress bar.                                      \n"
+  "                                                                   \n"
   "      -d,  --decompress                                            \n"
   "           Decompression mode.                                     \n"
   "                                                                   \n",

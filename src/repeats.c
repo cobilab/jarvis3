@@ -144,8 +144,6 @@ int32_t StartRM(RCLASS *C, uint32_t m, uint64_t i, uint8_t r)
       }
     }
 
-  //fprintf(stdout, "%"PRIu64"\n", RM->pos);
-  
   RM->nHits  = 0;
   RM->nTries = 0;
   RM->rev    = r;
