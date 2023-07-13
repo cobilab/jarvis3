@@ -12,7 +12,6 @@
 #include <float.h>
 #include <ctype.h>
 #include <time.h>
-#include <malloc.h>
 #include <unistd.h>
 
 #include "defs.h"
