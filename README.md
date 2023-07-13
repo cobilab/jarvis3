@@ -28,10 +28,10 @@ make
 
 #### Run JARVIS3 ####
 
-Run JARVIS3 using level 13:
+Example of running JARVIS3 using level 7:
 
 <pre>
-./JARVIS3 -v -l 13 File.seq
+./JARVIS3 -v -l 7 File.seq
 </pre>
 
 ### Parameters ###
@@ -43,17 +43,27 @@ To see the possible options type
 
 This will print the following options:
 ```
-
+                                                                   
+           ██ ███████ ███████ ██    ██ ██ ███████ ███████          
+           ██ ██   ██ ██   ██ ██    ██ ██ ██           ██          
+           ██ ███████ ██████  ██    ██ ██ ███████ ███████          
+      ██   ██ ██   ██ ██  ███  ██  ██  ██      ██      ██          
+      ███████ ██   ██ ██   ███  ████   ██ ███████ ███████          
+                                                                   
+NAME                                                               
+      JARVIS3 v3.3,                                              
+      Efficient lossless encoding of genomic sequences             
+                                                                   
 SYNOPSIS                                                           
       ./JARVIS3 [OPTION]... [FILE]                                 
                                                                    
 SAMPLE                                                             
-      Run Compression   -> ./JARVIS3 -v -l 13 sequence.txt          
+      Run Compression   -> ./JARVIS3 -v -l 7 sequence.txt         
       Run Decompression -> ./JARVIS3 -v -d sequence.txt.jc         
                                                                    
 DESCRIPTION                                                        
       Lossless compression and decompression of genomic            
-      sequences for efficient storage and analysis purposes.       
+      sequences for miniaml storage and analysis purposes.         
       Measure an upper bound of the sequence complexity.           
                                                                    
       -h,  --help                                                  
@@ -71,6 +81,9 @@ DESCRIPTION
       -v,  --verbose                                               
            Verbose mode (more information).                        
                                                                    
+      -p,  --progress                                              
+           Show progress bar.                                      
+                                                                   
       -d,  --decompress                                            
            Decompression mode.                                     
                                                                    
@@ -84,9 +97,13 @@ DESCRIPTION
                                                                    
       -l [NUMBER],  --level [NUMBER]                               
            Compression level (integer).                            
-           Default level: 8.                                      
+           Default level: 3.                                      
            It defines compressibility in balance with computational
            resources (RAM & time). Use -s for levels perception.   
+                                                                   
+      -sd [NUMBER],  --seed [NUMBER]                               
+           Pseudo-random seed.                                     
+           Default value: 0.                                      
                                                                    
       -hs [NUMBER],  --hidden-size [NUMBER]                        
            Hidden size of the neural network (integer).            
@@ -94,11 +111,18 @@ DESCRIPTION
                                                                    
       -lr [DOUBLE],  --learning-rate [DOUBLE]                      
            Neural Network leaning rate (double).                   
+           The 0 value turns the Neural Network off.               
            Default value: 0.03.                                   
                                                                    
       [FILE]                                                       
            Input sequence filename (to compress) -- MANDATORY.     
            File to compress is the last argument.                  
+                                                                   
+COPYRIGHT                                                          
+      Copyright (C) 2014-2024.                                     
+      This is a Free software, under GPLv3. You may redistribute   
+      copies of it under the terms of the GNU - General Public     
+      License v3 <http://www.gnu.org/licenses/gpl.html>. 
                                                                    
 ```
 
@@ -108,41 +132,38 @@ To see the possible levels (automatic choosen compression parameters), type:
 ./JARVIS3 -s
 </pre>
 
-This will ouput th following pre-set models for each 33 levels:
+This will ouput th following pre-set models for each 30 levels:
 <pre>
-Level 1: -rm 20:12:0.1:0.9:6:0.10:0:0.8:200000 
-Level 2: -rm 200:12:0.1:0.9:6:0.10:0:0.8:200000 -cm 3:1:0:0.7/0:0:0:0 
-Level 3: -rm 500:12:0.1:0.9:6:0.10:0:0.8:200000 -cm 3:1:0:0.7/0:0:0:0 
-Level 4: -rm 500:12:0.1:0.9:6:0.10:1:0.8:200000 -cm 3:1:0:0.7/0:0:0:0 
-Level 5: -rm 500:12:0.1:0.9:6:0.10:1:0.8:2000000 -cm 3:1:0:0.7/0:0:0:0 
-Level 6: -rm 500:11:0.1:0.9:6:0.10:1:0.8:5000000 -cm 3:1:0:0.7/0:0:0:0 
-Level 7: -rm 1000:12:0.1:0.9:6:0.10:1:0.8:200000 -cm 2:1:0:0.9/0:0:0:0 -cm 7:1:1:0.7/0:0:0:0 -cm 13:20:1:0.95/0:0:0:0 
-Level 8: -rm 1500:12:0.1:0.9:6:0.10:1:0.8:200000 -cm 2:1:0:0.9/0:0:0:0 -cm 7:1:1:0.7/0:0:0:0 -cm 13:20:1:0.95/0:0:0:0 
-Level 9: -rm 2000:12:0.1:0.9:6:0.10:1:0.8:250000 -cm 2:1:0:0.9/0:0:0:0 -cm 7:1:1:0.7/0:0:0:0 -cm 13:20:1:0.95/0:0:0:0 
-Level 10: -rm 4000:12:0.1:0.9:6:0.10:1:0.8:300000 -cm 2:1:0:0.9/0:0:0:0 -cm 7:1:1:0.7/0:0:0:0 -cm 13:20:1:0.95/0:0:0:0 
-Level 11: -rm 5000:12:0.1:0.9:6:0.10:1:0.8:400000 -cm 2:1:0:0.9/0:0:0:0 -cm 7:1:1:0.7/0:0:0:0 -cm 11:10:0:0.95/0:0:0:0 -cm 13:20:1:0.95/0:0:0:0 
-Level 12: -rm 1000:13:0.1:0.9:6:0.15:1:0.85:400000 -cm 2:1:0:0.9/0:0:0:0 -cm 7:1:1:0.7/0:0:0:0 -cm 11:10:0:0.95/0:0:0:0 -cm 13:20:1:0.95/0:0:0:0 
-Level 13: -rm 2000:14:0.1:0.9:6:0.15:1:0.95:500000 -cm 2:1:0:0.9/0:0:0:0 -cm 7:1:1:0.7/0:0:0:0 -cm 11:10:0:0.95/0:0:0:0 -cm 13:20:1:0.95/0:0:0:0 
-Level 14: -rm 2000:15:0.1:0.9:6:0.15:1:0.99:1000000 -cm 2:1:0:0.9/0:0:0:0 -cm 7:1:1:0.7/0:0:0:0 -cm 11:10:0:0.95/0:0:0:0 -cm 13:20:1:0.95/0:0:0:0 
-Level 15: -rm 2000:15:0.1:0.9:6:0.15:1:0.999:5000000 -cm 2:1:0:0.9/0:0:0:0 -cm 7:1:1:0.7/0:0:0:0 -cm 11:10:0:0.95/0:0:0:0 -cm 13:20:1:0.95/0:0:0:0 
-Level 16: -rm 1000:15:0.1:0.9:6:0.10:1:0.999:0 -cm 1:1:0:0.8/0:0:0:0 -cm 3:1:0:0.93/0:0:0:0 -cm 6:1:1:0.7/0:0:0:0 -cm 12:10:1:0.95/0:0:0:0 
-Level 17: -rm 1000:12:0.1:0.9:6:0.10:0:0.8:200000 -rm 1000:12:0.1:0.9:6:0.10:2:0.8:200000 -cm 1:1:0:0.8/0:0:0:0 -cm 3:1:0:0.93/0:0:0:0 -cm 6:1:1:0.7/0:0:0:0 -cm 12:10:1:0.95/0:0:0:0 
-Level 18: -rm 1000:15:0.1:0.9:6:0.10:1:0.999:0 -cm 1:1:0:0.8/0:0:0:0 -cm 3:1:0:0.93/0:0:0:0 -cm 6:1:1:0.7/0:0:0:0 -cm 12:10:1:0.95/0:0:0:0 
-Level 19: -rm 50:12:0.1:0.9:6:0.10:1:0.85:200000 -cm 3:1:0:0.93/0:0:0:0 -cm 7:10:1:0.7/0:0:0:0 -cm 13:50:1:0.95/0:0:0:0 
-Level 20: -rm 50:12:0.1:0.9:6:0.10:1:0.85:200000 -cm 1:1:0:0.8/0:0:0:0 -cm 3:1:0:0.93/0:0:0:0 -cm 6:1:1:0.7/0:0:0:0 -cm 13:200:1:0.95/0:0:0:0 
-Level 21: -rm 100:12:0.1:0.9:6:0.10:1:0.85:200000 -cm 1:1:0:0.8/0:0:0:0 -cm 3:1:0:0.93/0:0:0:0 -cm 6:1:1:0.7/0:0:0:0 -cm 13:200:1:0.95/0:0:0:0 
-Level 22: -rm 200:12:0.1:0.9:6:0.10:1:0.85:200000 -cm 1:1:0:0.8/0:0:0:0 -cm 3:1:0:0.93/0:0:0:0 -cm 6:1:1:0.7/0:0:0:0 -cm 13:200:1:0.95/0:0:0:0 
-Level 23: -rm 500:12:0.2:0.9:7:0.1:1:0.01:200000 -cm 1:1:0:0.7/0:0:0:0 -cm 3:1:0:0.9/0:0:0:0 -cm 7:10:1:0.92/0:0:0:0 -cm 12:10:1:0.94/0:0:0:0 
-Level 24: -rm 1000:13:0.2:0.9:7:0.1:1:0.1:200000 -cm 1:1:0:0.7/0:0:0:0 -cm 3:1:0:0.9/0:0:0:0 -cm 7:10:1:0.90/0:0:0:0 -cm 12:20:1:0.95/0:0:0:0 
-Level 25: -lr 0.01 -hs 42 -rm 1000:12:0.1:0.9:7:0.4:1:0.2:220000 -cm 1:1:0:0.7/0:0:0:0 -cm 7:10:1:0.7/0:0:0:0 -cm 12:1:1:0.85/0:0:0:0 
-Level 26: -lr 0.01 -hs 42 -rm 100:12:0.01:0.9:7:0.8:1:0.2:240000 -cm 1:1:0:0.9/0:0:0:0 -cm 7:10:1:0.9/0:0:0:0 -cm 12:10:1:0.9/0:0:0:0 
-Level 27: -lr 0.05 -hs 42 -rm 100:12:1:0.9:7:0.8:0:0.01:250000 -rm 100:12:1:0.9:7:0.8:2:0.01:240000 -cm 1:1:0:0.9/0:0:0:0 -cm 4:1:0:0.9/0:0:0:0 -cm 8:1:1:0.89/0:0:0:0 -cm 12:20:1:0.97/0:0:0:0 
-Level 28: -lr 0.05 -hs 42 -rm 100:12:1:0.9:7:0.8:0:0.01:250000 -rm 100:12:1:0.9:7:0.8:2:0.01:240000 -cm 1:1:0:0.9/0:0:0:0 -cm 4:1:0:0.9/0:0:0:0 -cm 8:1:1:0.89/0:0:0:0 -cm 12:20:1:0.97/0:0:0:0 
-Level 29: -lr 0.05 -hs 42 -rm 200:12:1:0.9:7:0.8:0:0.01:250000 -rm 200:12:1:0.9:7:0.8:2:0.01:240000 -cm 1:1:0:0.9/0:0:0:0 -cm 4:1:0:0.9/0:0:0:0 -cm 8:1:1:0.89/0:0:0:0 -cm 12:20:1:0.97/0:0:0:0 
-Level 30: -lr 0.05 -hs 42 -rm 200:12:1:0.9:7:0.8:1:0.01:250000 -cm 4:1:0:0.9/0:0:0:0 
-Level 31: -lr 0.05 -hs 42 -rm 100:12:1:0.9:7:0.8:1:0.01:250000 -cm 3:1:0:0.9/0:0:0:0 
-Level 32: -lr 0.03 -hs 42 -rm 500:12:1:0.9:7:0.8:1:0.01:250000 -cm 3:1:0:0.9/0:0:0:0 
-Level 33: -lr 0.03 -hs 42 -rm 200:12:1:0.9:7:0.8:1:0.01:250000 -cm 7:1:0:0.9/0:0:0:0 
+LEVEL 1: -rm 1:12:0.90:4:0.72:0:0.1:1 
+LEVEL 2: -rm 1:12:0.90:4:0.72:1:0.1:1 
+LEVEL 3: -rm 1:13:0.90:4:0.72:1:0.1:1 
+LEVEL 4: -rm 1:14:0.90:4:0.72:1:0.1:1 
+LEVEL 5: -rm 2:12:0.90:5:0.60:1:0.1:1 
+LEVEL 6: -rm 4:12:0.94:7:0.70:1:0.05:3 
+LEVEL 7: -rm 6:12:0.90:6:0.78:1:0.03:1 
+LEVEL 8: -rm 8:13:0.90:6:0.78:1:0.03:2 
+LEVEL 9: -rm 10:12:0.91:7:0.80:1:0.02:3 
+LEVEL 10: -rm 12:12:0.90:7:0.81:1:0.02:3 
+LEVEL 11:  -lr 0 -cm 1:1:0:0.9/0:0:0:0 -rm 2:12:0.92:7:0.80:1:0.05:2 
+LEVEL 12:  -lr 0 -cm 3:1:0:0.9/0:0:0:0 -rm 3:12:0.93:7:0.81:1:0.05:3 
+LEVEL 13: -lr 0 -cm 3:1:0:0.9/0:0:0:0 -rm 4:12:0.92:7:0.81:1:0.03:2 
+LEVEL 14: -lr 0 -cm 4:1:0:0.9/0:0:0:0 -rm 4:13:0.94:7:0.81:1:0.04:3 
+LEVEL 15: -lr 0 -cm 6:1:0:0.9/0:0:0:0 -rm 4:13:0.94:7:0.81:1:0.04:3 
+LEVEL 16: -lr 0 -cm 6:1:0:0.9/0:0:0:0 -rm 8:12:0.93:7:0.81:1:0.02:3 
+LEVEL 17: -lr 0 -cm 4:1:0:0.9/0:0:0:0 -rm 20:12:0.9:7:0.85:1:0.01:4 
+LEVEL 18: -lr 0 -cm 4:1:0:0.9/0:0:0:0 -rm 50:12:0.9:7:0.85:1:0.01:5 
+LEVEL 19: -lr 0 -cm 4:1:0:0.9/0:0:0:0 -rm 100:12:0.9:7:0.85:1:0.01:5 
+LEVEL 20: -lr 0 -cm 4:1:0:0.9/0:0:0:0 -rm 200:12:0.9:7:0.85:1:0.01:6 
+LEVEL 21: -lr 0.03 -hs 18 -cm 4:1:0:0.9/0:0:0:0 -rm 12:13:0.91:7:0.82:1:0.03:1 
+LEVEL 22: -lr 0.03 -hs 18 -cm 4:1:0:0.9/0:0:0:0 -rm 30:13:0.90:7:0.82:1:0.02:1 
+LEVEL 23: -lr 0.03 -hs 24 -cm 6:1:0:0.9/0:0:0:0 -rm 15:12:0.92:7:0.85:0:0.02:4 -rm 12:12:0.92:7:0.84:2:0.01:3 
+LEVEL 24: -lr 0.03 -hs 42 -cm 1:1:0:0.9/0:0:0:0 -cm 4:1:0:0.9/0:0:0:0 -cm 8:1:1:0.89/0:0:0:0 -cm 12:20:1:0.97/0:0:0:0 -rm 300:12:0.9:7:0.85:0:0.01:10 -rm 200:12:0.9:7:0.8:2:0.01:4 
+LEVEL 25: -lr 0.03 -hs 48 -cm 1:1:0:0.9/0:0:0:0 -cm 4:1:0:0.9/0:0:0:0 -cm 8:1:1:0.89/0:0:0:0 -cm 12:20:1:0.97/0:0:0:0 -rm 300:12:0.9:7:0.85:0:0.01:10 -rm 200:12:0.9:7:0.8:2:0.01:4 
+LEVEL 26: -lr 0.04 -hs 64 -cm 1:1:0:0.9/0:0:0:0 -cm 4:1:0:0.9/0:0:0:0 -cm 8:1:1:0.89/0:0:0:0 -cm 12:20:1:0.97/0:0:0:0 -rm 500:12:0.9:7:0.85:0:0.01:12 -rm 200:12:0.9:7:0.8:2:0.01:4 
+LEVEL 27: -lr 0.04 -hs 86 -cm 1:1:0:0.9/0:0:0:0 -cm 4:1:0:0.9/0:0:0:0 -cm 8:1:1:0.89/0:0:0:0 -cm 12:20:1:0.97/0:0:0:0 -rm 500:12:0.9:7:0.85:0:0.01:12 -rm 200:12:0.9:7:0.8:2:0.01:4 
+LEVEL 28: -lr 0.04 -hs 256 -cm 1:1:0:0.9/0:0:0:0 -cm 4:1:0:0.9/0:0:0:0 -cm 8:1:1:0.9/0:0:0:0 -cm 12:20:1:0.97/0:0:0:0 -rm 1500:12:0.9:7:0.85:0:0.01:10 -rm 500:12:0.9:7:0.82:2:0.01:3 
+LEVEL 29: -lr 0.04 -hs 248 -cm 1:1:0:0.9/0:0:0:0 -cm 3:1:0:0.9/0:0:0:0 -cm 7:1:0:0.9/0:0:0:0 -cm 9:1:1:0.9/0:0:0:0 -cm 11:10:0:0.9/0:0:0:0 -rm 100:14:0.9:7:0.85:1:0.01:3 -rm 200:12:0.88:7:0.85:0:0.01:3 -rm 300:12:0.87:7:0.85:2:0.01:3 
+LEVEL 30: -lr 0.04 -hs 248 -cm 1:1:0:0.9/0:0:0:0 -cm 3:1:0:0.9/0:0:0:0 -cm 7:1:0:0.9/0:0:0:0 -cm 9:1:1:0.9/0:0:0:0 -cm 11:10:0:0.9/0:0:0:0 -cm 13:200:1:0.9/1:10:1:0.9 -rm 100:14:0.9:7:0.85:1:0.01:3 -rm 200:12:0.88:7:0.85:0:0.01:8 -rm 300:12:0.87:7:0.85:2:0.01:3 
 </pre>
 
 To see the meaning of the model parameters, type:
@@ -151,10 +172,10 @@ To see the meaning of the model parameters, type:
 </pre>
 This will output the following content:
 <pre>
-      -cm [NB_C]:[NB_D]:[NB_I]:[NB_G]/[NB_S]:[NB_E]:[NB_I]:[NB_A]  
+      -cm [NB_C]:[NB_D]:[NB_I]:[NB_G]/[NB_S]:[NB_R]:[NB_E]:[NB_A]  
       Template of a context model.                                 
       Parameters:                                                  
-      [NB_C]: (integer [1;20]) order size of the regular context   
+      [NB_C]: (integer [1;14]) order size of the regular context   
               model. Higher values use more RAM but, usually, are  
               related to a better compression score.               
       [NB_D]: (integer [1;5000]) denominator to build alpha, which 
@@ -207,20 +228,16 @@ This will output the following content:
       ... (you may use several context models)                     
                                                                    
                                                                    
-      -rm [NB_R]:[NB_C]:[NB_A]:[NB_B]:[NB_L]:[NB_G]:[NB_I]:[NB_W]:[NB_Y]
+      -rm [NB_R]:[NB_C]:[NB_B]:[NB_L]:[NB_G]:[NB_I]:[NB_W]:[NB_Y]  
       Template of a repeat model.                                  
       Parameters:                                                  
       [NB_R]: (integer [1;10000] maximum number of repeat models   
               for the class. On very repetive sequences the RAM    
               increases along with this value, however it also     
               improves the compression capability.                 
-      [NB_C]: (integer [1;20]) order size of the repeat context    
+      [NB_C]: (integer [1;14]) order size of the repeat context    
               model. Higher values use more RAM but, usually, are  
               related to a better compression score.               
-      [NB_A]: (real (0;1]) alpha is a real value, which is a       
-              parameter estimator. Higher values are usually used  
-              in lower [NB_C]. When [NB_A] is one, the             
-              probabilities assume a Laplacian distribution.       
       [NB_B]: (real (0;1]) beta is a real value, which is a        
               parameter for discarding or maintaining a certain    
               repeat model.                                        
@@ -239,9 +256,9 @@ This will output the following content:
               use of this sub-program increases the necessary time 
               to compress but it does not affect the RAM.          
       [NB_W]: (real (0;1)) initial weight for the repeat class.    
-      [NB_Y]: (integer {0}, [50;*]) repeat cache size. This will   
-              use a cache of entries while hashing. Value '0' will 
-              use the whole sequence length. 
+      [NB_Y]: (integer {0}, [1;50]) maximum cache size. This will  
+              use a table cache with the specified size. The size  
+              must be in balance with the k-mer size [NB_C].
 </pre>
 
 
@@ -280,20 +297,6 @@ Compression of FASTQ data:
 Decompression of FASTQ data:
 <pre>
 ./JARVIS3.sh --decompress --fastq --threads 4 --input sample.fq.tar
-</pre>
-
-### Benchmark ###
-
-JARVIS3 has been tested in two large benchmarks, namely the:
-
-1. Human genome (T2T Chm13 version 2.0 [<a href="https://doi.org/10.1126/science.abj6987">article</a>,<a href="https://s3-us-west-2.amazonaws.com/human-pangenomics/T2T/CHM13/assemblies/analysis_set/chm13v2.0.fa.gz">sequence</a>])
-<pre>
-https://github.com/cobilab/HumanGenome
-</pre>
-
-2. Cassava genome (TME 204 [<a href="https://doi.org/10.1093/gigascience/giac028">article</a>,<a href="https://ftp.cngb.org/pub/gigadb/pub/10.5524/102001_103000/102193/00_Assembly_Fasta/haplotigs/TME204.HiFi_HiC.haplotig1.fa">sequence</a>]) 
-<pre>
-https://github.com/cobilab/CassavaGenome
 </pre>
 
 ### Citation ###
