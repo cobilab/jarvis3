@@ -10,22 +10,22 @@ CFLAGS = -O3 -Wall $(CPLP)
 LIBS   = -lm
 DEPS   = defs.h
 PROGS  = $(BIN)/XScoreC $(BIN)/XScoreD \
-	 $(BIN)/MergeFastqStreams $(BIN)/SplitFastqStreams \
-         $(BIN)/MergeFastaStreams $(BIN)/SplitFastaStreams
+	 $(BIN)/MergeFastqStreamsJ3 $(BIN)/SplitFastqStreamsJ3 \
+         $(BIN)/MergeFastaStreamsJ3 $(BIN)/SplitFastaStreamsJ3
 OBJS   = mem.o msg.o buffer.o common.o hash.o array.o levels.o alphabet.o \
          arith.o arith_aux.o bitio.o pmodels.o tolerant.o context.o
 #-------------------------------------------------------------------------------
 all:
 	$(MAKE) progs
 progs: $(PROGS)
-$(BIN)/MergeFastqStreams: MergeFastqStreams.c
-	$(CC) $(CFLAGS) -o $(BIN)/MergeFastqStreams MergeFastqStreams.c
-$(BIN)/SplitFastqStreams: SplitFastqStreams.c
-	$(CC) $(CFLAGS) -o $(BIN)/SplitFastqStreams SplitFastqStreams.c
-$(BIN)/MergeFastaStreams: MergeFastaStreams.c
-	$(CC) $(CFLAGS) -o $(BIN)/MergeFastaStreams MergeFastaStreams.c
-$(BIN)/SplitFastaStreams: SplitFastaStreams.c
-	$(CC) $(CFLAGS) -o $(BIN)/SplitFastaStreams SplitFastaStreams.c
+$(BIN)/MergeFastqStreamsJ3: MergeFastqStreams.c
+	$(CC) $(CFLAGS) -o $(BIN)/MergeFastqStreamsJ3 MergeFastqStreams.c
+$(BIN)/SplitFastqStreamsJ3: SplitFastqStreams.c
+	$(CC) $(CFLAGS) -o $(BIN)/SplitFastqStreamsJ3 SplitFastqStreams.c
+$(BIN)/MergeFastaStreamsJ3: MergeFastaStreams.c
+	$(CC) $(CFLAGS) -o $(BIN)/MergeFastaStreamsJ3 MergeFastaStreams.c
+$(BIN)/SplitFastaStreamsJ3: SplitFastaStreams.c
+	$(CC) $(CFLAGS) -o $(BIN)/SplitFastaStreamsJ3 SplitFastaStreams.c
 $(BIN)/XScoreC: xscorec.c $(DEPS) $(OBJS)
 	$(CC) $(CFLAGS) -o $(BIN)/XScoreC xscorec.c $(OBJS) $(LIBS)
 $(BIN)/XScoreD: xscored.c $(DEPS) $(OBJS)
