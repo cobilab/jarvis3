@@ -1,0 +1,5 @@
+*.o
+MergeFastaStreamsJ3
+MergeFastqStreamsJ3
+SplitFastaStreamsJ3
+SplitFastqStreamsJ3

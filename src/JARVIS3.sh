@@ -15,7 +15,7 @@ THREADS="8";
 SHOW_MENU () {
   echo " -------------------------------------------------------";
   echo "                                                        ";
-  echo " JARVIS3, v1.1. High reference-free compression of DNA  ";
+  echo " JARVIS3, v3.4. High reference-free compression of DNA  ";
   echo "                sequences, FASTA data, and FASTQ data.  ";
   echo "                                                        ";
   echo " Program options ---------------------------------------";
@@ -80,7 +80,7 @@ SHOW_HEADER () {
   echo " [JARVIS3 :: DNA, FASTA, and FASTQ Extensions]          ";
   echo "                                                        ";
   echo " Release year: 2024,                                    ";
-  echo " Version: 1.1                                           ";
+  echo " Version: 3.4                                           ";
   echo " Author: D. Pratas                                      ";
   echo " Language: Bash / C                                     ";
   echo " License: GPL v3                                        ";
@@ -275,10 +275,10 @@ if [[ "$INSTALL" -eq "1" ]];
   echo "Running installation ...";
   cd extra/
   make clean ; make ;
-  cp MergeFastaStreams ..
-  cp MergeFastqStreams ..
-  cp SplitFastaStreams ..
-  cp SplitFastqStreams ..
+  cp MergeFastaStreamsJ3 ..
+  cp MergeFastqStreamsJ3 ..
+  cp SplitFastaStreamsJ3 ..
+  cp SplitFastqStreamsJ3 ..
   cp XScoreC ..
   cp XScoreD ..
   gcc bzip2.c -o bzip2
@@ -336,11 +336,11 @@ if [[ "$DECOMPRESS" -eq "0" ]];
     elif [[ "$TYPE" -eq "2" ]]; # FASTA DATA ===================================
     then
     #
-    Program_installed "./SplitFastaStreams";
+    Program_installed "./SplitFastaStreamsJ3";
     Program_installed "./bbb";
     Program_installed "./bzip2";
     Program_installed "./JARVIS3";
-    ./SplitFastaStreams < $INPUT
+    ./SplitFastaStreamsJ3 < $INPUT
     SPLIT_DNA "DNA.JV3" "$BLOCK" "$THREADS" "$LEVEL" &
     ./bbb cfm10q HEADERS.JV3 HEADERS.JV3.bbb &
     ./bzip2 -f EXTRA.JV3 &
@@ -357,12 +357,12 @@ if [[ "$DECOMPRESS" -eq "0" ]];
     #
     else # FASTQ DATA ==========================================================
     #
-    Program_installed "./SplitFastqStreams";
+    Program_installed "./SplitFastqStreamsJ3";
     Program_installed "./bbb";
     Program_installed "./bzip2";
     Program_installed "./XScoreC";
     Program_installed "./JARVIS3";
-    ./SplitFastqStreams < $INPUT
+    ./SplitFastqStreamsJ3 < $INPUT
     SPLIT_DNA "DNA.JV3" "$BLOCK" "$THREADS" "$LEVEL" &
     ./bzip2 -f N.JV3 &
     ./bbb cfm10q HEADERS.JV3 HEADERS.JV3.bbb &
@@ -402,7 +402,7 @@ if [[ "$DECOMPRESS" -eq "0" ]];
     then
     #
     echo "Number of threads: $THREADS";
-    Program_installed "./MergeFastaStreams";
+    Program_installed "./MergeFastaStreamsJ3";
     Program_installed "./bbb";
     Program_installed "./bzip2";
     Program_installed "./JARVIS3";
@@ -413,7 +413,7 @@ if [[ "$DECOMPRESS" -eq "0" ]];
     ./bbb -fqd HEADERS.JV3.bbb HEADERS.JV3 &
     wait
     mv DNA.JV3.tar.out DNA.JV3
-    ./MergeFastaStreams > $INPUT.out
+    ./MergeFastaStreamsJ3 > $INPUT.out
     rm -f DNA.JV3.jc DNA.JV3.tar.out EXTRA.JV3.bz2 HEADERS.JV3.bbb .rep_out_dec
     echo "Done!";
     echo "Decompressed file: $INPUT.out";
@@ -421,7 +421,7 @@ if [[ "$DECOMPRESS" -eq "0" ]];
     else # FASTQ DATA ==========================================================
     #
     echo "Number of threads: $THREADS";
-    Program_installed "./MergeFastqStreams";
+    Program_installed "./MergeFastqStreamsJ3";
     Program_installed "./bbb";
     Program_installed "./bzip2";
     Program_installed "./XScoreD";
@@ -435,7 +435,7 @@ if [[ "$DECOMPRESS" -eq "0" ]];
     wait
     mv DNA.JV3.tar.out DNA.JV3
     mv QUALITIES.JV3.de QUALITIES.JV3
-    ./MergeFastqStreams > $INPUT.out
+    ./MergeFastqStreamsJ3 > $INPUT.out
     rm -f DNA.JV3.jc DNA.JV3.tar.out N.JV3.bz2 HEADERS.JV3.bbb \
     QUALITIES.JV3.co .rep_main_info .tmp_report_out_xd .tmp_report_err_xd ;
     echo "Decompressed file: $INPUT.out";
