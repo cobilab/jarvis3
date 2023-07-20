@@ -269,7 +269,6 @@ function RUN_NAF {
   cat naf_tmp_report.txt | grep "TIME" | tr '.' ',' | awk '{ printf $2/60"\t"$4/1024/1024"\n" }' > c_time_mem.txt;
   #
   BYTES=`ls -la NAF-OUT.naf | awk '{ print $5 }'`;
-  echo "BYTES=$BYTES";
   #
   /bin/time -f "TIME\t%e\tMEM\t%M" $D_COMMAND -o NAD-D-OUT.naf NAF-OUT.naf 2> naf_tmp_report.txt 
   cat naf_tmp_report.txt | grep "TIME" | tr '.' ',' | awk '{ printf $2/60"\t"$4/1024/1024"\n" }' > d_time_mem.txt;
@@ -450,23 +449,37 @@ printf "PROGRAM\tC_BYTES\tC_TIME (m)\tC_MEM (GB)\tD_TIME (m)\tD_MEM (GB)\tDIFF\t
 #RUN_JARVIS1 "$FILE" "JARVIS -v -rm 2000:12:0.1:0.9:6:0.10:1 -cm 4:1:1:0.7/0:0:0:0 -z 6 " "JARVIS -d " "JARVIS1" "15" >> data.csv;
 #RUN_JARVIS2_BIN "$FILE" "./JARVIS2 -v -l 1 " "./JARVIS2 -d " "JARVIS2-bin" "16" >> data.csv;
 #RUN_JARVIS2_SH "$FILE" " -lr 0.01 -hs 42 -rm 200:11:1:0.9:7:0.3:1:0.2:220000 -cm 12:1:1:0.85/0:0:0:0 " " --decompress --threads 8 --dna --input " "JARVIS2-sh" "23" " --block 100MB --threads 8 --dna "
-RUN_NAF "$FILE" "ennaf --temp-dir tmp/ --dna --level 2 " "unnaf " "NAF" "24" >> data.csv;
-RUN_NAF "$FILE" "ennaf --temp-dir tmp/ --dna --level 12 " "unnaf " "NAF" "24" >> data.csv;
-RUN_NAF "$FILE" "ennaf --temp-dir tmp/ --dna --level 22 " "unnaf " "NAF" "24" >> data.csv;
+for((x=1;x<=22;++x)); 
+  do
+  RUN_NAF "$FILE" "ennaf --temp-dir tmp/ --dna --level $x " "unnaf " "NAF" "24" >> data.csv;
+  done
+#RUN_NAF "$FILE" "ennaf --temp-dir tmp/ --dna --level 22 " "unnaf " "NAF" "24" >> data.csv;
 RUN_LZMA "$FILE" "lzma -1 -f -k " "lzma -f -k -d " "LZMA" "25" >> data.csv;
+RUN_LZMA "$FILE" "lzma -2 -f -k " "lzma -f -k -d " "LZMA" "25" >> data.csv;
+RUN_LZMA "$FILE" "lzma -3 -f -k " "lzma -f -k -d " "LZMA" "25" >> data.csv;
+RUN_LZMA "$FILE" "lzma -4 -f -k " "lzma -f -k -d " "LZMA" "25" >> data.csv;
 RUN_LZMA "$FILE" "lzma -5 -f -k " "lzma -f -k -d " "LZMA" "25" >> data.csv;
+RUN_LZMA "$FILE" "lzma -6 -f -k " "lzma -f -k -d " "LZMA" "25" >> data.csv;
+RUN_LZMA "$FILE" "lzma -7 -f -k " "lzma -f -k -d " "LZMA" "25" >> data.csv;
+RUN_LZMA "$FILE" "lzma -8 -f -k " "lzma -f -k -d " "LZMA" "25" >> data.csv;
 RUN_LZMA "$FILE" "lzma -9 -f -k " "lzma -f -k -d " "LZMA" "25" >> data.csv;
 RUN_BZIP2 "$FILE" "bzip2 -1 -f -k " "bzip2 -f -k -d " "BZIP2" "26" >> data.csv;
+RUN_BZIP2 "$FILE" "bzip2 -2 -f -k " "bzip2 -f -k -d " "BZIP2" "26" >> data.csv;
+RUN_BZIP2 "$FILE" "bzip2 -3 -f -k " "bzip2 -f -k -d " "BZIP2" "26" >> data.csv;
+RUN_BZIP2 "$FILE" "bzip2 -4 -f -k " "bzip2 -f -k -d " "BZIP2" "26" >> data.csv;
 RUN_BZIP2 "$FILE" "bzip2 -5 -f -k " "bzip2 -f -k -d " "BZIP2" "26" >> data.csv;
+RUN_BZIP2 "$FILE" "bzip2 -6 -f -k " "bzip2 -f -k -d " "BZIP2" "26" >> data.csv;
+RUN_BZIP2 "$FILE" "bzip2 -7 -f -k " "bzip2 -f -k -d " "BZIP2" "26" >> data.csv;
+RUN_BZIP2 "$FILE" "bzip2 -8 -f -k " "bzip2 -f -k -d " "BZIP2" "26" >> data.csv;
 RUN_BZIP2 "$FILE" "bzip2 -9 -f -k " "bzip2 -f -k -d " "BZIP2" "26" >> data.csv;
-#RUN_BSC "$FILE" " -b800000000 " "./bsc-m03 " "BSC-m03" "27" >> data.csv;
-#RUN_BSC "$FILE" " -b400000000 " "./bsc-m03 " "BSC-m03" "28" >> data.csv;
+RUN_BSC "$FILE" " -b800000000 " "./bsc-m03 " "BSC-m03" "27" >> data.csv;
+RUN_BSC "$FILE" " -b400000000 " "./bsc-m03 " "BSC-m03" "28" >> data.csv;
 RUN_BSC "$FILE" " -b4096000 " "./bsc-m03 " "BSC-m03" "29" >> data.csv;
 RUN_MFC "$FILE" "./MFCompressC -v -1 -p 1 -t 1 " "./MFCompressD " "MFCompress" "30" >> data.csv;
 RUN_MFC "$FILE" "./MFCompressC -v -2 -p 1 -t 1 " "./MFCompressD " "MFCompress" "31" >> data.csv;
 RUN_MFC "$FILE" "./MFCompressC -v -3 -p 1 -t 1 " "./MFCompressD " "MFCompress" "32" >> data.csv;
 #
-for((x=1;x<=5;++x)); 
+for((x=1;x<=25;++x)); 
 do
 echo "Running $x...";
 #RUN_JARVIS3_BIN "$FILE" "./JARVIS3 -v -l $x " "./JARVIS3 -d " "JARVIS3" "33" >> data.csv;
@@ -501,7 +514,7 @@ echo "$plotnames";
 gnuplot << EOF
     reset
     set terminal pdfcairo enhanced color font 'Verdade,12'
-    set output "Benchmark.pdf"
+    set output "Benchmark-$1-Figure.pdf"
     set style line 101 lc rgb '#000000' lt 1 lw 2
     set border 3 front ls 101
     set tics nomirror out scale 0.75
