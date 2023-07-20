@@ -440,20 +440,15 @@ printf "PROGRAM\tC_BYTES\tC_TIME (m)\tC_MEM (GB)\tD_TIME (m)\tD_MEM (GB)\tDIFF\t
 #
 # ------------------------------------------------------------------------------
 #
-#RUN_GECO2 "$FILE" "GeCo2 -v -l 1 " "GeDe2 -v " "GeCo2" "1" >> data.csv;
-#RUN_GECO2 "$FILE" "GeCo2 -v -l 5 " "GeDe2 -v " "GeCo2" "1" >> data.csv;
-#RUN_GECO2 "$FILE" "GeCo2 -v -l 7 " "GeDe2 -v " "GeCo2" "1" >> data.csv;
-#RUN_GECO3 "$FILE" "GeCo3 -v -l 1" "GeDe3 -v " "GeCo3" "6" >> data.csv;
-#RUN_GECO3 "$FILE" "GeCo3 -v -l 5" "GeDe3 -v " "GeCo3" "6" >> data.csv;
-#RUN_GECO3 "$FILE" "GeCo3 -v -l 7" "GeDe3 -v " "GeCo3" "6" >> data.csv;
-#RUN_JARVIS1 "$FILE" "JARVIS -v -rm 2000:12:0.1:0.9:6:0.10:1 -cm 4:1:1:0.7/0:0:0:0 -z 6 " "JARVIS -d " "JARVIS1" "15" >> data.csv;
-#RUN_JARVIS2_BIN "$FILE" "./JARVIS2 -v -l 1 " "./JARVIS2 -d " "JARVIS2-bin" "16" >> data.csv;
-#RUN_JARVIS2_SH "$FILE" " -lr 0.01 -hs 42 -rm 200:11:1:0.9:7:0.3:1:0.2:220000 -cm 12:1:1:0.85/0:0:0:0 " " --decompress --threads 8 --dna --input " "JARVIS2-sh" "23" " --block 100MB --threads 8 --dna "
+RUN_JARVIS2_SH "$FILE" " 1 " " --decompress --threads 1 --fasta --input " "JARVIS2-sh" "23" " --block 600MB --threads 1 --fasta " >> data.csv
+RUN_JARVIS2_SH "$FILE" " 2 " " --decompress --threads 1 --fasta --input " "JARVIS2-sh" "23" " --block 600MB --threads 1 --fasta " >> data.csv
+RUN_JARVIS2_SH "$FILE" " 3 " " --decompress --threads 1 --fasta --input " "JARVIS2-sh" "23" " --block 600MB --threads 1 --fasta " >> data.csv
+RUN_JARVIS2_SH "$FILE" " 7 " " --decompress --threads 1 --fasta --input " "JARVIS2-sh" "23" " --block 600MB --threads 1 --fasta " >> data.csv
 for((x=1;x<=22;++x)); 
   do
+  echo "Running NAF level $x...";
   RUN_NAF "$FILE" "ennaf --temp-dir tmp/ --dna --level $x " "unnaf " "NAF" "24" >> data.csv;
   done
-#RUN_NAF "$FILE" "ennaf --temp-dir tmp/ --dna --level 22 " "unnaf " "NAF" "24" >> data.csv;
 RUN_LZMA "$FILE" "lzma -1 -f -k " "lzma -f -k -d " "LZMA" "25" >> data.csv;
 RUN_LZMA "$FILE" "lzma -2 -f -k " "lzma -f -k -d " "LZMA" "25" >> data.csv;
 RUN_LZMA "$FILE" "lzma -3 -f -k " "lzma -f -k -d " "LZMA" "25" >> data.csv;
@@ -481,8 +476,7 @@ RUN_MFC "$FILE" "./MFCompressC -v -3 -p 1 -t 1 " "./MFCompressD " "MFCompress" "
 #
 for((x=1;x<=25;++x)); 
 do
-echo "Running $x...";
-#RUN_JARVIS3_BIN "$FILE" "./JARVIS3 -v -l $x " "./JARVIS3 -d " "JARVIS3" "33" >> data.csv;
+echo "Running JARVIS3 level $x...";
 RUN_JARVIS3_SH "$FILE" " $x --block 600MB --threads 1 " " --decompress --threads 1 --fasta --input " "JARVIS3" "23" " --block 600MB --threads 1 --fasta " >> data.csv;
 done
 #
@@ -544,6 +538,6 @@ gnuplot << EOF
     plot $plotnames
 EOF
 #
-evince Benchmark.pdf &
+evince Benchmark-$1-Figure.pdf &
 #
 # ==============================================================================
