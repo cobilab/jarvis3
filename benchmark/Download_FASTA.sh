@@ -19,6 +19,12 @@ efetch -db nucleotide -id "NC_000024.1" -format fasta > CY.fa
 #
 # COPUS -----------------------------------------------------------------------
 #
-ls
+wget http://sweet.ua.pt/pratas/datasets/DNACorpus.zip
+unzip DNACorpus.zip
+cat DNACorpus/* | gto_fasta_from_seq -n "CORPUS" > CORPUS.fa
 #
 # -----------------------------------------------------------------------------
+#
+wget virus.fa
+#
+#
