@@ -15,176 +15,6 @@ CHECK_INPUT () {
 #
 # ==============================================================================
 #
-function RUN_GECO3 {
-  #
-  IN_FILE="$1";
-  C_COMMAND="$2";
-  D_COMMAND="$3";
-  NAME="$4";
-  #
-  /bin/time -f "TIME\t%e\tMEM\t%M" $C_COMMAND $IN_FILE \
-  |& grep "TIME" \
-  |& tr '.' ',' \
-  |& awk '{ printf $2/60"\t"$4/1024/1024"\n" }' > c_time_mem.txt;
-  BYTES=`ls -la $IN_FILE.co | awk '{ print $5 }'`;
-  #
-  /bin/time -f "TIME\t%e\tMEM\t%M" $D_COMMAND $IN_FILE.co \
-  |& grep "TIME" \
-  |& tr '.' ',' \
-  |& awk '{ printf $2/60"\t"$4/1024/1024"\n" }' > d_time_mem.txt;
-  #
-  cmp $IN_FILE.de $IN_FILE > cmp.txt;
-  #
-  C_TIME=`cat c_time_mem.txt | awk '{ print $1}'`;
-  C_MEME=`cat c_time_mem.txt | awk '{ print $2}'`;
-  D_TIME=`cat d_time_mem.txt | awk '{ print $1}'`;
-  D_MEME=`cat d_time_mem.txt | awk '{ print $2}'`;
-  VERIFY="0";
-  CMP_SIZE=`ls -la cmp.txt | awk '{ print $5}'`
-  if [[ "$CMP_SIZE" != "0" ]]; then CMP_SIZE="1"; fi
-  #
-  printf "$NAME\t$BYTES\t$C_TIME\t$C_MEME\t$D_TIME\t$D_MEME\t$CMP_SIZE\t$5\n";
-  #
-  }
-#
-# ==============================================================================
-#
-function RUN_GECO2 {
-  #
-  IN_FILE="$1";
-  C_COMMAND="$2";
-  D_COMMAND="$3";
-  NAME="$4";
-  #
-  /bin/time -f "TIME\t%e\tMEM\t%M" $C_COMMAND $IN_FILE \
-  |& grep "TIME" \
-  |& tr '.' ',' \
-  |& awk '{ printf $2/60"\t"$4/1024/1024"\n" }' > c_time_mem.txt;
-  BYTES=`ls -la $IN_FILE.co | awk '{ print $5 }'`;
-  #
-  /bin/time -f "TIME\t%e\tMEM\t%M" $D_COMMAND $IN_FILE.co \
-  |& grep "TIME" \
-  |& tr '.' ',' \
-  |& awk '{ printf $2/60"\t"$4/1024/1024"\n" }' > d_time_mem.txt;
-  #
-  cmp $IN_FILE.de $IN_FILE > cmp.txt;
-  #
-  C_TIME=`cat c_time_mem.txt | awk '{ print $1}'`;
-  C_MEME=`cat c_time_mem.txt | awk '{ print $2}'`;
-  D_TIME=`cat d_time_mem.txt | awk '{ print $1}'`;
-  D_MEME=`cat d_time_mem.txt | awk '{ print $2}'`;
-  VERIFY="0";
-  CMP_SIZE=`ls -la cmp.txt | awk '{ print $5}'`
-  if [[ "$CMP_SIZE" != "0" ]]; then CMP_SIZE="1"; fi
-  #
-  printf "$NAME\t$BYTES\t$C_TIME\t$C_MEME\t$D_TIME\t$D_MEME\t$CMP_SIZE\t$5\n";
-  #
-  }
-#
-# ==============================================================================
-#
-function RUN_JARVIS2_BIN {
-  #
-  IN_FILE="$1";
-  C_COMMAND="$2";
-  D_COMMAND="$3";
-  NAME="$4";
-  #
-  /bin/time -f "TIME\t%e\tMEM\t%M" $C_COMMAND $IN_FILE \
-  |& grep "TIME" \
-  |& tr '.' ',' \
-  |& awk '{ printf $2/60"\t"$4/1024/1024"\n" }' > c_time_mem.txt;
-  BYTES=`ls -la $IN_FILE.jc | awk '{ print $5 }'`;
-  #
-  /bin/time -f "TIME\t%e\tMEM\t%M" $D_COMMAND $IN_FILE.jc \
-  |& grep "TIME" \
-  |& tr '.' ',' \
-  |& awk '{ printf $2/60"\t"$4/1024/1024"\n" }' > d_time_mem.txt;
-  #
-  cmp $IN_FILE.jc.jd $IN_FILE > cmp.txt;
-  #
-  C_TIME=`cat c_time_mem.txt | awk '{ print $1}'`;
-  C_MEME=`cat c_time_mem.txt | awk '{ print $2}'`;
-  D_TIME=`cat d_time_mem.txt | awk '{ print $1}'`;
-  D_MEME=`cat d_time_mem.txt | awk '{ print $2}'`;
-  VERIFY="0";
-  CMP_SIZE=`ls -la cmp.txt | awk '{ print $5}'`
-  if [[ "$CMP_SIZE" != "0" ]]; then CMP_SIZE="1"; fi
-  #
-  printf "$NAME\t$BYTES\t$C_TIME\t$C_MEME\t$D_TIME\t$D_MEME\t$CMP_SIZE\t$5\n";
-  #
-  }
-#
-# ==============================================================================
-#
-function RUN_JARVIS3_BIN {
-  #
-  IN_FILE="$1";
-  C_COMMAND="$2";
-  D_COMMAND="$3";
-  NAME="$4";
-  #
-  /bin/time -f "TIME\t%e\tMEM\t%M" $C_COMMAND $IN_FILE \
-  |& grep "TIME" \
-  |& tr '.' ',' \
-  |& awk '{ printf $2/60"\t"$4/1024/1024"\n" }' > c_time_mem.txt;
-  BYTES=`ls -la $IN_FILE.jc | awk '{ print $5 }'`;
-  #
-  /bin/time -f "TIME\t%e\tMEM\t%M" $D_COMMAND $IN_FILE.jc \
-  |& grep "TIME" \
-  |& tr '.' ',' \
-  |& awk '{ printf $2/60"\t"$4/1024/1024"\n" }' > d_time_mem.txt;
-  #
-  cmp $IN_FILE.jc.jd $IN_FILE > cmp.txt;
-  #
-  C_TIME=`cat c_time_mem.txt | awk '{ print $1}'`;
-  C_MEME=`cat c_time_mem.txt | awk '{ print $2}'`;
-  D_TIME=`cat d_time_mem.txt | awk '{ print $1}'`;
-  D_MEME=`cat d_time_mem.txt | awk '{ print $2}'`;
-  VERIFY="0";
-  CMP_SIZE=`ls -la cmp.txt | awk '{ print $5}'`
-  if [[ "$CMP_SIZE" != "0" ]]; then CMP_SIZE="1"; fi
-  #
-  printf "$NAME\t$BYTES\t$C_TIME\t$C_MEME\t$D_TIME\t$D_MEME\t$CMP_SIZE\t$5\n";
-  #
-  }
-#
-# ==============================================================================
-#
-function RUN_JARVIS1 {
-  #
-  IN_FILE="$1";
-  C_COMMAND="$2";
-  D_COMMAND="$3";
-  NAME="$4";
-  #
-  /bin/time -f "TIME\t%e\tMEM\t%M" $C_COMMAND $IN_FILE \
-  |& grep "TIME" \
-  |& tr '.' ',' \
-  |& awk '{ printf $2/60"\t"$4/1024/1024"\n" }' > c_time_mem.txt;
-  BYTES=`ls -la $IN_FILE.jc | awk '{ print $5 }'`;
-  #
-  /bin/time -f "TIME\t%e\tMEM\t%M" $D_COMMAND $IN_FILE.jc \
-  |& grep "TIME" \
-  |& tr '.' ',' \
-  |& awk '{ printf $2/60"\t"$4/1024/1024"\n" }' > d_time_mem.txt;
-  #
-  cmp $IN_FILE.jc.jd $IN_FILE > cmp.txt;
-  #
-  C_TIME=`cat c_time_mem.txt | awk '{ print $1}'`;
-  C_MEME=`cat c_time_mem.txt | awk '{ print $2}'`;
-  D_TIME=`cat d_time_mem.txt | awk '{ print $1}'`;
-  D_MEME=`cat d_time_mem.txt | awk '{ print $2}'`;
-  VERIFY="0";
-  CMP_SIZE=`ls -la cmp.txt | awk '{ print $5}'`
-  if [[ "$CMP_SIZE" != "0" ]]; then CMP_SIZE="1"; fi
-  #
-  printf "$NAME\t$BYTES\t$C_TIME\t$C_MEME\t$D_TIME\t$D_MEME\t$CMP_SIZE\t$5\n";
-  #
-  }
-#
-# ==============================================================================
-#
 function RUN_JARVIS2_SH {
   #
   IN_FILE="$1";
@@ -253,6 +83,72 @@ function RUN_JARVIS3_SH {
 #
 # ==============================================================================
 #
+function RUN_AGC {
+  #
+  IN_FILE="$1";
+  C_COMMAND="$2";
+  D_COMMAND="$3";
+  NAME="$4";
+  #
+  /bin/time -f "TIME\t%e\tMEM\t%M" $C_COMMAND $IN_FILE > AGC-OUT.agc 2> agc_tmp_report.txt;
+  cat agc_tmp_report.txt | grep "TIME" | tr '.' ',' | awk '{ printf $2/60"\t"$4/1024/1024"\n" }' > c_time_mem.txt;
+  #
+  BYTES=`ls -la AGC-OUT.agc | awk '{ print $5 }'`;
+  #
+  /bin/time -f "TIME\t%e\tMEM\t%M" $D_COMMAND AGC-OUT.agc > AGC-D-OUT.agc 2> agc_tmp_report.txt
+  cat agc_tmp_report.txt | grep "TIME" | tr '.' ',' | awk '{ printf $2/60"\t"$4/1024/1024"\n" }' > d_time_mem.txt;
+  #
+  cmp AGC-D-OUT.agc $IN_FILE > cmp.txt;
+  #
+  C_TIME=`cat c_time_mem.txt | awk '{ print $1}'`;
+  C_MEME=`cat c_time_mem.txt | awk '{ print $2}'`;
+  D_TIME=`cat d_time_mem.txt | awk '{ print $1}'`;
+  D_MEME=`cat d_time_mem.txt | awk '{ print $2}'`;
+  VERIFY="0";
+  CMP_SIZE=`ls -la cmp.txt | awk '{ print $5}'`
+  if [[ "$CMP_SIZE" != "0" ]]; then CMP_SIZE="1"; fi
+  #
+  printf "$NAME\t$BYTES\t$C_TIME\t$C_MEME\t$D_TIME\t$D_MEME\t$CMP_SIZE\t$5\n";
+  #
+  rm -f AGC-OUT.agc AGC-D-OUT.agc;
+  #
+  }
+#
+# ==============================================================================
+#
+function RUN_MBGC {
+  #
+  IN_FILE="$1";
+  C_COMMAND="$2";
+  D_COMMAND="$3";
+  NAME="$4";
+  #
+  /bin/time -f "TIME\t%e\tMEM\t%M" $C_COMMAND -i $IN_FILE MBGC-OUT.mbgc 1> garbage-MBGC 2> mbgc_tmp_report.txt;
+  cat mbgc_tmp_report.txt | grep "TIME" | tr '.' ',' | awk '{ printf $2/60"\t"$4/1024/1024"\n" }' > c_time_mem.txt;
+  #
+  BYTES=`ls -la MBGC-OUT.mbgc | awk '{ print $5 }'`;
+  #
+  /bin/time -f "TIME\t%e\tMEM\t%M" $D_COMMAND MBGC-OUT.mbgc MBGC-D-OUT 1> garbage-MBGC 2> mbgc_tmp_report.txt
+  cat mbgc_tmp_report.txt | grep "TIME" | tr '.' ',' | awk '{ printf $2/60"\t"$4/1024/1024"\n" }' > d_time_mem.txt;
+  #
+  cmp MBGC-D-OUT/$IN_FILE $IN_FILE > cmp.txt;
+  #
+  C_TIME=`cat c_time_mem.txt | awk '{ print $1}'`;
+  C_MEME=`cat c_time_mem.txt | awk '{ print $2}'`;
+  D_TIME=`cat d_time_mem.txt | awk '{ print $1}'`;
+  D_MEME=`cat d_time_mem.txt | awk '{ print $2}'`;
+  VERIFY="0";
+  CMP_SIZE=`ls -la cmp.txt | awk '{ print $5}'`
+  if [[ "$CMP_SIZE" != "0" ]]; then CMP_SIZE="1"; fi
+  #
+  printf "$NAME\t$BYTES\t$C_TIME\t$C_MEME\t$D_TIME\t$D_MEME\t$CMP_SIZE\t$5\n";
+  #
+  rm -fr MBGC-OUT.mbgc MBGC-D-OUT garbage-MBGC;
+  #
+  }
+#
+# ==============================================================================
+#
 function RUN_NAF {
   #
   rm -fr tmp 
@@ -262,8 +158,6 @@ function RUN_NAF {
   C_COMMAND="$2";
   D_COMMAND="$3";
   NAME="$4";
-#  C_NAF_FILE=${IN_FILE/.fa/.naf};
-#  D_NAF_FILE=${IN_FILE/.fa/.unnaf};
   #
   /bin/time -f "TIME\t%e\tMEM\t%M" $C_COMMAND -o NAF-OUT.naf $IN_FILE 2> naf_tmp_report.txt;
   cat naf_tmp_report.txt | grep "TIME" | tr '.' ',' | awk '{ printf $2/60"\t"$4/1024/1024"\n" }' > c_time_mem.txt;
@@ -436,50 +330,62 @@ rm -f data.csv
 #
 # ==============================================================================
 #
-printf "PROGRAM\tC_BYTES\tC_TIME (m)\tC_MEM (GB)\tD_TIME (m)\tD_MEM (GB)\tDIFF\tRUN\n";
-#
-# ------------------------------------------------------------------------------
-#
-RUN_JARVIS2_SH "$FILE" " 1 " " --decompress --threads 1 --fasta --input " "JARVIS2-sh" "23" " --block 600MB --threads 1 --fasta " >> data.csv
-RUN_JARVIS2_SH "$FILE" " 2 " " --decompress --threads 1 --fasta --input " "JARVIS2-sh" "23" " --block 600MB --threads 1 --fasta " >> data.csv
-RUN_JARVIS2_SH "$FILE" " 3 " " --decompress --threads 1 --fasta --input " "JARVIS2-sh" "23" " --block 600MB --threads 1 --fasta " >> data.csv
-RUN_JARVIS2_SH "$FILE" " 7 " " --decompress --threads 1 --fasta --input " "JARVIS2-sh" "23" " --block 600MB --threads 1 --fasta " >> data.csv
-for((x=1;x<=22;++x)); 
+echo "Running MBGC ...";
+for((x=1;x<=3;++x));
   do
-  echo "Running NAF level $x...";
+  echo "Level $x...";
+  RUN_MBGC "$FILE" "mbgc -c $x -t 1 " "mbgc -d -t 1 " "MBGC" "24" >> data.csv;
+  done
+#
+echo "Running AGC ...";
+RUN_AGC "$FILE" "agc create -t 1 " "agc getcol -t 1 " "AGC" "24" >> data.csv;
+echo "Running JARVIS2 ...";
+RUN_JARVIS2_SH "$FILE" " 1 " " --decompress --threads 1 --fasta --input " "JARVIS2" "23" " --block 600MB --threads 1 --fasta " >> data.csv
+echo "Running JARVIS2 ...";
+RUN_JARVIS2_SH "$FILE" " 2 " " --decompress --threads 1 --fasta --input " "JARVIS2" "23" " --block 600MB --threads 1 --fasta " >> data.csv
+echo "Running JARVIS2 ...";
+RUN_JARVIS2_SH "$FILE" " 3 " " --decompress --threads 1 --fasta --input " "JARVIS2" "23" " --block 600MB --threads 1 --fasta " >> data.csv
+echo "Running JARVIS2 ...";
+RUN_JARVIS2_SH "$FILE" " 7 " " --decompress --threads 1 --fasta --input " "JARVIS2" "23" " --block 600MB --threads 1 --fasta " >> data.csv
+echo "Running NAF ...";
+for((x=1;x<=5;++x)); 
+  do
+  echo "Level $x...";
   RUN_NAF "$FILE" "ennaf --temp-dir tmp/ --dna --level $x " "unnaf " "NAF" "24" >> data.csv;
   done
-RUN_LZMA "$FILE" "lzma -1 -f -k " "lzma -f -k -d " "LZMA" "25" >> data.csv;
-RUN_LZMA "$FILE" "lzma -2 -f -k " "lzma -f -k -d " "LZMA" "25" >> data.csv;
-RUN_LZMA "$FILE" "lzma -3 -f -k " "lzma -f -k -d " "LZMA" "25" >> data.csv;
-RUN_LZMA "$FILE" "lzma -4 -f -k " "lzma -f -k -d " "LZMA" "25" >> data.csv;
-RUN_LZMA "$FILE" "lzma -5 -f -k " "lzma -f -k -d " "LZMA" "25" >> data.csv;
-RUN_LZMA "$FILE" "lzma -6 -f -k " "lzma -f -k -d " "LZMA" "25" >> data.csv;
-RUN_LZMA "$FILE" "lzma -7 -f -k " "lzma -f -k -d " "LZMA" "25" >> data.csv;
-RUN_LZMA "$FILE" "lzma -8 -f -k " "lzma -f -k -d " "LZMA" "25" >> data.csv;
-RUN_LZMA "$FILE" "lzma -9 -f -k " "lzma -f -k -d " "LZMA" "25" >> data.csv;
-RUN_BZIP2 "$FILE" "bzip2 -1 -f -k " "bzip2 -f -k -d " "BZIP2" "26" >> data.csv;
-RUN_BZIP2 "$FILE" "bzip2 -2 -f -k " "bzip2 -f -k -d " "BZIP2" "26" >> data.csv;
-RUN_BZIP2 "$FILE" "bzip2 -3 -f -k " "bzip2 -f -k -d " "BZIP2" "26" >> data.csv;
-RUN_BZIP2 "$FILE" "bzip2 -4 -f -k " "bzip2 -f -k -d " "BZIP2" "26" >> data.csv;
-RUN_BZIP2 "$FILE" "bzip2 -5 -f -k " "bzip2 -f -k -d " "BZIP2" "26" >> data.csv;
-RUN_BZIP2 "$FILE" "bzip2 -6 -f -k " "bzip2 -f -k -d " "BZIP2" "26" >> data.csv;
-RUN_BZIP2 "$FILE" "bzip2 -7 -f -k " "bzip2 -f -k -d " "BZIP2" "26" >> data.csv;
-RUN_BZIP2 "$FILE" "bzip2 -8 -f -k " "bzip2 -f -k -d " "BZIP2" "26" >> data.csv;
-RUN_BZIP2 "$FILE" "bzip2 -9 -f -k " "bzip2 -f -k -d " "BZIP2" "26" >> data.csv;
+echo "Running LZMA ...";
+for((x=1;x<=9;++x)); 
+  do
+  echo "Level $x...";
+  RUN_LZMA "$FILE" "lzma -$x -f -k " "lzma -f -k -d " "LZMA" "25" >> data.csv;
+  done
+echo "Running Bzip2 ...";
+for((x=1;x<=9;++x));
+  do
+  echo "Level $x...";
+  RUN_BZIP2 "$FILE" "bzip2 -$x -f -k " "bzip2 -f -k -d " "BZIP2" "26" >> data.csv;
+  done  
+echo "Running BSC ...";
 RUN_BSC "$FILE" " -b800000000 " "./bsc-m03 " "BSC-m03" "27" >> data.csv;
+echo "Running BSC ...";
 RUN_BSC "$FILE" " -b400000000 " "./bsc-m03 " "BSC-m03" "28" >> data.csv;
+echo "Running BSC ...";
 RUN_BSC "$FILE" " -b4096000 " "./bsc-m03 " "BSC-m03" "29" >> data.csv;
-RUN_MFC "$FILE" "./MFCompressC -v -1 -p 1 -t 1 " "./MFCompressD " "MFCompress" "30" >> data.csv;
-RUN_MFC "$FILE" "./MFCompressC -v -2 -p 1 -t 1 " "./MFCompressD " "MFCompress" "31" >> data.csv;
-RUN_MFC "$FILE" "./MFCompressC -v -3 -p 1 -t 1 " "./MFCompressD " "MFCompress" "32" >> data.csv;
+echo "Running MFCompress ...";
+for((x=1;x<=3;++x));
+  do
+  echo "Level $x...";
+  RUN_MFC "$FILE" "./MFCompressC -v -$x -p 1 -t 1 " "./MFCompressD " "MFCompress" "30" >> data.csv;
+  done
 #
+echo "Running JARVIS3 ...";
 for((x=1;x<=25;++x)); 
-do
-echo "Running JARVIS3 level $x...";
-RUN_JARVIS3_SH "$FILE" " $x --block 600MB --threads 1 " " --decompress --threads 1 --fasta --input " "JARVIS3" "23" " --block 600MB --threads 1 --fasta " >> data.csv;
-done
+  do
+  echo "Level $x...";
+  RUN_JARVIS3_SH "$FILE" " $x --block 600MB --threads 1 " " --decompress --threads 1 --fasta --input " "JARVIS3" "23" " --block 600MB --threads 1 --fasta " >> data.csv;
+  done
 #
+printf "PROGRAM\tC_BYTES\tC_TIME (m)\tC_MEM (GB)\tD_TIME (m)\tD_MEM (GB)\tDIFF\tRUN\n";
 cat data.csv;
 #
 # ==============================================================================
@@ -534,7 +440,7 @@ gnuplot << EOF
     set style line 11 lc rgb '#425152' pt 11 ps 0.6  # circle
     set grid
     set ylabel "Real time (minutes)"
-    set xlabel "Data compressed size (bytes)"
+    set xlabel "Compressed data size (bytes)"
     plot $plotnames
 EOF
 #
