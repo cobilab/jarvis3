@@ -25,6 +25,3 @@ cat DNACorpus/* | gto_fasta_from_seq -n "CORPUS" > CORPUS.fa
 #
 # -----------------------------------------------------------------------------
 #
-wget virus.fa
-#
-#
