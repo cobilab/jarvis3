@@ -15,7 +15,7 @@ THREADS="8";
 SHOW_MENU () {
   echo " -------------------------------------------------------";
   echo "                                                        ";
-  echo " JARVIS3, v3.4. High reference-free compression of DNA  ";
+  echo " JARVIS3, v3.5. High reference-free compression of DNA  ";
   echo "                sequences, FASTA data, and FASTQ data.  ";
   echo "                                                        ";
   echo " Program options ---------------------------------------";
@@ -80,7 +80,7 @@ SHOW_HEADER () {
   echo " [JARVIS3 :: DNA, FASTA, and FASTQ Extensions]          ";
   echo "                                                        ";
   echo " Release year: 2024,                                    ";
-  echo " Version: 3.4                                           ";
+  echo " Version: 3.5                                           ";
   echo " Author: D. Pratas                                      ";
   echo " Language: Bash / C                                     ";
   echo " License: GPL v3                                        ";
@@ -103,7 +103,7 @@ MERGE_DNA () {
   #
   mapfile -t FILES < .DEC_F_JV3;
   #
-  D_NAMES="";
+  NAMES="";
   IDX_T=1;
   IDX_POS=1;
   #
@@ -366,7 +366,7 @@ if [[ "$DECOMPRESS" -eq "0" ]];
     SPLIT_DNA "DNA.JV3" "$BLOCK" "$THREADS" "$LEVEL" &
     ./bzip2 -f N.JV3 &
     ./bbb cfm10q HEADERS.JV3 HEADERS.JV3.bbb &
-    ./XScoreC -l 2 QUALITIES.JV3 1> .tmp_report_out_xc 2> .tmp_report_err_xc &
+    ./XScoreC -l 1 QUALITIES.JV3 1> .tmp_report_out_xc 2> .tmp_report_err_xc &
     wait
     tar -cvf $INPUT.tar DNA.JV3.tar N.JV3.bz2 HEADERS.JV3.bbb QUALITIES.JV3.co 1> .rep_main_info;
     echo "Done!";

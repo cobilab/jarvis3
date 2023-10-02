@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdint.h>
 
 // This application merges four channels of information: 
 //        * HEADERS;
@@ -35,7 +36,8 @@ int main(int argc, char *argv[]){
     return 1;
     }
 
-  unsigned idx = 0, idx2 = 0, n, max = 10000;
+  // FIXME: IF READ LARGER THAN 2000000 PROBLEMS WILL OCCUR 
+  uint64_t idx = 0, idx2 = 0, n, max = 1000000;
   int qual_str[max+1];
   int n_str   [max+1];
 
@@ -68,13 +70,13 @@ int main(int argc, char *argv[]){
       if(n_str[n] == 'a'){
 	c = fgetc(DNA);
         if(c == EOF) break;
-	else fprintf(stdout, "%c", c);
+	else fprintf(stdout, "%c", c); // WRITE DNA
         }
-      else fprintf(stdout, "N");
+      else fprintf(stdout, "N"); // WRITE N
       }
 
     fprintf(stdout, "\n+\n");
-    for(n = 0 ; n <= idx ; ++n)
+    for(n = 0 ; n <= idx ; ++n) // WRITE QUALS
       fprintf(stdout, "%c", qual_str[n]);
     }
     
