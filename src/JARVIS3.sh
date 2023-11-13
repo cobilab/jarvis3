@@ -435,6 +435,7 @@ if [[ "$DECOMPRESS" -eq "0" ]];
     wait
     mv DNA.JV3.tar.out DNA.JV3
     mv QUALITIES.JV3.de QUALITIES.JV3
+    # XXX MERGE HAS ISSUES RELATED W READS LONGER THAN 1,000,000. TODO: FIX IT.
     ./MergeFastqStreamsJ3 > $INPUT.out
     rm -f DNA.JV3.jc DNA.JV3.tar.out N.JV3.bz2 HEADERS.JV3.bbb \
     QUALITIES.JV3.co .rep_main_info .tmp_report_out_xd .tmp_report_err_xd ;
