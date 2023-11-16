@@ -197,9 +197,9 @@ function RUN_LZMA {
   /bin/time -f "TIME\t%e\tMEM\t%M" $C_COMMAND $FILE.orig 2> c_tmp_report.txt;
   cat c_tmp_report.txt | grep "TIME" | tr '.' ',' | awk '{ printf $2/60"\t"$4/1024/1024"\n" }' > c_time_mem.txt;
   #
-  BYTES=`ls -la $FILE.orig.lzma | awk '{ print $5 }'`;
+  BYTES=`ls -la $FILE.orig.xz | awk '{ print $5 }'`;
   #
-  /bin/time -f "TIME\t%e\tMEM\t%M" $D_COMMAND $FILE.orig.lzma 2> d_tmp_report.txt
+  /bin/time -f "TIME\t%e\tMEM\t%M" $D_COMMAND $FILE.orig.xz 2> d_tmp_report.txt
   cat d_tmp_report.txt | grep "TIME" | tr '.' ',' | awk '{ printf $2/60"\t"$4/1024/1024"\n" }' > d_time_mem.txt;
   #
   cmp $FILE $FILE.orig > cmp.txt;
@@ -214,7 +214,7 @@ function RUN_LZMA {
   #
   printf "$NAME\t$BYTES\t$C_TIME\t$C_MEME\t$D_TIME\t$D_MEME\t$CMP_SIZE\t$5\n";
   #
-  rm -f $FILE.orig $FILE.orig.lzma c_tmp_report.txt d_tmp_report.txt c_time_mem.txt d_time_mem.txt
+  rm -f $FILE.orig $FILE.orig.xz c_tmp_report.txt d_tmp_report.txt c_time_mem.txt d_time_mem.txt
   #
   }
 #
@@ -330,15 +330,15 @@ rm -f data.csv
 #
 # ==============================================================================
 #
-echo "Running MBGC ...";
-for((x=1;x<=3;++x));
-  do
-  echo "Level $x...";
-  RUN_MBGC "$FILE" "mbgc -c $x -t 1 " "mbgc -d -t 1 " "MBGC" "24" >> data.csv;
-  done
+#echo "Running MBGC ...";
+#for((x=1;x<=1;++x)); #UP TO LEVEL 3
+#  do
+#  echo "Level $x...";
+#  RUN_MBGC "$FILE" "./mbgc -c $x -t 1 " "./mbgc -d -t 1 " "MBGC" "24" >> data.csv;
+#  done
 #
 echo "Running AGC ...";
-RUN_AGC "$FILE" "agc create -t 1 " "agc getcol -t 1 " "AGC" "24" >> data.csv;
+RUN_AGC "$FILE" "./agc create -t 1 " "./agc getcol -t 1 " "AGC" "24" >> data.csv;
 echo "Running JARVIS2 ...";
 RUN_JARVIS2_SH "$FILE" " 1 " " --decompress --threads 1 --fasta --input " "JARVIS2" "23" " --block 600MB --threads 1 --fasta " >> data.csv
 echo "Running JARVIS2 ...";
@@ -351,19 +351,19 @@ echo "Running NAF ...";
 for((x=1;x<=5;++x)); 
   do
   echo "Level $x...";
-  RUN_NAF "$FILE" "ennaf --temp-dir tmp/ --dna --level $x " "unnaf " "NAF" "24" >> data.csv;
+  RUN_NAF "$FILE" "./ennaf --temp-dir tmp/ --dna --level $x " "./unnaf " "NAF" "24" >> data.csv;
   done
 echo "Running LZMA ...";
 for((x=1;x<=9;++x)); 
   do
   echo "Level $x...";
-  RUN_LZMA "$FILE" "lzma -$x -f -k " "lzma -f -k -d " "LZMA" "25" >> data.csv;
+  RUN_LZMA "$FILE" "./xz -$x -f -k " "./xz -f -k -d " "LZMA" "25" >> data.csv;
   done
 echo "Running Bzip2 ...";
 for((x=1;x<=9;++x));
   do
   echo "Level $x...";
-  RUN_BZIP2 "$FILE" "bzip2 -$x -f -k " "bzip2 -f -k -d " "BZIP2" "26" >> data.csv;
+  RUN_BZIP2 "$FILE" "./bzip2 -$x -f -k " "./bzip2 -f -k -d " "BZIP2" "26" >> data.csv;
   done  
 echo "Running BSC ...";
 RUN_BSC "$FILE" " -b800000000 " "./bsc-m03 " "BSC-m03" "27" >> data.csv;
@@ -379,7 +379,7 @@ for((x=1;x<=3;++x));
   done
 #
 echo "Running JARVIS3 ...";
-for((x=1;x<=25;++x)); 
+for((x=1;x<=23;++x)); 
   do
   echo "Level $x...";
   RUN_JARVIS3_SH "$FILE" " $x --block 600MB --threads 1 " " --decompress --threads 1 --fasta --input " "JARVIS3" "23" " --block 600MB --threads 1 --fasta " >> data.csv;
