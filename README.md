@@ -172,7 +172,7 @@ To see the meaning of the model parameters, type:
 </pre>
 This will output the following content:
 <pre>
-      -cm [NB_C]:[NB_D]:[NB_I]:[NB_G]/[NB_S]:[NB_R]:[NB_E]:[NB_A]  
+      -cm [NB_C]:[NB_D]:[NB_I]:[NB_G]/[NB_S]:[NB_E]:[NB_R]:[NB_A]  
       Template of a context model.                                 
       Parameters:                                                  
       [NB_C]: (integer [1;14]) order size of the regular context   
