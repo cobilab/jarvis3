@@ -138,6 +138,9 @@ void PrintMenu(void){
   "      -p,  --progress                                              \n"
   "           Show progress bar.                                      \n"
   "                                                                   \n"
+  "      -o,  --output                                                \n"
+  "           Compressed output file.                                 \n"
+  "                                                                   \n"
   "      -d,  --decompress                                            \n"
   "           Decompression mode.                                     \n"
   "                                                                   \n",

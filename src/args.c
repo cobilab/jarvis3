@@ -164,6 +164,16 @@ RModelPar ArgsUniqRModel(char *str, uint8_t type){
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+char *ArgsFileGen(char *arg[], uint32_t argc, char *str, char *nm, char *ext){
+  int32_t n = argc;
+  for( ; --n ; )
+    if(!strcmp(str, arg[n]))
+      return CloneString(arg[n+1]);
+  return Cat(nm, ext);
+  }
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 void InvName(int ir){
   switch(ir){
     case 0: fprintf(stderr, "regular only\n"); break;

@@ -172,7 +172,7 @@ void UpdateCModels(CMODEL **CM, CBUF *SB, uint8_t sym, uint32_t nCModels)
 //
 void CompressRMsOnly(PARAM *P, char *fn)
   {
-  FILE      *IN  = Fopen(fn, "r"), *OUT = Fopen(Cat(fn, ".jc"), "w");
+  FILE      *IN  = Fopen(fn, "r"), *OUT = Fopen(P->output, "w");
   uint64_t  i = 0, mSize = MAX_BUF, pos = 0;
   uint32_t  m, n;
   uint8_t   t[NSYM], *buf = (uint8_t *) Calloc(mSize, sizeof(uint8_t)), sym = 0, 
@@ -273,7 +273,7 @@ void CompressRMsOnly(PARAM *P, char *fn)
 // 
 void CompressNoNN(PARAM *P, char *fn)
   {
-  FILE      *IN  = Fopen(fn, "r"), *OUT = Fopen(Cat(fn, ".jc"), "w");
+  FILE      *IN  = Fopen(fn, "r"), *OUT = Fopen(P->output, "w");
   uint64_t  i = 0, mSize = MAX_BUF, pos = 0, r = 0;
   uint32_t  m, n, q, j, c;
   uint8_t   t[NSYM], *buf = (uint8_t *) Calloc(mSize, sizeof(uint8_t)), sym = 0, 
@@ -490,7 +490,7 @@ void CompressNoNN(PARAM *P, char *fn)
 // COMPRESSION
 //
 void Compress(PARAM *P, char *fn){
-  FILE      *IN  = Fopen(fn, "r"), *OUT = Fopen(Cat(fn, ".jc"), "w");
+  FILE      *IN  = Fopen(fn, "r"), *OUT = Fopen(P->output, "w");
   uint64_t  i = 0, mSize = MAX_BUF, pos = 0, r = 0;
   uint32_t  m, n, q, j, c;
   uint8_t   t[NSYM], *buf = (uint8_t *) Calloc(mSize, sizeof(uint8_t)), sym = 0, 
@@ -1196,6 +1196,8 @@ int main(int argc, char **argv)
   P->level     = ArgNumber (0,               p, argc, "-l",  "--level", 
 		 MIN_LEVEL, MAX_LEVEL);
   P->mode      = ArgState(DEF_MODE,  p, argc, "-d", "--decompress"); 
+  P->output    = ArgsFileGen(p, argc, "-o", argv[argc-1], ".jc");
+
 
   for(n = 1 ; n < argc ; ++n){
     if(strcmp(argv[n], "-cm") == 0){

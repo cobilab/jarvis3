@@ -63,6 +63,7 @@ typedef struct{
   uint32_t  selection;
   uint64_t  length;
   uint64_t  size;
+  char      *output;
   }
 PARAM;
 
