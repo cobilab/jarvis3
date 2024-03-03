@@ -115,7 +115,7 @@ DESCRIPTION
            Default value: 0.03.                                   
                                                                    
       -o [FILENAME], --output [FILENAME]                           
-           Compressed output file.                                 
+           Compressed/decompressed output filename.                        
                                                                    
       [FILENAME]                                                   
            Input sequence filename (to compress) -- MANDATORY.     

@@ -181,7 +181,7 @@ void PrintMenu(void){
   "           Default value: %.2lf.                                   \n"
   "                                                                   \n"
   "      -o [FILENAME], --output [FILENAME]                           \n"
-  "           Compressed output file.                                 \n"
+  "           Compressed/decompressed output filename.                \n"
   "                                                                   \n"
   "      [FILENAME]                                                   \n"
   "           Input sequence filename (to compress) -- MANDATORY.     \n"
