@@ -726,9 +726,9 @@ void Compress(PARAM *P, char *fn){
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // DECOMPRESSION
 //
-void Decompress(char *fn)
+void Decompress(char *outname, char *fn)
   {
-  FILE     *IN  = Fopen(fn, "r"), *OUT = Fopen(Cat(fn, ".jd"), "w");
+  FILE     *IN  = Fopen(fn, "r"), *OUT = Fopen(outname, "w");
   uint64_t i = 0, mSize = MAX_BUF, pos = 0;
   uint32_t m, n, j, q, r, c;
   uint8_t  *buf = (uint8_t *) Calloc(mSize, sizeof(uint8_t)), sym = 0, *p;
@@ -1184,20 +1184,21 @@ int main(int argc, char **argv)
     return EXIT_SUCCESS;
     }
 
-  P->verbose   = ArgState  (DEFAULT_VERBOSE, p, argc, "-v",  "--verbose");
-  P->force     = ArgState  (DEFAULT_FORCE,   p, argc, "-f",  "--force");
-  P->estim     = ArgState  (0,               p, argc, "-e",  "--estimate");
-  P->progress  = ArgState  (0,               p, argc, "-p",  "--progress");
-  P->seed      = ArgNumber (DEFAULT_SEED,    p, argc, "-sd", "--seed", 
+  P->verbose   = ArgState    (DEFAULT_VERBOSE, p, argc, "-v",  "--verbose");
+  P->force     = ArgState    (DEFAULT_FORCE,   p, argc, "-f",  "--force");
+  P->estim     = ArgState    (0,               p, argc, "-e",  "--estimate");
+  P->progress  = ArgState    (0,               p, argc, "-p",  "--progress");
+  P->seed      = ArgNumber   (DEFAULT_SEED,    p, argc, "-sd", "--seed", 
 		 1, 599999);
-  P->hs        = ArgNumber (DEFAULT_HS,      p, argc, "-hs", "--hidden-size", 
+  P->hs        = ArgNumber   (DEFAULT_HS,      p, argc, "-hs", "--hidden-size", 
 		 1, 999999);
-  P->lr        = ArgDouble (DEFAULT_LR,      p, argc, "-lr", "--learning-rate");
-  P->level     = ArgNumber (0,               p, argc, "-l",  "--level", 
+  P->lr        = ArgDouble   (DEFAULT_LR,      p, argc, "-lr", "--learning-rate");
+  P->level     = ArgNumber   (0,               p, argc, "-l",  "--level", 
 		 MIN_LEVEL, MAX_LEVEL);
-  P->mode      = ArgState(DEF_MODE,  p, argc, "-d", "--decompress"); 
-  P->output    = ArgsFileGen(p, argc, "-o", argv[argc-1], ".jc");
-
+  P->mode      = ArgState    (DEF_MODE,        p, argc, "-d", "--decompress"); 
+  
+  if(!P->mode) P->output  = ArgsFileGen (p, argc, "-o", argv[argc-1], ".jc");
+  else         P->output  = ArgsFileGen (p, argc, "-o", argv[argc-1], ".jd");
 
   for(n = 1 ; n < argc ; ++n){
     if(strcmp(argv[n], "-cm") == 0){
@@ -1292,7 +1293,7 @@ int main(int argc, char **argv)
     {
     if(P->verbose)
       fprintf(stderr, "Decompressing ...\n"); 
-    Decompress(argv[argc-1]);
+    Decompress(P->output, argv[argc-1]);
     }
 
   stop = clock();
