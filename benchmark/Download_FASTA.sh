@@ -20,7 +20,7 @@ echo -e "\e[34m[Downloader]\e[32m Download CY ...\e[0m";
 rm -f CY.fa
 efetch -db nucleotide -id "NC_000024.1" -format fasta > CY.fa
 #
-# COPUS -----------------------------------------------------------------------
+# CORPUS ----------------------------------------------------------------------
 #
 echo -e "\e[34m[Downloader]\e[32m Download CORPUS ...\e[0m";
 rm -fr DNACorpus

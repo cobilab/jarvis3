@@ -726,7 +726,7 @@ void Compress(PARAM *P, char *fn){
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // DECOMPRESSION
 //
-void Decompress(char *outname, char *fn)
+void Decompress(char *outname, char progress, char *fn)
   {
   FILE     *IN  = Fopen(fn, "r"), *OUT = Fopen(outname, "w");
   uint64_t i = 0, mSize = MAX_BUF, pos = 0;
@@ -744,6 +744,7 @@ void Decompress(char *outname, char *fn)
   startinputtingbits();
   start_decode(IN);
 
+  P->progress  = progress;
   P->seed      = ReadNBits(                      SEED_BITS, IN);
   P->size      = ReadNBits(                      SIZE_BITS, IN);
   P->length    = ReadNBits(                    LENGTH_BITS, IN);
@@ -852,7 +853,8 @@ void Decompress(char *outname, char *fn)
         buf = (uint8_t *) Realloc(buf, (mSize+=ADD_SPACE) * sizeof(uint8_t));
 
       #ifdef PROGRESS
-      if(P->progress) Progress(P->size, i);
+      if(P->progress)
+	Progress(P->size, i);
       #endif
       }
 
@@ -1293,7 +1295,7 @@ int main(int argc, char **argv)
     {
     if(P->verbose)
       fprintf(stderr, "Decompressing ...\n"); 
-    Decompress(P->output, argv[argc-1]);
+    Decompress(P->output, P->progress, argv[argc-1]);
     }
 
   stop = clock();
