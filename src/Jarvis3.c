@@ -247,7 +247,10 @@ void CompressRMsOnly(PARAM *P, char *fn)
       buf = (uint8_t *) Realloc(buf, (mSize+=ADD_SPACE) * sizeof(uint8_t));
 
     #ifdef PROGRESS
-    if(P->progress) Progress(P->size, i);
+    if(P->extended && i && i % (P->size / 20) == 0)
+      fprintf(stderr, "%2.0f%%\t%.5f\n", (100.*i)/P->size, _bytes_output*2./(i+1));
+    if(P->progress && !P->extended) 
+      Progress(P->size, i);
     #endif
     }
 
@@ -451,8 +454,11 @@ void CompressNoNN(PARAM *P, char *fn)
       buf = (uint8_t *) Realloc(buf, (mSize+=ADD_SPACE) * sizeof(uint8_t));
 
     #ifdef PROGRESS
-    if(P->progress) Progress(P->size, i);
-    #endif 
+    if(P->extended && i && i % (P->size / 20) == 0)
+      fprintf(stderr, "%2.0f%%\t%.5f\n", (100.*i)/P->size, _bytes_output*2./(i+1));
+    if(P->progress && !P->extended)
+      Progress(P->size, i);
+    #endif
     }
 
   WriteNBits(m, 8, OUT);
@@ -686,7 +692,10 @@ void Compress(PARAM *P, char *fn){
       buf = (uint8_t *) Realloc(buf, (mSize+=ADD_SPACE) * sizeof(uint8_t));
 
     #ifdef PROGRESS
-    if(P->progress) Progress(P->size, i); 
+    if(P->extended && i && i % (P->size / 20) == 0)
+      fprintf(stderr, "%2.0f%%\t%.5f\n", (100.*i)/P->size, _bytes_output*2./(i+1));
+    if(P->progress && !P->extended)
+      Progress(P->size, i);
     #endif
     }
 
@@ -853,8 +862,7 @@ void Decompress(char *outname, char progress, char *fn)
         buf = (uint8_t *) Realloc(buf, (mSize+=ADD_SPACE) * sizeof(uint8_t));
 
       #ifdef PROGRESS
-      if(P->progress)
-	Progress(P->size, i);
+      if(P->progress) Progress(P->size, i);
       #endif
       }
 
@@ -1190,6 +1198,7 @@ int main(int argc, char **argv)
   P->force     = ArgState    (DEFAULT_FORCE,   p, argc, "-f",  "--force");
   P->estim     = ArgState    (0,               p, argc, "-e",  "--estimate");
   P->progress  = ArgState    (0,               p, argc, "-p",  "--progress");
+  P->extended  = ArgState    (0,               p, argc, "-P",  "--progress-extended");
   P->seed      = ArgNumber   (DEFAULT_SEED,    p, argc, "-sd", "--seed", 
 		 1, 599999);
   P->hs        = ArgNumber   (DEFAULT_HS,      p, argc, "-hs", "--hidden-size", 

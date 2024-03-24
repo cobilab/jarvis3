@@ -342,7 +342,7 @@ if [[ "$DECOMPRESS" -eq "0" ]];
     Program_installed "./JARVIS3";
     ./SplitFastaStreamsJ3 < $INPUT
     SPLIT_DNA "DNA.JV3" "$BLOCK" "$THREADS" "$LEVEL" &
-    ./bbb cfm10q HEADERS.JV3 HEADERS.JV3.bbb &
+    ./bbb cfm5q HEADERS.JV3 HEADERS.JV3.bbb &
     ./bzip2 -f EXTRA.JV3 &
     wait
     tar -cvf $INPUT.tar DNA.JV3.tar EXTRA.JV3.bz2 HEADERS.JV3.bbb 1> .rep_out_ec
@@ -365,7 +365,7 @@ if [[ "$DECOMPRESS" -eq "0" ]];
     ./SplitFastqStreamsJ3 < $INPUT
     SPLIT_DNA "DNA.JV3" "$BLOCK" "$THREADS" "$LEVEL" &
     ./bzip2 -f N.JV3 &
-    ./bbb cfm10q HEADERS.JV3 HEADERS.JV3.bbb &
+    ./bbb cfm5q HEADERS.JV3 HEADERS.JV3.bbb &
     ./XScoreC -l 1 QUALITIES.JV3 1> .tmp_report_out_xc 2> .tmp_report_err_xc &
     wait
     tar -cvf $INPUT.tar DNA.JV3.tar N.JV3.bz2 HEADERS.JV3.bbb QUALITIES.JV3.co 1> .rep_main_info;
