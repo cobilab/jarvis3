@@ -17,10 +17,10 @@ char *WriteDataType(uint8_t type)
     case 1: return "fasta";
     case 2: return "fastq";
     case 3: return "vcf";
-    default: return "sequence";
+    default: return "DNA";
     }
 
-  return "n/a";
+  return "Unknown";
   }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

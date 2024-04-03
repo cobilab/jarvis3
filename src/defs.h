@@ -71,8 +71,8 @@ PARAM;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-#define RELEASE                3
-#define VERSION                4
+#define RELEASE                4
+#define VERSION                3
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
