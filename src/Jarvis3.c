@@ -33,12 +33,33 @@
 #include "arith_aux.h"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// FIND DATA TYPE
+//
+int FindDataType(char *FN)
+  {
+  FILE *F = Fopen(FN, "r");
+  int type = 0;
+
+  switch(fgetc(F))
+    {
+    case '>': type = 1; break;
+    case '@': type = 2; break;
+    case '#': type = 3; break;
+    default : type = 0;
+    }
+  fclose(F);
+
+  return type;
+  }
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // ENCODE HEADER RMS ONLY
 //
 void EncodeHeaderOnlyRMs(PARAM *P, RCLASS **RC, FILE *F)
   {
   uint32_t n;
 
+  WriteNBits(P->datatype,                          DATA_TYPE_BITS, F);
   WriteNBits(P->seed,                                   SEED_BITS, F);
   WriteNBits(P->size,                                   SIZE_BITS, F);
   WriteNBits(P->length,                               LENGTH_BITS, F);
@@ -68,6 +89,7 @@ void EncodeHeader(PARAM *P, RCLASS **RC, CMODEL **CM, FILE *F)
   {
   uint32_t n;
 
+  WriteNBits(P->datatype,                          DATA_TYPE_BITS, F);
   WriteNBits(P->seed,                                   SEED_BITS, F);
   WriteNBits(P->size,                                   SIZE_BITS, F);
   WriteNBits(P->length,                               LENGTH_BITS, F);
@@ -100,13 +122,14 @@ void EncodeHeader(PARAM *P, RCLASS **RC, CMODEL **CM, FILE *F)
     } 
 
   #ifdef DEBUG
-  printf("seed    = %"PRIu32"\n", P->seed);
-  printf("size    = %"PRIu64"\n", P->size);
-  printf("hs      = %u\n",        P->hs);
-  printf("lr      = %g\n",        P->lr);
-  printf("select  = %u\n",        P->selection);
-  printf("n CMs   = %u\n",        P->nCModels);
-  printf("n CPMs  = %u\n",        P->nCPModels);
+  printf("datatype = %u\n", P->datatype);
+  printf("seed     = %"PRIu32"\n", P->seed);
+  printf("size     = %"PRIu64"\n", P->size);
+  printf("hs       = %u\n",        P->hs);
+  printf("lr       = %g\n",        P->lr);
+  printf("select   = %u\n",        P->selection);
+  printf("n CMs    = %u\n",        P->nCModels);
+  printf("n CPMs   = %u\n",        P->nCPModels);
   for(n = 0 ; n < P->nCModels ; ++n){
     printf("  cmodel %u\n",        n + 1);
     printf("    ctx       = %u\n", CM[n]->ctx);
@@ -207,7 +230,14 @@ void CompressRMsOnly(PARAM *P, char *fn)
 
   if(P->length > 4294967295){
     fprintf(stderr, "Error: DNA sequence larger than 2^32.\n");
-    fprintf(stderr, "Tip: Use split to separate data into buckets...\n");
+    fprintf(stderr, "Tip: Use JARVIS3.sh or split to split data.\n");
+    exit(1);
+    }
+
+  if(P->datatype != 0)
+    {
+    fprintf(stderr, "Error: currently JARVIS3 only supports DNA format.\n");
+    fprintf(stderr, "Tip: Use JARVIS.sh for FASTA or FASTQ data.\n");
     exit(1);
     }
 
@@ -373,7 +403,8 @@ void CompressNoNN(PARAM *P, char *fn)
   start_encode();
   EncodeHeader(P, RC, CM, OUT);
 
-  while((m = fread(t, sizeof(uint8_t), NSYM, IN)) == NSYM){
+  while((m = fread(t, sizeof(uint8_t), NSYM, IN)) == NSYM)
+    {
     buf[i] = S2N(t[3])|(S2N(t[2])<<2)|(S2N(t[1])<<4)|(S2N(t[0])<<6); // PACK 4
     
     for(n = 0 ; n < m ; ++n){
@@ -596,7 +627,8 @@ void Compress(PARAM *P, char *fn){
   start_encode();
   EncodeHeader(P, RC, CM, OUT);
 
-  while((m = fread(t, sizeof(uint8_t), NSYM, IN)) == NSYM){
+  while((m = fread(t, sizeof(uint8_t), NSYM, IN)) == NSYM)
+    {
     buf[i] = S2N(t[3])|(S2N(t[2])<<2)|(S2N(t[1])<<4)|(S2N(t[0])<<6); // PACK 4
     
     for(n = 0 ; n < m ; ++n){
@@ -754,6 +786,7 @@ void Decompress(char *outname, char progress, char *fn)
   start_decode(IN);
 
   P->progress  = progress;
+  P->datatype  = ReadNBits(                 DATA_TYPE_BITS, IN);
   P->seed      = ReadNBits(                      SEED_BITS, IN);
   P->size      = ReadNBits(                      SIZE_BITS, IN);
   P->length    = ReadNBits(                    LENGTH_BITS, IN);
@@ -795,13 +828,14 @@ void Decompress(char *outname, char progress, char *fn)
   srand(P->seed);
 
   #ifdef DEBUG
-  printf("seed    = %"PRIu32"\n", P->seed);;
-  printf("size    = %"PRIu64"\n", P->size);
-  printf("length  = %"PRIu64"\n", P->length);
-  printf("hs      = %u\n",        P->hs);
-  printf("lr      = %g\n",        P->lr);
-  printf("n CMs   = %u\n",        P->nCModels);
-  printf("n CPMs  = %u\n",        P->nCPModels);
+  printf("datatype = %u\n", P->datatype);
+  printf("seed     = %"PRIu32"\n", P->seed);
+  printf("size     = %"PRIu64"\n", P->size);
+  printf("length   = %"PRIu64"\n", P->length);
+  printf("hs       = %u\n",        P->hs);
+  printf("lr       = %g\n",        P->lr);
+  printf("n CMs    = %u\n",        P->nCModels);
+  printf("n CPMs   = %u\n",        P->nCPModels);
   for(n = 0 ; n < P->nCModels ; ++n){
     printf("  cmodel %u\n",        n + 1);
     printf("    ctx       = %u\n", CM[n]->ctx);
@@ -1208,8 +1242,13 @@ int main(int argc, char **argv)
 		 MIN_LEVEL, MAX_LEVEL);
   P->mode      = ArgState    (DEF_MODE,        p, argc, "-d", "--decompress"); 
   
-  if(!P->mode) P->output  = ArgsFileGen (p, argc, "-o", argv[argc-1], ".jc");
-  else         P->output  = ArgsFileGen (p, argc, "-o", argv[argc-1], ".jd");
+  if(!P->mode)
+    {
+    P->output = ArgsFileGen (p, argc, "-o", argv[argc-1], ".jc");
+    P->datatype = FindDataType(argv[argc-1]);
+    }
+  else
+    P->output = ArgsFileGen (p, argc, "-o", argv[argc-1], ".jd");
 
   for(n = 1 ; n < argc ; ++n){
     if(strcmp(argv[n], "-cm") == 0){

@@ -10,6 +10,21 @@
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+char *WriteDataType(uint8_t type)
+  {
+  switch(type)
+    {
+    case 1: return "fasta";
+    case 2: return "fastq";
+    case 3: return "vcf";
+    default: return "sequence";
+    }
+
+  return "n/a";
+  }
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 uint32_t ArgNumber(uint32_t d, char *a[], uint32_t n, char *s, char *s2, 
 uint32_t l, uint32_t u)
   {
@@ -191,6 +206,8 @@ void PrintArgs(PARAM *P){
   "no" : "yes"); 
   fprintf(stderr, "Force mode ......................... %s\n", !P->force ? 
   "no" : "yes");
+  fprintf(stderr, "Data type .......................... %s\n", 
+  WriteDataType(P->datatype));
   fprintf(stderr, "Pseudo-random seed ................. %u\n", P->seed);  
   fprintf(stderr, "Neural Network hidden size ......... %u\n", P->hs);  
   fprintf(stderr, "Neural Network learning rate ....... %.3lf\n", P->lr);  

@@ -45,6 +45,7 @@ typedef struct{
   uint8_t   progress;
   uint8_t   extended;
   uint8_t   level;
+  uint8_t   datatype;
   uint8_t   nn;
   uint8_t   mode;
   uint32_t  col;
@@ -71,7 +72,7 @@ PARAM;
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 #define RELEASE                3
-#define VERSION                3
+#define VERSION                4
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -107,6 +108,7 @@ PARAM;
 #define TARGET                 0
 #define DEF_EXPLANATION        0
 #define DEFAULT_SEED           0
+#define DATA_TYPE_BITS         8
 #define SEED_BITS              32
 #define SIZE_BITS              48
 #define LENGTH_BITS            48

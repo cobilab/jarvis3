@@ -269,7 +269,9 @@ void StopRM(RCLASS *C)
       {
       RMODEL *R = &C->RM[n];
       if((R->acting = R->acting * C->P->beta + R->lastHit) > C->P->limit || 
-	  R->pos == 0)
+      R->pos == 0)
+      //ALTERNATIVE: 
+      //if(R->nTries - R->nHits > 10 || R->pos == 0)
         {
         if(n != C->nRM-1)
           C->RM[n] = C->RM[C->nRM-1];

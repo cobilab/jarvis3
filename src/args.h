@@ -5,6 +5,7 @@
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+char        *WriteDataType  (uint8_t);
 char        *ArgsFileGen    (char *[], uint32_t, char *, char *, char *);
 uint32_t    ArgNumber       (uint32_t , char *[], uint32_t, char *, char *, 
 		             uint32_t, uint32_t);
