@@ -288,7 +288,7 @@ void CompressRMsOnly(PARAM *P, char *fn)
   for(n = 0 ; n < m ; ++n)
     WriteNBits(S2N(t[n]), 8, OUT);        // ENCODE REMAINING SYMBOLS
 
-  fprintf(stderr, "Compressed %"PRIu64" sym to %"PRIu64" bytes [ %.4g bps "
+  fprintf(stdout, "Compressed %"PRIu64" sym to %"PRIu64" bytes [ %.4g bps "
 		  "; %.3g ratio ; %.4g NC ]\n", P->length, (uint64_t) 
 		  _bytes_output, (double) _bytes_output*8.0 / P->length, 
 		  (double) P->length / _bytes_output, _bytes_output * 4.0 /
@@ -496,7 +496,7 @@ void CompressNoNN(PARAM *P, char *fn)
   for(n = 0 ; n < m ; ++n)
     WriteNBits(S2N(t[n]), 8, OUT);        // ENCODE REMAINING SYMBOLS
 
-  fprintf(stderr, "Compressed %"PRIu64" sym to %"PRIu64" bytes [ %.4g bps "
+  fprintf(stdout, "Compressed %"PRIu64" sym to %"PRIu64" bytes [ %.4g bps "
                   "; %.3g ratio ; %.4g NC ]\n", P->length, (uint64_t)
                   _bytes_output, (double) _bytes_output*8.0 / P->length,
                   (double) P->length / _bytes_output, _bytes_output * 4.0 /
@@ -735,7 +735,7 @@ void Compress(PARAM *P, char *fn){
   for(n = 0 ; n < m ; ++n)
     WriteNBits(S2N(t[n]), 8, OUT);        // ENCODE REMAINING SYMBOLS
 
-  fprintf(stderr, "Compressed %"PRIu64" sym to %"PRIu64" bytes [ %.4g bps "
+  fprintf(stdout, "Compressed %"PRIu64" sym to %"PRIu64" bytes [ %.4g bps "
                   "; %.3g ratio ; %.4g NC ]\n", P->length, (uint64_t)
                   _bytes_output, (double) _bytes_output*8.0 / P->length,
                   (double) P->length / _bytes_output, _bytes_output * 4.0 /
