@@ -1,7 +1,10 @@
 #!/bin/bash
 #
 # sudo apt-get install libz-dev # TODO: NEED TO INSTALL THIS FOR ZLIB
-# sudo apt-get install -y ncbi-entrez-direct # NEED TO DOWNLOAD SEQS 
+ sudo apt-get install -y ncbi-entrez-direct # NEED TO DOWNLOAD SEQS 
+ sudo apt install gnuplot-x11 -y # NEED TO GENERATE PLOTS
+ sudo apt install -y cmake # NEED TO INSTALL SOME TOOLS
+ sudo apt install -y git # NEED TO INSTALL SOME TOOLS
 #
 # ------------------------------------------------------------------------------
 #
@@ -102,7 +105,7 @@ mv MBGC mbgc
 #
 echo -e "\e[34m[Installer]\e[32m Installing AGC ...\e[0m";
 rm -fr agc
-git clone https://github.com/refresh-bio/agc
+git clone --recurse-submodules https://github.com/refresh-bio/agc
 cd agc && make
 cp agc ../AGC
 cd ../
