@@ -51,14 +51,14 @@ This will print the following options:
       ███████ ██   ██ ██   ███  ████   ██ ███████ ███████          
                                                                    
 NAME                                                               
-      JARVIS3 v3.3,                                              
+      JARVIS3 v3.6,                                              
       Efficient lossless encoding of genomic sequences             
                                                                    
 SYNOPSIS                                                           
       ./JARVIS3 [OPTION]... [FILE]                                 
                                                                    
 SAMPLE                                                             
-      Run Compression   -> ./JARVIS3 -v -l 13 sequence.txt         
+      Run Compression   -> ./JARVIS3 -v -l 14 sequence.txt         
       Run Decompression -> ./JARVIS3 -v -d sequence.txt.jc         
                                                                    
 DESCRIPTION                                                        
@@ -135,7 +135,7 @@ To see the possible levels (automatic choosen compression parameters), type:
 ./JARVIS3 -s
 </pre>
 
-This will ouput th following pre-set models for each 31 levels:
+This will ouput th following pre-set models for each level:
 <pre>
 Level 1: -rm 1:12:0.90:4:0.72:0:0.1:1 
 Level 2: -rm 1:12:0.90:4:0.72:1:0.1:1 
@@ -160,20 +160,23 @@ Level 20: -lr 0 -cm 4:1:0:0.9/0:0:0:0 -rm 20:12:0.9:7:0.85:1:0.01:4
 Level 21: -lr 0 -cm 4:1:0:0.9/0:0:0:0 -rm 50:12:0.9:7:0.85:1:0.01:5 
 Level 22: -lr 0 -cm 4:1:0:0.9/0:0:0:0 -rm 100:12:0.9:7:0.85:1:0.01:5 
 Level 23: -lr 0 -cm 4:1:0:0.9/0:0:0:0 -rm 200:12:0.9:7:0.85:1:0.01:6 
-Level 24: -lr 0.03 -hs 18 -cm 4:1:0:0.9/0:0:0:0 -rm 12:13:0.91:7:0.82:1:0.03:1 
-Level 25: -lr 0.03 -hs 18 -cm 4:1:0:0.9/0:0:0:0 -rm 30:13:0.90:7:0.82:1:0.02:1 
-Level 26: -lr 0.03 -hs 24 -cm 6:1:0:0.9/0:0:0:0 -rm 15:12:0.92:7:0.85:0:0.02:4 -rm 12:12:0.92:7:0.84:2:0.01:3 
-Level 27: -lr 0.03 -hs 42 -cm 1:1:0:0.9/0:0:0:0 -cm 4:1:0:0.9/0:0:0:0 -cm 8:1:1:0.89/0:0:0:0 -cm 12:20:1:0.97/0:0:0:0 -rm 300:12:0.9:7:0.85:0:0.01:10 -rm 200:12:0.9:7:0.8:2:0.01:4 
-Level 28: -lr 0.03 -hs 48 -cm 1:1:0:0.9/0:0:0:0 -cm 4:1:0:0.9/0:0:0:0 -cm 8:1:1:0.89/0:0:0:0 -cm 12:20:1:0.97/0:0:0:0 -rm 300:12:0.9:7:0.85:0:0.01:10 -rm 200:12:0.9:7:0.8:2:0.01:4 
-Level 29: -lr 0.04 -hs 64 -cm 1:1:0:0.9/0:0:0:0 -cm 4:1:0:0.9/0:0:0:0 -cm 8:1:1:0.89/0:0:0:0 -cm 12:20:1:0.97/0:0:0:0 -rm 500:12:0.9:7:0.85:0:0.01:12 -rm 200:12:0.9:7:0.8:2:0.01:4 
-Level 30: -lr 0.04 -hs 86 -cm 1:1:0:0.9/0:0:0:0 -cm 4:1:0:0.9/0:0:0:0 -cm 8:1:1:0.89/0:0:0:0 -cm 12:20:1:0.97/0:0:0:0 -rm 500:12:0.9:7:0.85:0:0.01:12 -rm 200:12:0.9:7:0.8:2:0.01:4 
-Level 31: -lr 0.04 -hs 256 -cm 1:1:0:0.9/0:0:0:0 -cm 4:1:0:0.9/0:0:0:0 -cm 8:1:1:0.9/0:0:0:0 -cm 12:20:1:0.97/0:0:0:0 -rm 1500:12:0.9:7:0.85:0:0.01:10 -rm 500:12:0.9:7:0.82:2:0.01:3 
-Level 32: -lr 0.04 -hs 248 -cm 1:1:0:0.9/0:0:0:0 -cm 3:1:0:0.9/0:0:0:0 -cm 7:1:0:0.9/0:0:0:0 -cm 9:1:1:0.9/0:0:0:0 -cm 11:10:0:0.9/0:0:0:0 -rm 100:14:0.9:7:0.85:1:0.01:3 -rm 200:12:0.88:7:0.85:0:0.01:3 -rm 300:12:0.87:7:0.85:2:0.01:3 
-Level 33: -lr 0.04 -hs 248 -cm 1:1:0:0.9/0:0:0:0 -cm 3:1:0:0.9/0:0:0:0 -cm 7:1:0:0.9/0:0:0:0 -cm 9:1:1:0.9/0:0:0:0 -cm 11:10:0:0.9/0:0:0:0 -cm 13:200:1:0.9/1:10:1:0.9 -rm 100:14:0.9:7:0.85:1:0.01:3 -rm 200:12:0.88:7:0.85:0:0.01:8 -rm 300:12:0.87:7:0.85:2:0.01:3 
-Level 34: -lr 0.01 -hs 248 -cm 1:1:0:0.9/0:0:0:0 -cm 3:1:0:0.9/0:0:0:0 -cm 6:1:0:0.9/0:0:0:0 -cm 9:1:0:0.9/0:0:0:0 -cm 11:10:1:0.9/0:0:0:0 -cm 14:200:1:0.9/1:10:1:0.9 -rm 300:14:0.88:7:0.85:0:0.01:8 -rm 300:14:0.88:7:0.85:2:0.01:8 -rm 500:12:0.88:7:0.85:0:0.01:15 
-Level 35: -lr 0 -cm 12:1:0:0.7/0:0:0:0 -rm 2:14:0.95:1:0.9:1:0.1:1 
-Level 36: -lr 0 -cm 12:1:0:0.7/0:0:0:0 -rm 3:14:0.95:1:0.9:1:0.1:1 
-Level 37: -lr 0.03 -lr 32 -cm 12:1:0:0.7/0:0:0:0 -rm 4:14:0.95:1:0.9:1:0.1:1 
+Level 24: -lr 0 -cm 6:1:0:0.9/0:0:0:0 -rm 6:15:0.93:6:0.81:1:0.02:1 
+Level 25: -lr 0.03 -hs 24 -cm 6:1:0:0.9/0:0:0:0 -rm 6:15:0.92:6:0.81:1:0.02:1 
+Level 26: -lr 0.03 -hs 32 -cm 4:1:0:0.9/0:0:0:0 -rm 20:15:0.90:7:0.82:1:0.02:1 
+Level 27: -lr 0.03 -hs 24 -cm 6:1:0:0.9/0:0:0:0 -rm 15:13:0.92:7:0.85:0:0.02:4 -rm 13:12:0.92:7:0.84:2:0.01:3 
+Level 28: -lr 0.03 -hs 42 -cm 6:1:0:0.9/0:0:0:0 -rm 6:15:0.93:6:0.81:1:0.02:1 
+Level 29: -lr 0.03 -hs 42 -cm 6:1:0:0.9/0:0:0:0 -rm 10:15:0.93:6:0.81:1:0.02:1 
+Level 30: -lr 0.03 -hs 42 -cm 6:1:0:0.9/0:0:0:0 -rm 10:15:0.93:6:0.81:0:0.02:1 -rm 10:15:0.93:6:0.81:2:0.02:1 
+Level 31: -lr 0.03 -hs 48 -cm 1:1:0:0.9/0:0:0:0 -cm 4:1:0:0.9/0:0:0:0 -cm 8:1:1:0.89/0:0:0:0 -cm 12:20:1:0.97/0:0:0:0 -rm 300:12:0.9:7:0.85:0:0.01:10 -rm 200:12:0.9:7:0.8:2:0.01:4 
+Level 32: -lr 0.04 -hs 64 -cm 1:1:0:0.9/0:0:0:0 -cm 4:1:0:0.9/0:0:0:0 -cm 8:1:1:0.89/0:0:0:0 -cm 12:20:1:0.97/0:0:0:0 -rm 500:12:0.9:7:0.85:0:0.01:12 -rm 200:12:0.9:7:0.8:2:0.01:4 
+Level 33: -lr 0.04 -hs 86 -cm 1:1:0:0.9/0:0:0:0 -cm 4:1:0:0.9/0:0:0:0 -cm 8:1:1:0.89/0:0:0:0 -cm 12:20:1:0.97/0:0:0:0 -rm 500:12:0.9:7:0.85:0:0.01:12 -rm 200:12:0.9:7:0.8:2:0.01:4 
+Level 34: -lr 0.04 -hs 256 -cm 1:1:0:0.9/0:0:0:0 -cm 4:1:0:0.9/0:0:0:0 -cm 8:1:1:0.9/0:0:0:0 -cm 12:20:1:0.97/0:0:0:0 -rm 1500:12:0.9:7:0.85:0:0.01:10 -rm 500:12:0.9:7:0.82:2:0.01:3 
+Level 35: -lr 0.04 -hs 248 -cm 1:1:0:0.9/0:0:0:0 -cm 3:1:0:0.9/0:0:0:0 -cm 7:1:0:0.9/0:0:0:0 -cm 9:1:1:0.9/0:0:0:0 -cm 11:10:0:0.9/0:0:0:0 -rm 100:14:0.9:7:0.85:1:0.01:3 -rm 200:12:0.88:7:0.85:0:0.01:3 -rm 300:12:0.87:7:0.85:2:0.01:3 
+Level 36: -lr 0.04 -hs 248 -cm 1:1:0:0.9/0:0:0:0 -cm 3:1:0:0.9/0:0:0:0 -cm 7:1:0:0.9/0:0:0:0 -cm 9:1:1:0.9/0:0:0:0 -cm 11:10:0:0.9/0:0:0:0 -cm 13:200:1:0.9/1:10:1:0.9 -rm 100:14:0.9:7:0.85:1:0.01:3 -rm 200:12:0.88:7:0.85:0:0.01:8 -rm 300:12:0.87:7:0.85:2:0.01:3 
+Level 37: -lr 0.01 -hs 248 -cm 1:1:0:0.9/0:0:0:0 -cm 3:1:0:0.9/0:0:0:0 -cm 6:1:0:0.9/0:0:0:0 -cm 9:1:0:0.9/0:0:0:0 -cm 11:10:1:0.9/0:0:0:0 -cm 14:200:1:0.9/1:10:1:0.9 -rm 300:14:0.88:7:0.85:0:0.01:8 -rm 300:14:0.88:7:0.85:2:0.01:8 -rm 500:12:0.88:7:0.85:0:0.01:15 
+Level 38: -lr 0 -cm 12:1:0:0.7/0:0:0:0 -rm 2:14:0.95:1:0.9:1:0.1:1 
+Level 39: -lr 0 -cm 12:1:0:0.7/0:0:0:0 -rm 3:14:0.95:1:0.9:1:0.1:1 
+Level 40: -lr 0.03 -lr 32 -cm 12:1:0:0.7/0:0:0:0 -rm 4:14:0.95:1:0.9:1:0.1:1
 </pre>
 
 To see the meaning of the model parameters, type:
@@ -191,14 +194,14 @@ This will output the following content:
       [NB_D]: (integer [1;5000]) denominator to build alpha, which 
               is a parameter estimator. Alpha is given by 1/[NB_D].
               Higher values are usually used with higher [NB_C],   
-              and related to confiant bets. When [NB_D] is one,    
+              and related to confident bets. When [NB_D] is one,   
               the probabilities assume a Laplacian distribution.   
       [NB_I]: (integer {0,1,2}) number to define if a sub-program  
               which addresses the specific properties of DNA       
               sequences (Inverted repeats) is used or not. The     
               number 1 turns ON the sub-program using at the same  
               time the regular context model. The number 2 does    
-              only contemple the invesions only (NO regular). The  
+              only contemple the inversions only (NO regular). The 
               number 0 does not contemple its use (Inverted repeats
               OFF). The use of this sub-program increases the      
               necessary time to compress but it does not affect the
@@ -214,13 +217,13 @@ This will output the following content:
               model is on, it pauses when the number of editions   
               is higher that [NB_C], while it is turned on when    
               a complete match of size [NB_C] is seen again. This  
-              is probabilistic-algorithmic model very usefull to   
+              is probabilistic-algorithmic model very useful to    
               handle the high substitutional nature of genomic     
               sequences. When [NB_S] > 0, the compressor used more 
               processing time, but uses the same RAM and, usually, 
               achieves a substantial higher compression ratio. The 
               impact of this model is usually only noticed for     
-              [NB_C] >= 14.                                        
+              higher [NB_C].                                       
       [NB_R]: (integer {0,1}) number to define if a sub-program    
               which addresses the specific properties of DNA       
               sequences (Inverted repeats) is used or not. It is   
@@ -268,7 +271,8 @@ This will output the following content:
       [NB_W]: (real (0;1)) initial weight for the repeat class.    
       [NB_Y]: (integer {0}, [1;50]) maximum cache size. This will  
               use a table cache with the specified size. The size  
-              must be in balance with the k-mer size [NB_C].
+              must be in balance with the k-mer size [NB_C].  
+
 </pre>
 
 
