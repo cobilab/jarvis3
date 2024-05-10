@@ -288,6 +288,43 @@ The extension of compressing FASTA and FASTQ data contains a menu to expose the 
 ./JARVIS3.sh --help
 </pre>
 
+This will ouput the following menu
+<pre>
+ -------------------------------------------------------
+                                                        
+ JARVIS3, v3.6. High reference-free compression of DNA  
+                sequences, FASTA data, and FASTQ data.  
+                                                        
+ Program options ---------------------------------------
+                                                        
+ -h, --help                   Show this,                
+ -a, --about                  Show program information, 
+ -c, --install                Install/compile programs, 
+ -s, --show                   Show compression levels,  
+                                                        
+ -l <INT>, --level <INT>      JARVIS3 compression level,
+ -b <INT>, --block <INT>      Block size to be splitted,
+ -t <INT>, --threads <INT>    Number of JARVIS3 threads,
+                                                        
+ -dn, --dna                   Assume DNA sequence type, 
+ -fa, --fasta                 Assume FASTA data type,   
+ -fq, --fastq                 Assume FASTQ data type,   
+ -au, --automatic             Detect data type (def),   
+                                                        
+ -d, --decompress             Decompression mode,       
+                                                        
+ Input options -----------------------------------------
+                                                        
+ -i <FILE>, --input <FILE>    Input DNA filename.       
+                                                        
+ Example -----------------------------------------------
+                                                        
+ ./JARVIS3.sh --block 16MB -t 8 -i sample.seq           
+ ./JARVIS3.sh --decompress -t 4 -i sample.seq.tar       
+                                                        
+ -------------------------------------------------------
+</pre>
+
 Preparing JARVIS3 for FASTA and FASTQ:
 <pre>
 ./JARVIS3.sh --install
