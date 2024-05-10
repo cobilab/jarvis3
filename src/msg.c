@@ -117,7 +117,7 @@ void PrintMenu(void){
   "                                                                   \n"
   "DESCRIPTION                                                        \n"
   "      Lossless compression and decompression of genomic            \n"
-  "      sequences for miniaml storage and analysis purposes.         \n"
+  "      sequences for minimal storage and analysis purposes.         \n"
   "      Measure an upper bound of the sequence complexity.           \n"
   "                                                                   \n"
   "      -h,  --help                                                  \n"
