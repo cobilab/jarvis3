@@ -43,7 +43,7 @@ void ModelsExplanation(void){
   "              processing time, but uses the same RAM and, usually, \n"
   "              achieves a substantial higher compression ratio. The \n"
   "              impact of this model is usually only noticed for     \n"
-  "              [NB_C] >= 14.                                        \n"
+  "              higher [NB_C].                                       \n"
   "      [NB_R]: (integer {0,1}) number to define if a sub-program    \n"
   "              which addresses the specific properties of DNA       \n"
   "              sequences (Inverted repeats) is used or not. It is   \n"

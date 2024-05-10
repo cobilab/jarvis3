@@ -39,11 +39,11 @@ December 1999
 	/* Default B_bits and F_bits */
 
 #ifndef B_BITS
-#define		B_BITS		32
+#define		B_BITS		24
 #endif
 
 #ifndef F_BITS
-#define		F_BITS		27
+#define		F_BITS		23
 #endif
 
 /* Change these types for different precision calculations.  They may affect
