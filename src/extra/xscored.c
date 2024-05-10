@@ -219,7 +219,7 @@ int32_t main(int argc, char *argv[]){
   FILE        *Reader = NULL;
   uint8_t     help, verbose, force, nTar = 1;
   clock_t     stop = 0, start = clock();
-  int64_t     garbagex;
+  int64_t     garbagex = 0;
 
   if((help = ArgsState(DEFAULT_HELP, p, argc, "-h")) == 1 || argc < 2){
     PrintMenuD();
