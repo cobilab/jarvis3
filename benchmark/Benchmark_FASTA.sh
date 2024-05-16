@@ -379,7 +379,7 @@ for((x=1;x<=3;++x));
   done
 #
 echo "Running JARVIS3 ...";
-for((x=1;x<=23;++x)); 
+for((x=1;x<=26;++x)); 
   do
   echo "Level $x...";
   RUN_JARVIS3_SH "$FILE" " $x --block 600MB --threads 1 " " --decompress --threads 1 --fasta --input " "JARVIS3" "23" " --block 600MB --threads 1 --fasta " >> data.csv;
@@ -403,6 +403,7 @@ for dint in "${INT_DATA[@]}"
   do
   #
   grep $dint data2.csv > data-$idx.csv
+  echo "$(sort -t$'\t' -k 2 -n data-$idx.csv)" > data-$idx.csv
   tmp="'data-$idx.csv' u 2:3 w lp ls $idx title '$dint', ";
   plotnames="$plotnames $tmp";
   ((++idx));

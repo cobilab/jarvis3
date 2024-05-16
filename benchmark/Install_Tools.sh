@@ -62,10 +62,10 @@ rm -rf JARVIS2-bin-64-Linux.zip JARVIS2-bin-64-Linux/
 # JARVIS3 ----------------------------------------------------------------------
 #
 echo -e "\e[34m[Installer]\e[32m Installing JARVIS3 ...\e[0m";
-rm -fr jarvis3-3.3/ v3.3.zip extra
-wget https://github.com/cobilab/jarvis3/archive/refs/tags/v3.3.zip
-unzip v3.3.zip
-cd jarvis3-3.3/src/
+rm -fr jarvis3-3.6/ v3.6.zip extra
+wget https://github.com/cobilab/jarvis3/archive/refs/tags/v3.6.zip
+unzip v3.6.zip
+cd jarvis3-3.6/src/
 make
 cp -rf extra/ ../../
 cp -f JARVIS3.sh ../../
