@@ -9,6 +9,7 @@ TYPE=0;
 LEVEL=9;
 BLOCK="250MB";
 THREADS="8";
+OUTPUT="";
 #
 ################################################################################
 #
@@ -28,6 +29,7 @@ SHOW_MENU () {
   echo " -l <INT>, --level <INT>      JARVIS3 compression level,";
   echo " -b <INT>, --block <INT>      Block size to be splitted,";
   echo " -t <INT>, --threads <INT>    Number of JARVIS3 threads,";
+  echo " -o <INT>, --output <STR>     Output filename,          ";  
   echo "                                                        ";
   echo " -dn, --dna                   Assume DNA sequence type, ";
   echo " -fa, --fasta                 Assume FASTA data type,   ";
@@ -234,6 +236,10 @@ while [[ $# -gt 0 ]]
       INPUT="$2";
       shift 2;
     ;;
+    -o|--output)
+      OUTPUT="$2";
+      shift 2;
+    ;;
     -*) # unknown option with small
     echo "Invalid arg ($1)!";
     echo "For help, try: ./JARVIS3.sh -h"
@@ -350,7 +356,12 @@ if [[ "$DECOMPRESS" -eq "0" ]];
     echo "------";
     ls -la $INPUT.tar | awk '{ print "TOTAL:\t"$5; }'
     rm -f DNA.JV3.tar EXTRA.JV3 HEADERS.JV3 .rep_out_ec
-    echo "Compressed file: $INPUT.tar";
+    if [ -n "$OUTPUT" ]; then
+      mv $INPUT.tar $OUTPUT.tar
+      echo "Compressed file: $OUTPUT.tar";
+    else
+      echo "Compressed file: $INPUT.tar";
+    fi
     #
     else # FASTQ DATA ==========================================================
     #
@@ -374,7 +385,12 @@ if [[ "$DECOMPRESS" -eq "0" ]];
     ls -lah $INPUT.tar | awk '{ print "TOTAL:\t"$5; }'
     rm -f DNA.JV3 N.JV3 HEADERS.JV3 QUALITIES.JV3 .rep_main_info \
     .tmp_report_out_xc .tmp_report_err_xc;
-    echo "Compressed file: $INPUT.tar";
+    if [ -n "$OUTPUT" ]; then
+      mv $INPUT.tar $OUTPUT.tar
+      echo "Compressed file: $OUTPUT.tar";
+    else
+      echo "Compressed file: $INPUT.tar";
+    fi
     #	    
     fi
   #
@@ -411,7 +427,12 @@ if [[ "$DECOMPRESS" -eq "0" ]];
     ./MergeFastaStreamsJ3 > $INPUT.out
     rm -f DNA.JV3.jc DNA.JV3.tar.out EXTRA.JV3.bz2 HEADERS.JV3.bz2 .rep_out_dec
     echo "Done!";
-    echo "Decompressed file: $INPUT.out";
+    if [ -n "$OUTPUT" ]; then
+      mv $INPUT.out $OUTPUT.out
+      echo "Decompressed file: $OUTPUT.out";
+    else
+      echo "Decompressed file: $INPUT.out";
+    fi
     #
     else # FASTQ DATA ==========================================================
     #
@@ -433,7 +454,12 @@ if [[ "$DECOMPRESS" -eq "0" ]];
     ./MergeFastqStreamsJ3 > $INPUT.out
     rm -f DNA.JV3.jc DNA.JV3.tar.out N.JV3.bz2 HEADERS.JV3.bz2 \
     QUALITIES.JV3.co .rep_main_info .tmp_report_out_xd .tmp_report_err_xd ;
-    echo "Decompressed file: $INPUT.out";
+    if [ -n "$OUTPUT" ]; then
+      mv $INPUT.out $OUTPUT.out
+      echo "Decompressed file: $OUTPUT.out";
+    else
+      echo "Decompressed file: $INPUT.out";
+    fi
     #
     fi
   fi
