@@ -5,6 +5,11 @@
  sudo apt install gnuplot-x11 -y # NEED TO GENERATE PLOTS
  sudo apt install -y cmake # NEED TO INSTALL SOME TOOLS
  sudo apt install -y git # NEED TO INSTALL SOME TOOLS
+ sudo apt-get install clang-12 -y #REQUIRED BY CMIX
+ wget https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/3.0.7/sratoolkit.3.0.7-ubuntu64.tar.gz
+ tar -xf sratoolkit.3.0.7-ubuntu64.tar.gz
+ sudo apt install clang -y
+ sudo apt install libtbb-dev -y
 #
 # ------------------------------------------------------------------------------
 #
@@ -125,7 +130,7 @@ cd ../../
 #
 # GeCo2 ------------------------------------------------------------------------
 #
-echo -e "\e[34m[Installer]\e[32m Installing GECO2 ...\e[0m";
+#echo -e "\e[34m[Installer]\e[32m Installing GECO2 ...\e[0m";
 rm -fr geco2/
 git clone https://github.com/cobilab/geco2.git
 cd geco2/src/
@@ -145,6 +150,31 @@ cd fqzcomp-master/
 make
 cp fqzcomp ../
 cd ../
+#
+# SPRING ----------------------------------------------------------------------
+#
+echo -e "\e[34m[Installer]\e[32m Installing SPRING ...\e[0m";
+rm -fr master.zip
+git clone https://github.com/shubhamchandak94/SPRING.git
+unzip master.zip
+cd SPRING
+mkdir build
+cd build
+cmake ..
+make
+cp spring ../../
+cd ../../
+#
+# LEON ----------------------------------------------------------------------
+#
+echo -e "\e[34m[Installer]\e[32m Installing LEON ...\e[0m";
+rm -fr LEON
+git clone --recursive https://github.com/GATB/LEON.git
+cd LEON
+sh INSTALL
+cp leon ..
+cd ..
+#
 #
 # ==============================================================================
 #                 G E N E R A L - P U R P O S E   E N C O D E R S
@@ -200,12 +230,14 @@ rm -fr tmp_paq8l/
 #
 # CMIX -------------------------------------------------------------------------
 #
-#echo -e "\e[34m[Installer]\e[32m Installing CMIX ...\e[0m";
-#rm -fr cmix/
-#git clone https://github.com/byronknoll/cmix.git
-#cd cmix
-#make
-#cd ../ #TODO: where is binary to copy?
+echo -e "\e[34m[Installer]\e[32m Installing CMIX ...\e[0m";
+rm -fr cmix/
+git clone https://github.com/byronknoll/cmix.git
+mv cmix cmix_dir
+cd cmix_dir
+make
+cp cmix ..
+cd ../ 
 #
 # ------------------------------------------------------------------------------
 #
@@ -233,6 +265,8 @@ PROGRAM_EXISTS "./xz";
 PROGRAM_EXISTS "./bsc-m03";
 PROGRAM_EXISTS "./nncp";
 PROGRAM_EXISTS "./paq8l";
-#PROGRAM_EXISTS "./cmix";
+PROGRAM_EXISTS "./cmix";
+PROGRAM_EXISTS "./spring";
+PROGRAM_EXISTS "./leon";
 #
 # ==============================================================================

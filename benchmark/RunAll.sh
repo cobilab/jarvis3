@@ -3,6 +3,10 @@
 ./Install_Tools.sh
 #
 ./Download_FASTA.sh
+./Download_FASTQ.sh
 #
 ./Run_All_FASTA.sh
+./Run_All_FASTQ.sh
+#
+./Run_All_Plots.sh
 #
