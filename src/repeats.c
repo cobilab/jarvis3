@@ -28,8 +28,9 @@ uint8_t GetNBase(uint8_t *b, uint64_t i){
 
 void FillLT(void)
   {
-  for(uint32_t x = 0 ; x < MAX_LT ; ++x)
-    for(uint32_t y = 0 ; y < MAX_LT ; ++y)
+  uint32_t x, y;
+  for(x = 0 ; x < MAX_LT ; ++x)
+    for(y = 0 ; y < MAX_LT ; ++y)
       {
       uint32_t lt_idx = y * MAX_LT + x;
       LT  [lt_idx] = (y + 1.0) / (x + 2.0);
@@ -313,8 +314,9 @@ void StartMultipleRMs(RCLASS *C, uint8_t *b)
 void ComputeMixture(RCLASS *C, PMODEL *M, uint8_t *b)
   {
   double F[4] = {0,0,0,0};
-  
-  for(uint32_t r = 0 ; r < C->nRM ; ++r)
+
+  uint32_t r;
+  for(r = 0 ; r < C->nRM ; ++r)
     {
     RMODEL *R = &C->RM[r];
     ComputeRMProbs(C, R, b);
@@ -338,7 +340,8 @@ void ComputeMixture(RCLASS *C, PMODEL *M, uint8_t *b)
 //
 void UpdateWeights(RCLASS *C, uint8_t *b, uint8_t s)
   {
-  for(uint32_t r = 0 ; r < C->nRM ; ++r)
+  uint32_t r;
+  for(r = 0 ; r < C->nRM ; ++r)
     {
     RMODEL *R = &C->RM[r];
     R->weight = Power(R->weight, C->P->gamma) * R->probs[s];
