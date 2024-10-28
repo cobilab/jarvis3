@@ -53,6 +53,15 @@ int FindDataType(char *FN)
   }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// ERR AND EXIT ON UNKNOWN SYMBOL
+//
+void ErrAndExit(void)
+  {
+  fprintf(stderr, "Error: non ACGT symbol in sequence!\n");
+  exit(1);
+  }
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // ENCODE HEADER RMS ONLY
 //
 void EncodeHeaderOnlyRMs(PARAM *P, RCLASS **RC, FILE *F)
@@ -254,8 +263,13 @@ void CompressRMsOnly(PARAM *P, char *fn)
 
   while((m = fread(t, sizeof(uint8_t), NSYM, IN)) == NSYM)
     {
+    if(!strchr("ACGT", t[0])) ErrAndExit();
+    if(!strchr("ACGT", t[1])) ErrAndExit();
+    if(!strchr("ACGT", t[2])) ErrAndExit();
+    if(!strchr("ACGT", t[3])) ErrAndExit();
+
     buf[i] = S2N(t[3])|(S2N(t[2])<<2)|(S2N(t[1])<<4)|(S2N(t[0])<<6); // PACK 4
-    
+
     for(n = 0 ; n < m ; ++n)
       {
       SB->buf[SB->idx] = sym = S2N(t[n]);
@@ -405,10 +419,15 @@ void CompressNoNN(PARAM *P, char *fn)
 
   while((m = fread(t, sizeof(uint8_t), NSYM, IN)) == NSYM)
     {
-    buf[i] = S2N(t[3])|(S2N(t[2])<<2)|(S2N(t[1])<<4)|(S2N(t[0])<<6); // PACK 4
-    
-    for(n = 0 ; n < m ; ++n){
+    if(!strchr("ACGT", t[0])) ErrAndExit();
+    if(!strchr("ACGT", t[1])) ErrAndExit();
+    if(!strchr("ACGT", t[2])) ErrAndExit();
+    if(!strchr("ACGT", t[3])) ErrAndExit();
 
+    buf[i] = S2N(t[3])|(S2N(t[2])<<2)|(S2N(t[1])<<4)|(S2N(t[0])<<6); // PACK 4
+
+    for(n = 0 ; n < m ; ++n)
+      {
       SB->buf[SB->idx] = sym = S2N(t[n]);
 
       memset((void *)PT->freqs, 0, NSYM * sizeof(double));
@@ -629,10 +648,15 @@ void Compress(PARAM *P, char *fn){
 
   while((m = fread(t, sizeof(uint8_t), NSYM, IN)) == NSYM)
     {
-    buf[i] = S2N(t[3])|(S2N(t[2])<<2)|(S2N(t[1])<<4)|(S2N(t[0])<<6); // PACK 4
+    if(!strchr("ACGT", t[0])) ErrAndExit();
+    if(!strchr("ACGT", t[1])) ErrAndExit();
+    if(!strchr("ACGT", t[2])) ErrAndExit();
+    if(!strchr("ACGT", t[3])) ErrAndExit();
     
-    for(n = 0 ; n < m ; ++n){
+    buf[i] = S2N(t[3])|(S2N(t[2])<<2)|(S2N(t[1])<<4)|(S2N(t[0])<<6); // PACK 4
 
+    for(n = 0 ; n < m ; ++n)
+      {
       SB->buf[SB->idx] = sym = S2N(t[n]);
 
       memset((void *)PT->freqs, 0, NSYM * sizeof(double));
