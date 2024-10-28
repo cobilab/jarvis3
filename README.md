@@ -18,11 +18,18 @@ alt="JARVIS3" width="300" border="0" /></p>
 
 ### Installation ###
 
+Manually:
 <pre>
 git clone https://github.com/cobilab/jarvis3.git
 cd jarvis3/src/
 make
 </pre>
+
+Using Conda:
+<pre>
+conda install -c bioconda jarvis3
+<pre>
+
 
 ### Execution ###
 
@@ -51,7 +58,7 @@ This will print the following options:
       ███████ ██   ██ ██   ███  ████   ██ ███████ ███████          
                                                                    
 NAME                                                               
-      JARVIS3 v3.6,                                              
+      JARVIS3 v3.7,                                              
       Efficient lossless encoding of genomic sequences             
                                                                    
 SYNOPSIS                                                           
@@ -292,7 +299,7 @@ This will ouput the following menu
 <pre>
  -------------------------------------------------------
                                                         
- JARVIS3, v3.6. High reference-free compression of DNA  
+ JARVIS3, v3.7. High reference-free compression of DNA  
                 sequences, FASTA data, and FASTQ data.  
                                                         
  Program options ---------------------------------------
