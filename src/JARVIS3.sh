@@ -16,7 +16,7 @@ OUTPUT="";
 SHOW_MENU () {
   echo " -------------------------------------------------------";
   echo "                                                        ";
-  echo " JARVIS3, v3.6. High reference-free compression of DNA  ";
+  echo " JARVIS3, v3.7. High reference-free compression of DNA  ";
   echo "                sequences, FASTA data, and FASTQ data.  ";
   echo "                                                        ";
   echo " Program options ---------------------------------------";
@@ -82,7 +82,7 @@ SHOW_HEADER () {
   echo " [JARVIS3 :: DNA, FASTA, and FASTQ Extensions]          ";
   echo "                                                        ";
   echo " Release year: 2024,                                    ";
-  echo " Version: 3.5                                           ";
+  echo " Version: 3.7                                           ";
   echo " Author: D. Pratas                                      ";
   echo " Language: Bash / C                                     ";
   echo " License: GPL v3                                        ";
