@@ -28,7 +28,7 @@ make
 Using Conda:
 <pre>
 conda install -c bioconda jarvis3
-<pre>
+</pre>
 
 
 ### Execution ###
