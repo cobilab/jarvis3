@@ -360,7 +360,7 @@ Decompression of FASTQ data:
 ### Citation ###
 
 <pre>
-In progress...
+Sousa, Maria JP, Armando J. Pinho, and Diogo Pratas. "JARVIS3: an efficient encoder for genomic data." Bioinformatics 40.12 (2024): btae725.
 </pre>
 
 #### Issues ###
