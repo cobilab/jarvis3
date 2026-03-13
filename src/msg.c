@@ -191,7 +191,7 @@ void PrintMenu(void){
   "           File to compress is the last argument.                  \n"
   "                                                                   \n"
   "COPYRIGHT                                                          \n"
-  "      Copyright (C) 2014-2024.                                     \n"
+  "      Copyright (C) 2014-2026.                                     \n"
   "      This is a Free software, under GPLv3. You may redistribute   \n"
   "      copies of it under the terms of the GNU - General Public     \n"
   "      License v3 <http://www.gnu.org/licenses/gpl.html>.         \n\n",
@@ -213,7 +213,7 @@ void PrintVersion(void){
   "   Efficient lossless encoding and decoding of DNA sequences       \n"
   "                                                                   \n"
   "Developed at the CoBiLab (https://cobilab.github.io) at @IEETA.    \n"
-  "Copyright (C) 2014-2024, University of Aveiro and University of    \n"
+  "Copyright (C) 2014-2026, University of Aveiro and University of    \n"
   "Helsinki. JARVIS3 is a Free software. Copies may be distributed    \n"
   "under the terms of the GNU-General Public License v3. See site:    \n"
   "http://www.gnu.org/licenses/gpl.html. There is NOT ANY WARRANTY    \n" 

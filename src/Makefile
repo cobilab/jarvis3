@@ -1,14 +1,17 @@
 #============================================================================#
-#             JARVIS3 2014-2024, IEETA/DETI, UNIVERSITY OF AVEIRO            #
+#             JARVIS3 2014-2026, IEETA/DETI, UNIVERSITY OF AVEIRO            #
 #============================================================================#
 BIN    = .
 CC     = gcc
 CPLP   = 
 #-----------------------------------------------------------------------------
-CFLAGS = -Wall -Ofast $(CPLP) -DPROGRESS
-#CFLAGS = -Wall -pg -Ofast $(CPLP) -DPROGRESS
-#CFLAGS = -Wall -Ofast $(CPLP) -DPROGRESS
-#CFLAGS = -Wall -Ofast -march=native -mtune=native -DPROGRESS
+
+# AGRESSIVE COMPILATION -> LOW PORTABILITY
+#CFLAGS = -Wall -Ofast -march=native -mtune=native -flto -fomit-frame-pointer $(CPLP) -DPROGRESS
+
+# DEFENSIVE COMPILATION -> PORTABLE 
+CFLAGS  = -Wall -O3 -march=x86-64 -mtune=generic -ffp-contract=off -fno-strict-aliasing -fomit-frame-pointer -flto -DPROGRESS -flto
+
 #-----------------------------------------------------------------------------
 LIBS   = -lm
 DEPS   = defs.h

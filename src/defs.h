@@ -71,12 +71,13 @@ PARAM;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-#define RELEASE                7
+#define RELEASE                8
 #define VERSION                3
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-#define BUFFER_SIZE            262144
+#define OUTBUF_SIZE            (1 << 16)
+#define BUFFER_SIZE            (1 << 16) //262144
 #define ADD_SPACE              100000000
 #define PROGRESS_MIN           1000000
 #define DEF_VERSION            0

@@ -9,6 +9,7 @@ typedef struct{
   uint32_t   in;
   CBUF       *seq;           // BUFFER FOR EDITED SEQUENCE
   uint8_t    *mask;          // BUFFER FOR FAILS & HITS
+  uint32_t   fails;          // CURRENT NUMBER OF FAILS IN MASK
   uint64_t   idx;            // INDEX FOR UPDATE
   uint64_t   idx2;           // AUXILIAR INDEX FOR UPDATE
   uint32_t   threshold;      // DISCARD ABOVE THIS VALUE

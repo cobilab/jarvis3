@@ -10,36 +10,46 @@
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-PMODEL *CreatePModel(uint32_t n){
-  PMODEL *PM = (PMODEL   *) Calloc(1, sizeof(PMODEL));
+PMODEL *CreatePModel(uint32_t n)
+  {
+  PMODEL *PM = (PMODEL *) Calloc(1, sizeof(PMODEL));
   PM->freqs  = (uint32_t *) Calloc(n, sizeof(uint32_t));
   return PM;
   }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-CMWEIGHT *CreateWeightModel(uint32_t size){
+CMWEIGHT *CreateWeightModel(uint32_t size)
+  {
   uint32_t n;
-  CMWEIGHT *CMW    = (CMWEIGHT *) Calloc(1, sizeof(CMWEIGHT));
+  CMWEIGHT *CMW = (CMWEIGHT *) Calloc(1, sizeof(CMWEIGHT));
+  const double fraction = 1.0 / size;
+
   CMW->totModels   = size;
-  CMW->totalWeight = 0;
+  CMW->totalWeight = 0.0;
   CMW->gamma       = (double *) Calloc(CMW->totModels, sizeof(double));
   CMW->weight      = (double *) Calloc(CMW->totModels, sizeof(double));
-  double fraction  = 1.0 / CMW->totModels;
-  for(n = 0 ; n < CMW->totModels ; ++n){
+
+  for(n = 0 ; n < CMW->totModels ; ++n)
+    {
     CMW->weight[n] = fraction;
     CMW->gamma[n]  = DEFAULT_GAMMA;
     }
+
   return CMW;
   }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-void ResetWeightModel(CMWEIGHT *CMW){
+void ResetWeightModel(CMWEIGHT *CMW)
+  {
   uint32_t n;
-  double fraction = 1.0 / CMW->totModels;
-  CMW->totalWeight = 0;
-  for(n = 0 ; n < CMW->totModels ; ++n){
+  const double fraction = 1.0 / CMW->totModels;
+
+  CMW->totalWeight = 0.0;
+
+  for(n = 0 ; n < CMW->totModels ; ++n)
+    {
     CMW->weight[n] = fraction;
     CMW->gamma[n]  = DEFAULT_GAMMA;
     }
@@ -47,27 +57,42 @@ void ResetWeightModel(CMWEIGHT *CMW){
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-void RenormalizeWeights(CMWEIGHT*CMW){
+void RenormalizeWeights(CMWEIGHT *CMW)
+  {
   uint32_t n;
-  for(n = 0 ; n < CMW->totModels ; ++n) 
-    CMW->weight[n] /= CMW->totalWeight;
+  double inv;
+
+  if(CMW->totalWeight == 0.0)
+    return;
+
+  inv = 1.0 / CMW->totalWeight;
+
+  for(n = 0 ; n < CMW->totModels ; ++n)
+    CMW->weight[n] *= inv;
   }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-void CalcDecayment(CMWEIGHT *CMW, PMODEL **PM, uint8_t sym){
+void CalcDecayment(CMWEIGHT *CMW, PMODEL **PM, uint8_t sym)
+  {
   uint32_t n;
-  CMW->totalWeight = 0;
-  for(n = 0 ; n < CMW->totModels ; ++n){
-    CMW->weight[n] = Power(CMW->weight[n], CMW->gamma[n]) * 
-                     (double) PM[n]->freqs[sym] / PM[n]->sum;
-    CMW->totalWeight += CMW->weight[n];
+  double total = 0.0;
+
+  for(n = 0 ; n < CMW->totModels ; ++n)
+    {
+    PMODEL *P = PM[n];
+    const double ps = (double) P->freqs[sym] / P->sum;
+    CMW->weight[n] = Power(CMW->weight[n], CMW->gamma[n]) * ps;
+    total += CMW->weight[n];
     }
+
+  CMW->totalWeight = total;
   }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-void RemoveWeightModel(CMWEIGHT *CMW){
+void RemoveWeightModel(CMWEIGHT *CMW)
+  {
   Free(CMW->weight);
   Free(CMW->gamma);
   Free(CMW);
@@ -75,55 +100,74 @@ void RemoveWeightModel(CMWEIGHT *CMW){
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-void ComputeMXProbs(FPMODEL *PT, PMODEL *MX, uint32_t nSym){
-  uint32_t x;
-  MX->sum = 0;
-  for(x = 0 ; x < nSym ; ++x)
-    MX->sum += MX->freqs[x] = 1 + (unsigned) (PT->freqs[x] * MX_PMODEL);
+void ComputeMXProbs(FPMODEL *PT, PMODEL *MX, uint32_t nSym)
+  {
+  (void) nSym;
+
+  const uint32_t f0 = 1u + (uint32_t)(PT->freqs[0] * MX_PMODEL);
+  const uint32_t f1 = 1u + (uint32_t)(PT->freqs[1] * MX_PMODEL);
+  const uint32_t f2 = 1u + (uint32_t)(PT->freqs[2] * MX_PMODEL);
+  const uint32_t f3 = 1u + (uint32_t)(PT->freqs[3] * MX_PMODEL);
+
+  MX->freqs[0] = f0;
+  MX->freqs[1] = f1;
+  MX->freqs[2] = f2;
+  MX->freqs[3] = f3;
+  MX->sum = f0 + f1 + f2 + f3;
   }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-void RemovePModel(PMODEL *PM){
+void RemovePModel(PMODEL *PM)
+  {
   Free(PM->freqs);
   Free(PM);
   }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-FPMODEL *CreateFloatPModel(uint32_t n){
+FPMODEL *CreateFloatPModel(uint32_t n)
+  {
   FPMODEL *F = (FPMODEL *) Calloc(1, sizeof(FPMODEL));
-  F->freqs   = (double  *) Calloc(n, sizeof(double));
+  F->freqs   = (double *) Calloc(n, sizeof(double));
+  F->nSym    = n;
   return F;
   }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-void RemoveFPModel(FPMODEL *FM){
+void RemoveFPModel(FPMODEL *FM)
+  {
   Free(FM->freqs);
   Free(FM);
   }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-void ComputeWeightedFreqs(double w, PMODEL *P, FPMODEL *PT, uint32_t nSym){
-  uint32_t x;
-  double f = w / P->sum;
-  for(x = 0 ; x < nSym ; ++x)
-    PT->freqs[x] += (double) P->freqs[x] * f;
+void ComputeWeightedFreqs(double w, PMODEL *P, FPMODEL *PT, uint32_t nSym)
+  {
+  (void) nSym;
+
+  const double f = w / P->sum;
+
+  PT->freqs[0] += (double) P->freqs[0] * f;
+  PT->freqs[1] += (double) P->freqs[1] * f;
+  PT->freqs[2] += (double) P->freqs[2] * f;
+  PT->freqs[3] += (double) P->freqs[3] * f;
   }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-double PModelNats(PMODEL *P, uint32_t s){
+double PModelNats(PMODEL *P, uint32_t s)
+  {
   return log((double) P->sum / P->freqs[s]);
   }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-double PModelStat(PMODEL *P, uint32_t s){
+double PModelStat(PMODEL *P, uint32_t s)
+  {
   return (double) P->sum / P->freqs[s];
   }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-

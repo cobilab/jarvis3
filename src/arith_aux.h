@@ -11,11 +11,14 @@ the same to Armando J. Pinho, ap@ua.pt. The copyright notice above
 and this statement of conditions must remain an integral part of each
 and every copy made of these files.
 
+Adapted by D. Pratas 2026
+
 ------------------------------------------------------------------------------*/
 
 #ifndef ARITH_AUX_H_INCLUDED
 #define ARITH_AUX_H_INCLUDED
 
+#include <stdio.h>
 #include <stdint.h>
 #define __STDC_FORMAT_MACROS
 #include <inttypes.h>
@@ -29,4 +32,3 @@ void AESym(int symbol, int *counters, int totalCount, FILE *oFp);
 int ArithDecodeSymbol(int nSymbols, int *counters, int totalCount, FILE *iFp);
 
 #endif /* ARITH_AUX_H_INCLUDED */
-

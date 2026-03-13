@@ -11,7 +11,7 @@
 #define ARRAY_MODE            0
 #define HASH_TABLE_MODE       1
 
-#define MAX_ARRAY_MEMORY      2048    //Size in MBytes
+#define MAX_ARRAY_MEMORY      2048    // Size in MBytes
 
 typedef struct{
   uint32_t   ctx;           // Current depth of context template
@@ -29,7 +29,7 @@ typedef struct{
   uint64_t   pModelIdx;     // IDX
   uint64_t   pModelIdxIR;   // IDX INVERSIONS
   uint32_t   edits;         // EDITS
-  uint32_t   nSym;          // EDITS
+  uint32_t   nSym;          // SYMBOL COUNT
   uint32_t   ir;            // INVERTED REPEATS
   }
 CMODEL;
@@ -41,11 +41,11 @@ uint8_t         GetPModelIdxIR       (uint8_t *, CMODEL *);
 uint64_t        GetPModelIdxCorr     (uint8_t *, CMODEL *, uint64_t);
 void            ResetCModelIdx       (CMODEL *);
 void            UpdateCModelCounter  (CMODEL *, uint32_t, uint64_t);
-CMODEL          *CreateCModel        (uint32_t, uint32_t, uint8_t, uint32_t, 
+CMODEL          *CreateCModel        (uint32_t, uint32_t, uint8_t, uint32_t,
                                       uint32_t, uint32_t, double, double,
                                       uint32_t, uint32_t);
-void            ComputePModel        (CMODEL *, PMODEL *, uint64_t, uint32_t, 
-		                     long *, long *);
+void            ComputePModel        (CMODEL *, PMODEL *, uint64_t, uint32_t,
+                                      long *, long *);
 void            RemoveCModel         (CMODEL *);
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

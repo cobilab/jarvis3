@@ -1,11 +1,9 @@
 #ifndef REPEATS_H_INCLUDED
 #define REPEATS_H_INCLUDED
 
+#include <stdint.h>
 #include "defs.h"
 #include "pmodels.h"
-#include "cm.h"
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 #define MAX_BUF          2000000
 #define NSYM             4
@@ -25,74 +23,83 @@
 
 typedef struct
   {
-  uint32_t *array;   // ARRAY WITH POSITIONS
-  uint32_t nPos;     // NUMBER OF POSITIONS (CACHE)
-  uint32_t nPosAnd1; // NUMBER OF POSITIONS (CACHE) PLUS ONE (INDEXES)
-  uint32_t size;     // ARRAY_SIZE
-  }
-RTABLE;
-
-typedef struct
-  {
-  uint64_t idx;      // CURRENT CONTEXT INDEX
-  uint64_t idxRev;   // CURRENT INVERTED REPEAT INDEX
-  uint64_t mult;     // CURRENT INVERTED REPEAT INDEX
-  uint32_t ctx;      // CONTEXT TEMPLATE SIZE FOR REPEAT MODEL
-  uint32_t limit;    // REPEAT PERFORMANCE LIMIT, ASSOCIATED WITH BETA
-  double   beta;     // REPEAT PERFORMANCE DECAYING FOR REPEAT MOVE
-  double   gamma;    // PERFORMANCE DECAYING PARAMETER
-  uint8_t  rev;      // INVERTED REPEAT USAGE [HEAVY -> MEMORY/TIME]
-  uint64_t c_pos;    // CACHE INDEX POSITION TO REMOVE STORED POSITION
-  int64_t  c_max;    // CACHE MAXIMUM THRESHOLD TO REMOVE POSITION
-  uint64_t c_idx;    // CACHE CONTEXT INDEX
-  uint64_t c_idxRev; // CACHE INVERTED REPEAT INDEX
-  double   iWeight;  // INITIAL WEIGHT FOR EACH REPEAT MODEL CLASS
+  double   beta;
+  double   gamma;
+  double   iWeight;
+  uint32_t limit;
+  uint32_t ctx;
+  uint64_t mult;
+  uint64_t idx;
+  uint64_t idxRev;
+  uint64_t c_pos;
+  uint64_t c_max;
+  uint64_t c_idx;
+  uint64_t c_idxRev;
+  uint8_t  rev;
   }
 RPARAM;
 
-typedef struct
-  {
-  uint64_t pos;      // POSITION OF THE SYMBOL
-  uint32_t nHits;    // NUMBER OF TIMES THIS MODEL WAS CORRECT
-  uint32_t nTries;   // NUMBER OF TIMES THIS MODEL WAS USED
-  double   probs[4]; // REPEAT MODEL SYMBOL PROBABILITIES
-  double   weight;   // WEIGHT OF THE MODEL FOR MIXTURE
-  double   acting;   // THE ACTING PERFORMANCE
-  double   lastHit;  // IS ON OR NOT
-  uint32_t id;       // ID OF THE RHASH
-  uint8_t  rev;      // INVERTED REPETAT MODEL. IF REV='Y' THEN IS TRUE
-  }
-RMODEL;
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 typedef struct
   {
-  CMODEL   *C;       // CONTEXT MODEL FOR COMPLEMENTAR SYMBOL PROBS 
-  RTABLE   *T;       // REPEATING KMERS TABLE
-  RMODEL   *RM;      // POINTER FOR EACH OF THE MULTIPLE REPEAT MODELS
-  RPARAM   *P;       // EXTRA PARAMETERS FOR REPEAT MODELS
-  uint32_t nRM;      // CURRENT NUMBER OF REPEAT MODELS
-  uint32_t mRM;      // MAXIMUM NUMBER OF REPEAT MODELS
-  uint64_t size;     // SIZE OF THE INPUT SEQUENCE PACKED
-  uint64_t length;   // LENGTH OF THE INPUT SEQUENCE
+  uint32_t *array;
+  uint64_t size;
+  uint32_t nPos;
+  uint32_t nPosAnd1;
+  }
+RTABLE;
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+typedef struct
+  {
+  uint32_t pos;
+  uint32_t nHits;
+  uint32_t nTries;
+  double   probs[NSYM];
+  double   weight;
+  double   acting;
+  uint8_t  rev;
+  uint8_t  lastHit;
+  }
+RMODEL;
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+typedef struct
+  {
+  RPARAM  *P;
+  RTABLE  *T;
+  RMODEL  *RM;
+  uint32_t nRM;
+  uint32_t mRM;
   }
 RCLASS;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-uint8_t   GetNBase           (uint8_t *, uint64_t);
-RCLASS    *CreateRC          (uint32_t, double, uint32_t, uint32_t, double, 
-		               uint8_t, double, uint64_t);
-uint64_t  GetIdxRev          (uint8_t *, RCLASS *);
-uint64_t  GetIdx             (uint8_t *, RCLASS *);
-int32_t   StartRM            (RCLASS *, uint32_t, uint64_t, uint8_t);
-void      AddKmerPos         (RTABLE *, uint64_t, uint32_t);
-void      ComputeRMProbs     (RCLASS *, RMODEL *, uint8_t *);
-void      UpdateRM           (RMODEL *, uint8_t *, uint8_t);
-void      RenormWeights      (RCLASS *);
-void      StopRM             (RCLASS *);
-void      StartMultipleRMs   (RCLASS *, uint8_t *);
-void      ComputeMixture     (RCLASS *, PMODEL *, uint8_t *);
-void      UpdateWeights      (RCLASS *, uint8_t *, uint8_t);
+static inline uint8_t GetNBase(const uint8_t *b, uint64_t i)
+  {
+  return (uint8_t) ((b[i >> 2] >> (((3 - (i & 0x3)) << 1))) & 0x3);
+  }
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+void     FillLT          (void);
+RCLASS  *CreateRC        (uint32_t, double, uint32_t, uint32_t, double,
+                          uint8_t, double, uint64_t);
+uint64_t GetIdxRev       (uint8_t *, RCLASS *);
+uint64_t GetIdx          (uint8_t *, RCLASS *);
+int32_t  StartRM         (RCLASS *, uint32_t, uint64_t, uint8_t);
+void     AddKmerPos      (RTABLE *, uint64_t, uint32_t);
+void     ComputeRMProbs  (RCLASS *, RMODEL *, uint8_t *);
+void     UpdateRM        (RMODEL *, uint8_t *, uint8_t);
+void     RenormWeights   (RCLASS *);
+void     StopRM          (RCLASS *);
+void     StartMultipleRMs(RCLASS *, uint8_t *);
+void     ComputeMixture  (RCLASS *, PMODEL *, uint8_t *);
+void     UpdateWeights   (RCLASS *, uint8_t *, uint8_t);
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

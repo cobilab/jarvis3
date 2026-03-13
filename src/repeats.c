@@ -13,19 +13,19 @@
 //
 double LT  [MAX_LT * MAX_LT];
 double LT_C[MAX_LT * MAX_LT];
+static int LT_READY = 0;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// GET NUMERICAL BASE FROM PACKED SEQUENCE BY ID. THE ID%4 IS GIVEN BY THE 2
-// LESS SIGNIFICATIVE BITS (ID&3).
-//
-uint8_t GetNBase(uint8_t *b, uint64_t i){
-  return (uint8_t) (((0x3<<((3-(i&0x3))<<1)) & b[i>>2])>>((3-(i&0x3))<<1));
+
+static inline uint8_t Comp2(uint8_t x)
+  {
+  static const uint8_t comp2[4] = {3, 2, 1, 0};
+  return comp2[x & 0x3];
   }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // FILL LOOKUP TABLE
 //
-
 void FillLT(void)
   {
   uint32_t x, y;
@@ -34,14 +34,14 @@ void FillLT(void)
       {
       uint32_t lt_idx = y * MAX_LT + x;
       LT  [lt_idx] = (y + 1.0) / (x + 2.0);
-      LT_C[lt_idx] = (1 - LT[lt_idx]) / 3;
+      LT_C[lt_idx] = (1.0 - LT[lt_idx]) / 3.0;
       }
 
   return;
   }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// CREATES THE RCLASS BASIC STRUCTURE 
+// CREATES THE RCLASS BASIC STRUCTURE
 //
 RCLASS *CreateRC(uint32_t m, double b, uint32_t l, uint32_t c,
 double g, uint8_t i, double w, uint64_t s)
@@ -51,8 +51,8 @@ double g, uint8_t i, double w, uint64_t s)
   C->RM          = (RMODEL *) Calloc(m, sizeof(RMODEL));
   C->mRM         = m;
   C->P->rev      = i;
-  C->P->beta     = ((int)(b*65534))/65534.0;
-  C->P->gamma    = ((int)(g*65534))/65534.0;
+  C->P->beta     = ((int)(b * 65534)) / 65534.0;
+  C->P->gamma    = ((int)(g * 65534)) / 65534.0;
   C->P->limit    = l;
   C->P->ctx      = c;
   C->P->mult     = CalcMult(c);
@@ -65,20 +65,26 @@ double g, uint8_t i, double w, uint64_t s)
   C->P->iWeight  = w;
 
   // CACHE TABLE
-  C->T           = (RTABLE *) Calloc(1, sizeof(RTABLE));
-  C->T->nPos     = s;
+  C->T       = (RTABLE *) Calloc(1, sizeof(RTABLE));
+  C->T->nPos = s;
+
   if(C->T->nPos == 1)
     {
-    C->T->size = pow(NSYM, C->P->ctx);
+    C->T->size = 1ULL << (2 * C->P->ctx);
     }
   else
     {
     C->T->nPosAnd1 = C->T->nPos + 1;
-    C->T->size     = pow(NSYM, C->P->ctx) * C->T->nPosAnd1;
+    C->T->size     = (1ULL << (2 * C->P->ctx)) * C->T->nPosAnd1;
     }
+
   C->T->array = (uint32_t *) Calloc(C->T->size + 1, sizeof(uint32_t));
 
-  FillLT();
+  if(!LT_READY)
+    {
+    FillLT();
+    LT_READY = 1;
+    }
 
   return C;
   }
@@ -86,102 +92,110 @@ double g, uint8_t i, double w, uint64_t s)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // REVERSE COMPLEMENT INDEX BASED ON PAST SYMBOLS
 //
-uint64_t GetIdxRev(uint8_t *p, RCLASS *C){
-  return (C->P->idxRev = (C->P->idxRev>>2)+CompNum(*p)*C->P->mult);
+uint64_t GetIdxRev(uint8_t *p, RCLASS *C)
+  {
+  return (C->P->idxRev = (C->P->idxRev >> 2) + CompNum(*p) * C->P->mult);
   }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // INDEX CALC BASED ON PAST SYMBOLS
 //
-uint64_t GetIdx(uint8_t *p, RCLASS *C){
-  return (C->P->idx = ((C->P->idx-*(p-C->P->ctx)*C->P->mult)<<2)+*p);
+uint64_t GetIdx(uint8_t *p, RCLASS *C)
+  {
+  return (C->P->idx = ((C->P->idx - *(p - C->P->ctx) * C->P->mult) << 2) + *p);
   }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// START EACH REPEAT MODEL, CURRENTLY BY RANDOM STORED POSITION 
+// START EACH REPEAT MODEL, CURRENTLY BY RANDOM STORED POSITION
 //
 int32_t StartRM(RCLASS *C, uint32_t m, uint64_t i, uint8_t r)
   {
-  RMODEL *RM = NULL;
+  RMODEL *RM = &C->RM[m];
+  uint32_t pos;
 
   if(C->T->nPos == 1)
     {
-    uint32_t idx = C->T->array[i];
-    RM = &C->RM[m];
-    if(r == 0) // REGULAR REPEAT
+    pos = C->T->array[i];
+
+    if(r == 0)
       {
-      if(idx == 0) return 0;
-      RM->pos = idx;
+      if(pos == 0)
+        return 0;
       }
     else
       {
-      if(idx <= C->P->ctx+1)
+      if(pos <= C->P->ctx + 1)
         return 0;
-      RM->pos = idx - C->P->ctx - 1;
+      pos -= C->P->ctx + 1;
       }
     }
   else
     {
     uint32_t *E = &C->T->array[i * C->T->nPosAnd1];
     uint32_t last = E[C->T->nPos];
+    static uint32_t rng = 2463534242u;
+    uint32_t idx;
 
-    if(last == 0) return 0;
-
-    RM = &C->RM[m];
-    uint64_t idx = rand() % C->T->nPos;
-
-    if(E[idx] <= C->P->ctx+1)
+    if(last == 0)
       return 0;
-      
-    if(r == 0) // REGULAR REPEAT
-      {
-      if(E[idx] == 0)
-        RM->pos = E[last]; // IF POSITION 0 THEN USE LATEST  
-      else 
-        RM->pos = E[idx];
-      }
-    else // INVERTED REPEAT
-      {
-      RM->pos = E[idx] - C->P->ctx - 1;
-      }
+
+    rng ^= rng << 13;
+    rng ^= rng >> 17;
+    rng ^= rng << 5;
+
+    idx = rng % C->T->nPos;
+    pos = E[idx];
+
+    if(pos == 0)
+      pos = E[last];
+
+    if(pos <= C->P->ctx + 1)
+      return 0;
+
+    if(r != 0)
+      pos -= C->P->ctx + 1;
     }
 
+  RM->pos    = pos;
   RM->nHits  = 0;
   RM->nTries = 0;
   RM->rev    = r;
   RM->acting = 0;
   RM->weight = C->P->iWeight;
 
-  memset((void *)RM->probs, 0, NSYM * sizeof(double));
+  RM->probs[0] = 0.0;
+  RM->probs[1] = 0.0;
+  RM->probs[2] = 0.0;
+  RM->probs[3] = 0.0;
 
   return 1;
   }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// ADD KMER POSITION INTO RTABLE 
+// ADD KMER POSITION INTO RTABLE
 //
 void AddKmerPos(RTABLE *RT, uint64_t key, uint32_t pos)
   {
   if(RT->nPos == 1)
     {
     RT->array[key] = pos;
+    return;
+    }
+
+  uint32_t *TC = &RT->array[key * RT->nPosAnd1];
+  uint32_t nPos = RT->nPos;
+  uint32_t idx = TC[nPos];
+
+  if(idx == nPos)
+    {
+    TC[0]    = pos;
+    TC[nPos] = 0;
     }
   else
     {
-    uint32_t *TC = &RT->array[key * RT->nPosAnd1];
-    uint32_t nPos = RT->nPos;
-    uint32_t idx = TC[nPos];
-
-    if(idx == nPos)
-      {
-      TC[0   ] = pos;
-      TC[nPos] = 0;
-      }
-    else
-      {
-      TC[++idx] = pos;
-      TC[nPos ] = idx;
-      }
+    ++idx;
+    TC[idx]  = pos;
+    TC[nPos] = idx;
     }
 
   return;
@@ -192,26 +206,34 @@ void AddKmerPos(RTABLE *RT, uint64_t key, uint32_t pos)
 //
 void ComputeRMProbs(RCLASS *C, RMODEL *R, uint8_t *b)
   {
-  uint8_t s = (R->rev) ? CompNum(GetNBase(b, R->pos)) : GetNBase(b, R->pos);
-  double comp_prob;	
+  uint8_t s;
+  double p_hit, p_other;
+
+  (void) C;
+
+  if(R->rev == 0)
+    s = GetNBase(b, R->pos);
+  else
+    s = Comp2(GetNBase(b, R->pos));
 
   if(R->nTries < MAX_LT)
     {
     uint32_t lt_idx = R->nHits * MAX_LT + R->nTries;
-    R->probs[s] = LT  [lt_idx];
-    comp_prob   = LT_C[lt_idx];
+    p_hit   = LT[lt_idx];
+    p_other = LT_C[lt_idx];
     }
   else
     {
-    R->probs[s] = (R->nHits+1.0) / (R->nTries+2.0); 
-    comp_prob = (1-R->probs[s])/3;
+    p_hit   = (R->nHits + 1.0) / (R->nTries + 2.0);
+    p_other = (1.0 - p_hit) / 3.0;
     }
-    
-  if(0 != s) R->probs[0] = comp_prob;
-  if(1 != s) R->probs[1] = comp_prob;
-  if(2 != s) R->probs[2] = comp_prob;
-  if(3 != s) R->probs[3] = comp_prob;
-  
+
+  R->probs[0] = p_other;
+  R->probs[1] = p_other;
+  R->probs[2] = p_other;
+  R->probs[3] = p_other;
+  R->probs[s] = p_hit;
+
   return;
   }
 
@@ -220,23 +242,25 @@ void ComputeRMProbs(RCLASS *C, RMODEL *R, uint8_t *b)
 //
 void UpdateRM(RMODEL *R, uint8_t *b, uint8_t s)
   {
+  uint8_t rsym;
+
   R->lastHit = 1;
 
   if(R->rev == 0)
     {
-    if(GetNBase(b, R->pos++) == s)
-      {
-      ++R->nHits;
-      R->lastHit = 0;
-      }
+    rsym = GetNBase(b, R->pos);
+    ++R->pos;
     }
   else
     {
-    if(CompNum(GetNBase(b, R->pos--)) == s)
-      {
-      ++R->nHits;
-      R->lastHit = 0;
-      }
+    rsym = Comp2(GetNBase(b, R->pos));
+    --R->pos;
+    }
+
+  if(rsym == s)
+    {
+    ++R->nHits;
+    R->lastHit = 0;
     }
 
   ++R->nTries;
@@ -249,11 +273,20 @@ void UpdateRM(RMODEL *R, uint8_t *b, uint8_t s)
 void RenormWeights(RCLASS *C)
   {
   uint32_t n;
-  double t = 0;
+  double t = 0.0;
+
+  if(C->nRM <= 1)
+    return;
+
   for(n = 0 ; n < C->nRM ; ++n)
     t += C->RM[n].weight;
+
+  if(t == 0.0)
+    return;
+
+  t = 1.0 / t;
   for(n = 0 ; n < C->nRM ; ++n)
-    C->RM[n].weight /= t;
+    C->RM[n].weight *= t;
 
   return;
   }
@@ -263,37 +296,33 @@ void RenormWeights(RCLASS *C)
 //
 void StopRM(RCLASS *C)
   {
-  uint32_t n, a;
-  do
+  uint32_t src, dst = 0;
+
+  for(src = 0 ; src < C->nRM ; ++src)
     {
-    for(a = 0, n = 0 ; n < C->nRM ; ++n)
+    RMODEL *R = &C->RM[src];
+    R->acting = R->acting * C->P->beta + R->lastHit;
+
+    if(R->acting <= C->P->limit && R->pos != 0)
       {
-      RMODEL *R = &C->RM[n];
-      if((R->acting = R->acting * C->P->beta + R->lastHit) > C->P->limit || 
-      R->pos == 0)
-      //ALTERNATIVE: 
-      //if(R->nTries - R->nHits > 10 || R->pos == 0)
-        {
-        if(n != C->nRM-1)
-          C->RM[n] = C->RM[C->nRM-1];
-        C->nRM--;
-        a = 1;
-        break;
-        }
+      if(dst != src)
+        C->RM[dst] = C->RM[src];
+      ++dst;
       }
     }
-  while(a);
+
+  C->nRM = dst;
 
   return;
   }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // START NEW REPEAT MODELS IF THERE IS STILL SPACE
-//                         
+//
 void StartMultipleRMs(RCLASS *C, uint8_t *b)
   {
-  uint64_t idx = GetIdx(b, C); // DO NOT SET IT INSIDE THE NEXT IF!
-			       
+  uint64_t idx = GetIdx(b, C);
+
   if(C->P->rev != 2)
     if(C->nRM < C->mRM && StartRM(C, C->nRM, idx, 0))
       ++C->nRM;
@@ -313,24 +342,28 @@ void StartMultipleRMs(RCLASS *C, uint8_t *b)
 //
 void ComputeMixture(RCLASS *C, PMODEL *M, uint8_t *b)
   {
-  double F[4] = {0,0,0,0};
-
+  double f0 = 0.0, f1 = 0.0, f2 = 0.0, f3 = 0.0;
   uint32_t r;
+
   for(r = 0 ; r < C->nRM ; ++r)
     {
     RMODEL *R = &C->RM[r];
+    const double rmw = R->weight;
+
     ComputeRMProbs(C, R, b);
-    double rmw = R->weight;
-    F[0] += R->probs[0] * rmw;
-    F[1] += R->probs[1] * rmw;
-    F[2] += R->probs[2] * rmw;
-    F[3] += R->probs[3] * rmw;
+
+    f0 += R->probs[0] * rmw;
+    f1 += R->probs[1] * rmw;
+    f2 += R->probs[2] * rmw;
+    f3 += R->probs[3] * rmw;
     }
 
-  M->sum  = (M->freqs[0] = 1 + (uint32_t)(F[0] * MAXC));
-  M->sum += (M->freqs[1] = 1 + (uint32_t)(F[1] * MAXC));
-  M->sum += (M->freqs[2] = 1 + (uint32_t)(F[2] * MAXC));
-  M->sum += (M->freqs[3] = 1 + (uint32_t)(F[3] * MAXC));
+  M->freqs[0] = 1 + (uint32_t)(f0 * MAXC);
+  M->freqs[1] = 1 + (uint32_t)(f1 * MAXC);
+  M->freqs[2] = 1 + (uint32_t)(f2 * MAXC);
+  M->freqs[3] = 1 + (uint32_t)(f3 * MAXC);
+
+  M->sum = M->freqs[0] + M->freqs[1] + M->freqs[2] + M->freqs[3];
 
   return;
   }

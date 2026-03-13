@@ -11,16 +11,8 @@
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 void ShiftBuffer(uint8_t *buf, int size, uint8_t new){
-//  memmove(buf, buf + 1, size * sizeof(uint8_t));
-  uint32_t x;
-  uint32_t tmp[size];
-
-  for(x = 1 ; x < size ; ++x)
-    tmp[x-1] = buf[x];
-  tmp[size-1] = new;
-
-  for(x = 0 ; x < size ; ++x)
-    buf[x] = tmp[x];
+  memmove(buf, buf + 1, (size - 1) * sizeof(uint8_t));
+  buf[size - 1] = new;
   }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
