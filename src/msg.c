@@ -226,7 +226,7 @@ void MsgNoModels(void){
   }
 
 void FailModelScheme(void){
-  fprintf(stderr, "Error: unknown scheme for repeat model arguments!\n");
+  fprintf(stderr, "Error: unknown scheme for context/repeat model arguments!\n");
   fprintf(stderr, "Plz, reset the models according to the description:\n");
   ModelsExplanation();
   }
