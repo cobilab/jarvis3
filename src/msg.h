@@ -8,7 +8,8 @@ void   PrintMenu          (void);
 void   PrintMenuD         (void);
 void   PrintVersion       (void);
 void   MsgNoModels        (void);
-void   FailModelScheme    (void);
+void   FailModelSchemeRM  (void);
+void   FailModelSchemeCM  (void);
 
 #endif
 
