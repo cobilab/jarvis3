@@ -154,7 +154,7 @@ RModelPar ArgsUniqRModel(char *str, uint8_t type){
        weight >= 1        || cache  <  1        ||
        cache  > MAX_CACHE)
          {
-         FailModelScheme();
+         FailModelSchemeRM();
          exit(1);
          }
        
@@ -170,7 +170,7 @@ RModelPar ArgsUniqRModel(char *str, uint8_t type){
     return Mp;
     }
   else{
-    FailModelScheme();
+    FailModelSchemeCM();
     exit(1);
     }
 
