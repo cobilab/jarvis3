@@ -111,7 +111,7 @@ CModelPar ArgsUniqCModel(char *str, uint8_t type){
        edits  >  256     || eDen   > 50000   ||
        ir     >  2       ||
        eIr    >  1){
-       FailModelScheme();
+       FailModelSchemeCM();
        exit(1);
        }
 
@@ -127,7 +127,7 @@ CModelPar ArgsUniqCModel(char *str, uint8_t type){
     return Mp;
     }
   else{
-    FailModelScheme();
+    FailModelSchemeCM();
     exit(1);
     }
 
@@ -170,7 +170,7 @@ RModelPar ArgsUniqRModel(char *str, uint8_t type){
     return Mp;
     }
   else{
-    FailModelSchemeCM();
+    FailModelSchemeRM();
     exit(1);
     }
 
